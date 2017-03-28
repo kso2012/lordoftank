@@ -106,6 +106,15 @@ void ACommonProjectile::FireImpulse()
 	
 	for (UPrimitiveComponent* PrimitiveComponent : AffectedComponents)
 	{
+		if (ImpulseStrength > SMALL_NUMBER)
+		{
+			if (UDestructibleComponent* DestructibleComponent = Cast<UDestructibleComponent>(PrimitiveComponent))
+			{
+				DestructibleComponent->ApplyRadiusDamage(ImpulseStrength, Origin, RadialRadius, ImpulseStrength, Falloff == RIF_Constant );
+			}
+		}
+
+
 		PrimitiveComponent->AddRadialImpulse(Origin, RadialRadius, ImpulseStrength, Falloff, false);
 	}
 

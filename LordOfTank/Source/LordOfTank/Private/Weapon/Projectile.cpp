@@ -16,9 +16,9 @@ AProjectile::AProjectile()
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	CollisionComp->SetCollisionObjectType(COLLISION_PROJECTILE);
-	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	CollisionComp->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Block);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
+	//CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	//CollisionComp->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Block);
 	RootComponent = CollisionComp;
 
 	AmmoMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AmmoMesh"));
