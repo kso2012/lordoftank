@@ -24,6 +24,12 @@ protected:
 	/*발사체 메쉬*/
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* AmmoMesh;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+		UParticleSystemComponent* TrailParticle;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+		UParticleSystem* ExplosionParticle;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -32,6 +38,9 @@ public:
 	/** called when projectile hits something */
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
+		
+	virtual void SetHomingTarget(AActor* HomingTarget);
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,7 +48,7 @@ protected:
 	//탄알 수
 	float AmmoCount;
 	//탄알 데미지
-	float Damage;
+	float ProjectileDamage;
 
 
 

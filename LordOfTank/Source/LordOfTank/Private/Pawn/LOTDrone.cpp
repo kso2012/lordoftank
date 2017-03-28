@@ -132,7 +132,7 @@ void ALOTDrone::MoveForwardInput(float Val)
 		}
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		float TempClamp = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		CurrentForwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 50.f) ? 0.f : TempClamp;
+		CurrentForwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 500.f) ? 0.f : TempClamp;
 	}
 
 
@@ -176,7 +176,7 @@ void ALOTDrone::MoveUpwardInput(float Val)
 		}
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		float TempClamp = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
-		CurrentUpwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f,50.f) ? 0.f : TempClamp;
+		CurrentUpwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f,500.f) ? 0.f : TempClamp;
 
 
 	}

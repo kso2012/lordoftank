@@ -4,8 +4,12 @@
 #include "Vehicle/FrontWheel.h"
 #include "Vehicle/RearWheel.h"
 #include "Weapon/Projectile.h"
+#include "Weapon/CommonProjectile.h"
+#include "Weapon/ArmorPiercingProjectile.h"
+#include "Weapon/HomingProjectile.h"
 #include "Effects/TankCameraShake.h"
 #include "WheeledVehicleMovementComponent4W.h"
+#include "LOTDrone.h"
 #include "LOTPlayer.h"
 
 
@@ -24,6 +28,9 @@ ALOTPlayer::ALOTPlayer()
 	//스켈레톤컴포넌트에 애니메이션 적용.
 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/LOTAssets/TankAssets/LOTPlaytankAnimBP"));
 	GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
+	GetMesh()->OnComponentHit.AddDynamic(this, &ALOTPlayer::OnHit);
+	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::OnOverlapBegin);
+	
 	//터렛컴포넌트에 메쉬 적용.
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> TurretStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Turret_SM"));
@@ -46,14 +53,8 @@ ALOTPlayer::ALOTPlayer()
 	//총구에 씬컴포넌트 부착.
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
-	//MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
 
-	//총알 설정.
-	//static ConstructorHelpers::FClassFinder<AProjectile> ProjectileClass(TEXT("/Game/BP/MyServer.MyServer_C"));
 	
-
-
-
 	// 바퀴에 휠 클래스 적용
 	UWheeledVehicleMovementComponent4W* Vehicle4W = CastChecked<UWheeledVehicleMovementComponent4W>(GetVehicleMovement());
 
@@ -101,10 +102,13 @@ ALOTPlayer::ALOTPlayer()
 	FireModeCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
 	FireModeCamera->Deactivate();
 
-	//CurrentProjectile = AProjectile::StaticClass();
-	
+
 
 	bIsFireMode = false;
+
+	MaxHealth = 100.f;
+	CurrentHealth = MaxHealth;
+
 
 	
 }
@@ -112,7 +116,10 @@ ALOTPlayer::ALOTPlayer()
 void ALOTPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	SetDefaultInvetory();
 	OnResetVR();
+
+
 }
 
 
@@ -125,10 +132,32 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	InputComponent->BindAxis("Right", this, &ALOTPlayer::MoveRight);
 	InputComponent->BindAction("Fire", IE_Pressed, this, &ALOTPlayer::Fire);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTPlayer::FireMode);
+	InputComponent->BindAction("One", IE_Pressed, this, &ALOTPlayer::One);
+	InputComponent->BindAction("Two", IE_Pressed, this, &ALOTPlayer::Two);
 
 
+}
+void ALOTPlayer::One()
+{
+	
+	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
+	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
 
+	UWorld* const World = GetWorld();
+	FVector StartTrace = MuzzleLocation->K2_GetComponentLocation();
+	FVector EndTrace = MuzzleLocation->K2_GetComponentLocation() + MuzzleLocation->GetForwardVector() * 5000;
 
+	FHitResult OutHit;
+	if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, OutHit, true)) {
+		HomingTarget = OutHit.GetActor();
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
+	}
+
+}
+void ALOTPlayer::Two()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Two!!!"));
+	CurrentProjectile =ProjectileInventory[1];
 }
 
 void ALOTPlayer::Tick(float DeltaTime)
@@ -153,7 +182,7 @@ void ALOTPlayer::FireMode()
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		TurretMesh->SetVisibility(false, false);
 		GetMesh()->SetVisibility(false, false);
-		
+		BarrelMesh->SetVisibility(false, false);
 	}
 	else
 	{
@@ -161,14 +190,13 @@ void ALOTPlayer::FireMode()
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노포격모드!!!"));
 		MoveModeCamera->Activate();
 		FireModeCamera->Deactivate();
+
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		TurretMesh->SetVisibility(true, false);
 		GetMesh()->SetVisibility(true, false);
-	}
-
-		
+		BarrelMesh->SetVisibility(true, false);
 	
-
+	}
 }
 
 
@@ -177,22 +205,26 @@ void ALOTPlayer::FireMode()
 void ALOTPlayer::Fire()
 {
 	
-	if (CurrentProjectile != NULL)
+	if (CurrentProjectile != NULL && bIsFireMode)
 	{
 		const FRotator SpawnRotation = GetActorRotation()+ FireModeCamera->RelativeRotation;//
-		// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+		
 		const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation()) ;
 
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
 			World->SpawnActor<AActor>(CurrentProjectile, SpawnLocation, SpawnRotation);
+			//World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation)->SetHomingTarget(HomingTarget);
+			//// spawn the pickup
+			//APickup* const SpawnedPickup = World->SpawnActor<APickup>(WhatToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
+			//World->SpawnActor<ALOTDrone>(ALOTDrone::StaticClass(), SpawnLocation+FVector(0.0f,0.0f,1000.f), SpawnRotation);
 			
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
 
 		}
 	}
-
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
 
 }
 
@@ -200,6 +232,8 @@ void ALOTPlayer::Turn(float Val)
 {
 	
 }
+
+
 
 void ALOTPlayer::OnResetVR()
 {
@@ -221,3 +255,57 @@ void ALOTPlayer::MoveRight(float Val)
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
 
 }
+
+void ALOTPlayer::SetDefaultInvetory()
+{
+	if (ProjectileInventory.Num() == 0)
+	{
+		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
+		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
+		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
+		CurrentProjectile = ProjectileInventory[0];
+
+	}
+}
+
+void ALOTPlayer::SpawnDrone()
+{
+	
+}
+
+//void ALOTPlayer::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	// Other Actor is the actor that triggered the event. Check that is not ourself.  
+//	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+//	{
+//		// Turn off the light  
+//		//PointLight->SetVisibility(false);
+//	}
+//}
+
+void ALOTPlayer::TakeDamage(float damage)
+{
+	CurrentHealth -= damage;
+	if (CurrentHealth <= 0.f) {
+
+		TurretMesh->SetSimulatePhysics(true);
+		BarrelMesh->SetSimulatePhysics(true);
+		TurretMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		BarrelMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	}
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CurrentHealth));
+}
+
+
+
+void ALOTPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+
+	// Only add impulse and destroy projectile if we hit a physics
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
+	{
+		;
+	}
+}
+
