@@ -2,14 +2,14 @@
 	"TargetName" : "LordOfTankEditor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
-	"BuildId" : "948840c1-30ff-4769-8b79-97e007b76e10",
+	"BuildId" : "e5ec3029-bb39-4f13-bb00-76b9f96862ee",
 	"Version" : 
 	{
 		"MajorVersion" : 4,
 		"MinorVersion" : 15,
-		"PatchVersion" : 0,
-		"Changelist" : 3299760,
-		"CompatibleChangelist" : 0,
+		"PatchVersion" : 1,
+		"Changelist" : 3348071,
+		"CompatibleChangelist" : 3299760,
 		"IsLicenseeVersion" : 0,
 		"IsPromotedBuild" : 1,
 		"BranchName" : "++UE4+Release-4.15"
@@ -17,15 +17,15 @@
 	"BuildProducts" :
 	[
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-9367.dll",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-9863.dll",
 			"Type" : "DynamicLibrary"
 		},
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-9367.pdb",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-9863.pdb",
 			"Type" : "SymbolFile"
 		},
 		{
-			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LordOfTank-9367.lib",
+			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LordOfTank-9863.lib",
 			"Type" : "ImportLibrary"
 		},
 		{
@@ -173,6 +173,10 @@
 		},
 		{
 			"Path" : "$(EngineDir)/Plugins/Runtime/ExampleDeviceProfileSelector/ExampleDeviceProfileSelector.uplugin",
+			"Type" : "UFS"
+		},
+		{
+			"Path" : "$(EngineDir)/Plugins/Runtime/GearVR/GearVR.uplugin",
 			"Type" : "UFS"
 		},
 		{
