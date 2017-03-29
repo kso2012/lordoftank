@@ -117,7 +117,7 @@ ALOTPlayer::ALOTPlayer()
 void ALOTPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	SetDefaultInvetory();
+	//SetDefaultInvetory();
 	OnResetVR();
 
 
