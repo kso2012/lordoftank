@@ -16,6 +16,11 @@ class LORDOFTANK_API ACommonProjectile : public AProjectile
 	/** Add a collision channel for this radial force to affect */
 	void AddCollisionChannelToAffect(enum ECollisionChannel CollisionChannel);
 
+	/** Add an object type for this radial force to affect */
+	UFUNCTION(BlueprintCallable, Category = "Physics|Components|RadialForce")
+		virtual void AddObjectTypeToAffect(TEnumAsByte<enum EObjectTypeQuery> ObjectType);
+
+
 	/** Update CollisionObjectQueryParams from ObjectTypesToAffect */
 	void UpdateCollisionObjectQueryParams();
 
@@ -46,10 +51,7 @@ public:
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 	
-	/** Add an object type for this radial force to affect */
-	UFUNCTION(BlueprintCallable, Category = "Physics|Components|RadialForce")
-		virtual void AddObjectTypeToAffect(TEnumAsByte<enum EObjectTypeQuery> ObjectType);
-
+	
 
 	
 };

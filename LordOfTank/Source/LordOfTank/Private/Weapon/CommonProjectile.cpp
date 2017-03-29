@@ -149,7 +149,8 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) )
 	{
 		FireImpulse();
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true);
-		Destroy();
+		
 	}
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true);
+	Destroy();
 }

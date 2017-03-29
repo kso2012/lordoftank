@@ -117,7 +117,7 @@ ALOTPlayer::ALOTPlayer()
 void ALOTPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	//SetDefaultInvetory();
+	SetDefaultInvetory();
 	OnResetVR();
 
 
@@ -264,7 +264,7 @@ void ALOTPlayer::SetDefaultInvetory()
 		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
-		CurrentProjectile = ProjectileInventory[1];
+		CurrentProjectile = ProjectileInventory[2];
 
 	}
 }

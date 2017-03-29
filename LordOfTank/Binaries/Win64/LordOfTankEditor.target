@@ -2,7 +2,7 @@
 	"TargetName" : "LordOfTankEditor",
 	"Platform" : "Win64",
 	"Configuration" : "Development",
-	"BuildId" : "b50e6a89-9646-416b-af14-1d4d8f87f0a7",
+	"BuildId" : "59d97bd7-7ca7-414d-b3d8-356139952042",
 	"Version" : 
 	{
 		"MajorVersion" : 4,
@@ -17,15 +17,15 @@
 	"BuildProducts" :
 	[
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-1954.dll",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-4881.dll",
 			"Type" : "DynamicLibrary"
 		},
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-1954.pdb",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LordOfTank-4881.pdb",
 			"Type" : "SymbolFile"
 		},
 		{
-			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LordOfTank-1954.lib",
+			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-LordOfTank-4881.lib",
 			"Type" : "ImportLibrary"
 		},
 		{
