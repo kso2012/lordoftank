@@ -130,7 +130,7 @@ void ACommonProjectile::FireImpulse()
 
 			float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
 			
-			Test->TakeDamage(ProjectileDamage*DamageRatio);
+			Test->ApplyDamage(ProjectileDamage*DamageRatio);
 		}
 	}
 
@@ -149,10 +149,7 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) )
 	{
 		FireImpulse();
-
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true);
-
-
 		Destroy();
 	}
 }

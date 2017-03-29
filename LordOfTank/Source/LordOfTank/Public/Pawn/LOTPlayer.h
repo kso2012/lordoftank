@@ -104,7 +104,7 @@ public:
 
 	void Two();
 	UFUNCTION()
-	void TakeDamage(float damage);
+	void ApplyDamage(float damage);
 
 	
 

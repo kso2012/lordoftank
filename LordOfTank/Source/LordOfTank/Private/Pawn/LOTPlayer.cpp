@@ -53,6 +53,7 @@ ALOTPlayer::ALOTPlayer()
 	//ÃÑ±¸¿¡ ¾ÀÄÄÆ÷³ÍÆ® ºÎÂø.
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
+	
 
 	
 	// ¹ÙÄû¿¡ ÈÙ Å¬·¡½º Àû¿ë
@@ -263,7 +264,7 @@ void ALOTPlayer::SetDefaultInvetory()
 		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
-		CurrentProjectile = ProjectileInventory[0];
+		CurrentProjectile = ProjectileInventory[1];
 
 	}
 }
@@ -283,7 +284,7 @@ void ALOTPlayer::SpawnDrone()
 //	}
 //}
 
-void ALOTPlayer::TakeDamage(float damage)
+void ALOTPlayer::ApplyDamage(float damage)
 {
 	CurrentHealth -= damage;
 	if (CurrentHealth <= 0.f) {
