@@ -17,7 +17,6 @@
 
 ALOTPlayer::ALOTPlayer()
 {
-
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
