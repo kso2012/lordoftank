@@ -22,7 +22,7 @@ AArmorPiercingProjectile::AArmorPiercingProjectile()
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
 	FlareParticle->SetTemplate(FlareParticleAsset.Object);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke.P_Smoke'"));
 	ExplosionParticle = ExplosionParticleAsset.Object;
 
 	ProjectileDamage = 20.f;

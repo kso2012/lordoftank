@@ -33,6 +33,9 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 		UParticleSystem* ExplosionParticle;
+
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UCameraComponent* Camera;
 	
 public:	
 	// Sets default values for this actor's properties

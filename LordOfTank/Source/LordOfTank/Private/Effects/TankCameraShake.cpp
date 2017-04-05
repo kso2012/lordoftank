@@ -8,9 +8,9 @@
 UTankCameraShake::UTankCameraShake()
 {
 	OscillationDuration = 0.3f;
-	RotOscillation.Pitch.Amplitude = 1.f;
+	RotOscillation.Pitch.Amplitude = 3.f;
 	RotOscillation.Pitch.Frequency = 100.f;
-	RotOscillation.Yaw.Amplitude = 1.f;
+	RotOscillation.Yaw.Amplitude = 3.f;
 	RotOscillation.Yaw.Frequency = 100.f;
 	LocOscillation.X.Amplitude = -10000.f;
 	LocOscillation.X.Frequency = 1.f;

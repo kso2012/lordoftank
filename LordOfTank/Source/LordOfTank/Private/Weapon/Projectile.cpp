@@ -24,6 +24,8 @@ AProjectile::AProjectile()
 	AmmoMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AmmoMesh"));
 	AmmoMesh->SetupAttachment(RootComponent);
 	AmmoMesh->SetRelativeRotation(FRotator(-90.f, 0.0f, 0.0f));
+	AmmoMesh->SetRelativeLocation(FVector(-200.0f, 0.0f, 0.0f));
+	//AmmoMesh->SetRelativeRocation(FVector(-90.f, 0.0f, 0.0f));
 	AmmoMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	TrailParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailParticle"));
@@ -32,7 +34,11 @@ AProjectile::AProjectile()
 	FlareParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FlareParticle"));
 	FlareParticle->AttachToComponent(AmmoMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Trail_RC"));
 
-	
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
+	Camera->SetupAttachment(RootComponent);
+	Camera->bUsePawnControlRotation = false;
+	Camera->FieldOfView = 90.f;
+
 
 	ExplosionParticle = CreateDefaultSubobject<UParticleSystem>(TEXT("ExplosionParticle"));
 	

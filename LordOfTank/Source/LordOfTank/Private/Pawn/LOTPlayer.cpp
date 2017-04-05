@@ -214,13 +214,15 @@ void ALOTPlayer::Fire()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
-			World->SpawnActor<AActor>(CurrentProjectile, SpawnLocation, SpawnRotation);
+
+			AActor* TempActor = World->SpawnActor<AActor>(CurrentProjectile, SpawnLocation, SpawnRotation);
 			//World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation)->SetHomingTarget(HomingTarget);
 			//// spawn the pickup
 			//APickup* const SpawnedPickup = World->SpawnActor<APickup>(WhatToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
 			//World->SpawnActor<ALOTDrone>(ALOTDrone::StaticClass(), SpawnLocation+FVector(0.0f,0.0f,1000.f), SpawnRotation);
 			
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
+			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,1.0f,VTBlend_Linear,0.0f,true);
 
 		}
 	}
@@ -263,7 +265,7 @@ void ALOTPlayer::SetDefaultInvetory()
 		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
-		CurrentProjectile = ProjectileInventory[2];
+		CurrentProjectile = ProjectileInventory[1];
 
 	}
 }
