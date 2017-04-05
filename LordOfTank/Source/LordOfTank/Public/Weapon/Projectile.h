@@ -29,6 +29,9 @@ protected:
 		UParticleSystemComponent* TrailParticle;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+		UParticleSystemComponent* FlareParticle;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 		UParticleSystem* ExplosionParticle;
 	
 public:	

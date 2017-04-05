@@ -263,15 +263,12 @@ void ALOTPlayer::SetDefaultInvetory()
 		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
-		CurrentProjectile = ProjectileInventory[0];
+		CurrentProjectile = ProjectileInventory[2];
 
 	}
 }
 
-void ALOTPlayer::SpawnDrone()
-{
-	
-}
+
 
 //void ALOTPlayer::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 //{

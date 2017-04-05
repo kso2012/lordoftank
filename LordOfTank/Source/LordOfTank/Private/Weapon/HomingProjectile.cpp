@@ -14,13 +14,16 @@ AHomingProjectile::AHomingProjectile()
 	CollisionComp->OnComponentHit.AddDynamic(this, &AHomingProjectile::OnHit);		
 
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> AmmoStaticMesh(TEXT("StaticMesh'/Game/LOTAssets/TankAssets/Meshes/ArmorPiercingAmmo.ArmorPiercingAmmo'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> AmmoStaticMesh(TEXT("StaticMesh'/Game/ProjectilesPack/Meshes/Projectiles/Rockets/SM_Rocket_05.SM_Rocket_05'"));
 	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/LOTAssets/TankAssets/Particles/PT_ProjectileTrail.PT_ProjectileTrail'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
 	TrailParticle->SetTemplate(TrailParticleAsset.Object);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/LOTAssets/TankAssets/Particles/PT_LargeExplosion.PT_LargeExplosion'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
+	FlareParticle->SetTemplate(FlareParticleAsset.Object);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
 	ExplosionParticle = ExplosionParticleAsset.Object;
 	
 
@@ -150,7 +153,7 @@ void AHomingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		FireImpulse();
 		
 	}
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true);
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
 	Destroy();
 }
 
