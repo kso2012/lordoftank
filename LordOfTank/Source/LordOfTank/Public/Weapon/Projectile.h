@@ -11,12 +11,11 @@ class LORDOFTANK_API AProjectile : public AActor
 	GENERATED_BODY()
 protected:
 
-		/** Sphere collision component */
+
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 		class USphereComponent* CollisionComp;
 
 	//발사체 이동에 관해서는 프로젝트타일무브먼트컴포넌트를 사용해야한다.
-	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 		class UProjectileMovementComponent* ProjectileMovement;
 
@@ -38,10 +37,10 @@ protected:
 		UCameraComponent* Camera;
 	
 public:	
-	// Sets default values for this actor's properties
+
 	AProjectile();
 
-	/** called when projectile hits something */
+
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
@@ -49,7 +48,7 @@ public:
 	virtual void SetHomingTarget(AActor* HomingTarget);
 
 protected:
-	// Called when the game starts or when spawned
+
 	virtual void BeginPlay() override;
 	//탄알 수
 	float AmmoCount;

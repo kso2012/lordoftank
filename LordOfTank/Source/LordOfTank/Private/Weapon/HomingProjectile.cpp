@@ -70,22 +70,19 @@ void AHomingProjectile::FireImpulse()
 	Falloff = RIF_Linear;
 	const FVector Origin = GetActorLocation();
 
-	// Find objects within the sphere
+
 	static FName FireImpulseOverlapName = FName(TEXT("FireImpulseOverlap"));
 	TArray<FOverlapResult> Overlaps;
 
 	FCollisionQueryParams Params(FireImpulseOverlapName, false);
-	Params.bTraceAsyncScene = true; // want to hurt stuff in async scene
+	Params.bTraceAsyncScene = true; 
 
-									// Ignore owner actor if desired
+									
 
 	Params.AddIgnoredActor(GetOwner());
 	int count = 0;
 
 	GetWorld()->OverlapMultiByObjectType(Overlaps, Origin, FQuat::Identity, CollisionObjectQueryParams, FCollisionShape::MakeSphere(RadialRadius), Params);
-	// A component can have multiple physics presences (e.g. destructible mesh components).
-	// The component should handle the radial force for all of the physics objects it contains
-	// so here we grab all of the unique components to avoid applying impulses more than once.
 	TArray<UPrimitiveComponent*, TInlineAllocator<1>> AffectedComponents;
 	TArray<AActor*, TInlineAllocator<1>> AffectedActors;
 	AffectedComponents.Reserve(Overlaps.Num());

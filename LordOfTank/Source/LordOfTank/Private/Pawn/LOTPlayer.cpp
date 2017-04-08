@@ -17,9 +17,7 @@
 
 ALOTPlayer::ALOTPlayer()
 {
-	// set our turn rates for input
-	BaseTurnRate = 45.f;
-	BaseLookUpRate = 45.f;
+	
 	PrimaryActorTick.bCanEverTick = true;
 	//½ºÄÌ·¹ÅæÄÄÆ÷³ÍÆ®¿¡ ¸Þ½¬ Àû¿ë.
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> BodySkeletalMesh(TEXT("/Game/LOTAssets/TankAssets/LOTBody.LOTBody"));
@@ -132,33 +130,11 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	InputComponent->BindAxis("Right", this, &ALOTPlayer::MoveRight);
 	InputComponent->BindAction("Fire", IE_Pressed, this, &ALOTPlayer::Fire);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTPlayer::FireMode);
-	InputComponent->BindAction("One", IE_Pressed, this, &ALOTPlayer::One);
-	InputComponent->BindAction("Two", IE_Pressed, this, &ALOTPlayer::Two);
 
 
 }
-void ALOTPlayer::One()
-{
-	
-	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
-	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
 
-	UWorld* const World = GetWorld();
-	FVector StartTrace = MuzzleLocation->K2_GetComponentLocation();
-	FVector EndTrace = MuzzleLocation->K2_GetComponentLocation() + MuzzleLocation->GetForwardVector() * 5000;
 
-	FHitResult OutHit;
-	if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, OutHit, true)) {
-		HomingTarget = OutHit.GetActor();
-		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
-	}
-
-}
-void ALOTPlayer::Two()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Two!!!"));
-	CurrentProjectile =ProjectileInventory[1];
-}
 
 void ALOTPlayer::Tick(float DeltaTime)
 {
@@ -214,7 +190,7 @@ void ALOTPlayer::Fire()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
-
+			
 			AActor* TempActor = World->SpawnActor<AActor>(CurrentProjectile, SpawnLocation, SpawnRotation);
 			//World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation)->SetHomingTarget(HomingTarget);
 			//// spawn the pickup
@@ -265,7 +241,7 @@ void ALOTPlayer::SetDefaultInvetory()
 		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
-		CurrentProjectile = ProjectileInventory[1];
+		CurrentProjectile = ProjectileInventory[2];
 
 	}
 }

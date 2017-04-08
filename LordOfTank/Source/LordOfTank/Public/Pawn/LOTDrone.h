@@ -18,7 +18,7 @@ class LORDOFTANK_API ALOTDrone : public APawn
 {
 	GENERATED_BODY()
 
-
+		//비행기 몸통 메쉬
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* PlaneMesh;
 
@@ -26,9 +26,12 @@ class LORDOFTANK_API ALOTDrone : public APawn
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* SpringArm;
 
-
+		//이동모드 카메라
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* Camera;
+		//탐지모드 카메라
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UCameraComponent* DetectCamera;
 
 
 protected:
@@ -41,13 +44,13 @@ protected:
 
 	void ThrustInput(float Val);
 
-
+	//상하로 움직일 때 입력처리
 	void MoveUpwardInput(float Val);
 
-
+	//앞뒤로 움직일 때 입력처리
 	void MoveForwardInput(float val);
 
-
+	//좌우로 회전할 때 입력처리
 	void MoveRightInput(float Val);
 
 private:
@@ -91,6 +94,7 @@ private:
 
 	uint32 bAcceleratedForward : 1;
 
+	uint32 bIsDetectMode : 1;
 
 
 public:
@@ -99,12 +103,18 @@ public:
 	ALOTDrone();
 
 	virtual void Tick(float DeltaTime) override;
+	//타겟설정
+	void SetTarget();
 
-	FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
+	//FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
 
-	FORCEINLINE class USpringArmComponent* GetSpringArm() const { return SpringArm; }
+	//FORCEINLINE class USpringArmComponent* GetSpringArm() const { return SpringArm; }
 
-	FORCEINLINE class UCameraComponent* GetCamera() const { return Camera; }
+	//FORCEINLINE class UCameraComponent* GetCamera() const { return Camera; }
+
+	void DetectMode();
+
+	class AActor* HomingTarget;
 	
 	
 };

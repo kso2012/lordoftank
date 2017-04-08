@@ -16,7 +16,7 @@ class LORDOFTANK_API AArmorPiercingProjectile : public AProjectile
 public:
 	AArmorPiercingProjectile();
 
-	/** called when projectile hits something */
+
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 	
