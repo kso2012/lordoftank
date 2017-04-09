@@ -96,6 +96,7 @@ private:
 
 	uint32 bIsDetectMode : 1;
 
+	class AActor* HomingTarget;
 
 public:
 
@@ -106,6 +107,8 @@ public:
 	//Å¸°Ù¼³Á¤
 	void SetTarget();
 
+	FORCEINLINE class AActor* GetHomingTarget() const { return HomingTarget; }
+	
 	//FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
 
 	//FORCEINLINE class USpringArmComponent* GetSpringArm() const { return SpringArm; }
@@ -114,7 +117,7 @@ public:
 
 	void DetectMode();
 
-	class AActor* HomingTarget;
+	
 	
 	
 };

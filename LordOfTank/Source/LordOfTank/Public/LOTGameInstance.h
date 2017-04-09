@@ -2,8 +2,14 @@
 
 #pragma once
 
+#include "WinSock2.h"
+#include <iostream>
+#include <string>
 #include "Engine/GameInstance.h"
 #include "LOTGameInstance.generated.h"
+using namespace std;
+
+#define SERVER_PORT 4000
 
 /**
  * 
