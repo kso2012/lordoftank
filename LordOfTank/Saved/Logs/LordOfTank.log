@@ -1,9 +1,9 @@
-﻿Log file open, 04/15/17 11:58:10
+﻿Log file open, 04/15/17 20:02:28
 LogInit:Display: Running engine for game: LordOfTank
 LogPlatformFile: Not using cached read wrapper
-LogInit:Display: RandInit(1628789489) SRandInit(1628789489).
+LogInit:Display: RandInit(-155740179) SRandInit(-155740179).
 LogTaskGraph: Started task graph with 5 named threads and 8 total threads with 1 sets of task threads.
-LogStats: Stats thread started at 10.669400
+LogStats: Stats thread started at 3.439961
 LogInit: Using libcurl 7.47.1
 LogInit:  - built for x86_64-pc-win32
 LogInit:  - supports SSL with OpenSSL/1.0.2g
@@ -58,657 +58,723 @@ LogInit: Base directory: C:/Program Files/Epic Games/UE_4.15/Engine/Binaries/Win
 LogInit: Installed Engine Build: 1
 LogInit: Presizing for max 8388607 objects, including 0 objects not considered by GC, pre-allocating 0 bytes for permanent pool.
 LogInit: Object subsystem initialized
-[2017.04.15-02.58.15:846][  0]LogInit: Selected Device Profile: [Windows]
-[2017.04.15-02.58.15:846][  0]LogInit: Applying CVar settings loaded from the selected device profile: [Windows]
-[2017.04.15-02.58.16:117][  0]LogInit: Computer: DESKTOP-QGBNOPV
-[2017.04.15-02.58.16:117][  0]LogInit: User: syj
-[2017.04.15-02.58.16:117][  0]LogInit: CPU Page size=65536, Cores=4
-[2017.04.15-02.58.16:117][  0]LogInit: High frequency timer resolution =3.416977 MHz
-[2017.04.15-02.58.16:118][  0]LogMemory: Memory total: Physical=7.9GB (8GB approx)
-[2017.04.15-02.58.16:155][  0]LogMemory: Platform Memory Stats for Windows
-[2017.04.15-02.58.16:155][  0]LogMemory: Process Physical Memory: 270.60 MB used, 270.60 MB peak
-[2017.04.15-02.58.16:155][  0]LogMemory: Process Virtual Memory: 265.72 MB used, 265.72 MB peak
-[2017.04.15-02.58.16:155][  0]LogMemory: Physical Memory: 6031.34 MB used,  2079.71 MB free, 8111.06 MB total
-[2017.04.15-02.58.16:155][  0]LogMemory: Virtual Memory: 681.11 MB used,  2079.71 MB free, 134217728.00 MB total
-[2017.04.15-02.58.20:248][  0]LogTextLocalizationManager: No specific translations for ('ko-KR') exist, so ('ko') translations will be used.
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:KismetSchema, Key:Default):
+[2017.04.15-11.02.31:963][  0]LogInit: Selected Device Profile: [Windows]
+[2017.04.15-11.02.31:963][  0]LogInit: Applying CVar settings loaded from the selected device profile: [Windows]
+[2017.04.15-11.02.32:724][  0]LogInit: Computer: DESKTOP-QGBNOPV
+[2017.04.15-11.02.32:724][  0]LogInit: User: syj
+[2017.04.15-11.02.32:724][  0]LogInit: CPU Page size=65536, Cores=4
+[2017.04.15-11.02.32:724][  0]LogInit: High frequency timer resolution =3.416979 MHz
+[2017.04.15-11.02.32:724][  0]LogMemory: Memory total: Physical=7.9GB (8GB approx)
+[2017.04.15-11.02.32:724][  0]LogMemory: Platform Memory Stats for Windows
+[2017.04.15-11.02.32:724][  0]LogMemory: Process Physical Memory: 270.48 MB used, 270.48 MB peak
+[2017.04.15-11.02.32:724][  0]LogMemory: Process Virtual Memory: 265.50 MB used, 265.50 MB peak
+[2017.04.15-11.02.32:724][  0]LogMemory: Physical Memory: 4715.38 MB used,  3395.68 MB free, 8111.06 MB total
+[2017.04.15-11.02.32:724][  0]LogMemory: Virtual Memory: 681.11 MB used,  3395.68 MB free, 134217728.00 MB total
+[2017.04.15-11.02.36:544][  0]LogTextLocalizationManager: No specific translations for ('ko-KR') exist, so ('ko') translations will be used.
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:KismetSchema, Key:Default):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (940523119) Localized String: (디폴트)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (940523119) Localized String: (기본)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_AssetPlayerBase:InternalTimeAccumulator):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_AssetPlayerBase:InternalTimeAccumulator):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (502993589) Localized String: (이 노드에서 애셋을 레퍼런싱하는 데 사용되는 누적 시간입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (502993589) Localized String: (내부 시간 누산기 - 이 노드에서 애셋을 레퍼런싱하는 데 사용된 누적 시간입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (502993589) Localized String: (이 노드에서 애셋을 레퍼런싱하는 데 사용된 누적 시간입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_AssetPlayerBase:bIgnoreForRelevancyTest):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_AssetPlayerBase:bIgnoreForRelevancyTest):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (319969718) Localized String: (True 면, 스테이트에서 최고 가중치 애니메이션을 찾는 "Relevant anim" 노드는 이 노드를 무시합니다.
  )
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (319969718) Localized String: (연관성 테스트에 무시 - true 인 경우 스테이트 내 최고 웨이팅된 애니메이션을 찾는 "Relevant anim" (연관 애님) 노드가
 이 노드를 무시합니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (319969718) Localized String: (True 면 스테이트 내 최고 웨이팅된 애니메이션을 찾는 "Relevant anim" 노드가 무시됩니다.
  )
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_AssetPlayerBase:BlendWeight):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_AssetPlayerBase:BlendWeight):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (-1232800293) Localized String: (이 노드에 마지막 걸린 블렌드웨이트 입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-1232800293) Localized String: (블렌드 웨이트 - 이 노드에 대해 마지막으로 접한 블렌드 웨이트입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (-1232800293) Localized String: (이 노드에 대해 마지막 접한 블렌드 웨이트)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:bLoop):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:bLoop):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (2133979316) Localized String: (애니메이션이 끝까지 재생되면 반복할까요?)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (2133979316) Localized String: (루프 - 애니메이션이 끝에 도달했을 때 계속 반복할까요?)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_StateMachine:bSkipFirstUpdateTransition):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_StateMachine:bSkipFirstUpdateTransition):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (1865475011) Localized String: (첫 업데이트시 도입 상태에서의 트랜지션을 건너뛸까요? 
 기본은 true 로, 첫 업데이트시에는 트랜지션 데이터를 버립니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (1865475011) Localized String: (첫 번째 업데이트 트랜지션 건너뛰기 - 첫 번째 업데이트에서 입력 스테이트의 트랜지션을 건너뜁니까?
 디폴트는 true 고 첫 번째 업데이트의 트랜지션 데이터를 버립니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:X):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:X):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (2060772590) Localized String: (블렌드스페이스에서 샘플링할 X 좌표입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (2060772590) Localized String: (X - 블렌드스페이스 샘플의 X 좌표입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:Y):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:Y):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (-1719607538) Localized String: (블렌드스페이스에서 샘플링할 Y 좌표입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-1719607538) Localized String: (Y - 블렌드스페이스 샘플의 Y 좌표입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:Z):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:Z):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (1728943471) Localized String: (블렌드스페이스에서 샘플링할 Z 좌표입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (1728943471) Localized String: (Z - 블렌드스페이스 샘플의 Z 좌표입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:BlendSpace):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:BlendSpace):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (1599043277) Localized String: (재생할 블렌드스페이스 애셋입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (1599043277) Localized String: (블렌드스페이스 - 재생할 블렌드스페이스 애셋입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_StateMachine:MaxTransitionsPerFrame):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_StateMachine:MaxTransitionsPerFrame):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (1567650430) Localized String: (이 머신에서 한 프레임 내 '동시에' 취할 수 있는 트랜지션 최대 수입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (1567650430) Localized String: (프레임 당 최대 트랜지션 - 한 프레임에서 이 머신이 동시에 취할 수 있는 트랜지션 최대 수입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:PlayRate):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:PlayRate):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (-1274923958) Localized String: (재생 속도 배수입니다. 음수가 되면 애니메이션을 역순으로 재생하게 됩니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-1274923958) Localized String: (재생 속도 - 재생 속도 배수입니다. 음수가 되면 애니메이션을 거꾸로 재생합니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:StartPosition):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_BlendSpacePlayer:StartPosition):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/EditorTutorials/ko/EditorTutorials.locres) Source String Hash: (-207153555) Localized String: (시작 위치 범위는 [0,1] 이며, 재초기화시에만 적용됩니다.
 루핑을 하면, 1 회전 후 0.f 부터 시작할 것입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-207153555) Localized String: (시작 위치 - [0, 1] 범위의 시작 위치로, 재초기화할 때만 적용됩니다.
 반복하면 1회전 후 0.f 부터 시작됩니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:CameraFilmbackSettings:SensorWidth):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:CameraFilmbackSettings:SensorWidth):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-1448580153) Localized String: (센서 폭 - 필름백 또는 디지털 센서의 가로 크기로, mm 단위입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (-1448580153) Localized String: (필름백 또는 디지털 센서의 가로 크기로, mm 단위입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:CameraFilmbackSettings:SensorAspectRatio):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:CameraFilmbackSettings:SensorAspectRatio):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-194807515) Localized String: (센서 종횡비 - 읽기 전용입니다. 센서 치수에서 계산했습니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (-194807515) Localized String: (읽기 전용입니다. 센서 크기에서 계산했습니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:bLoopAnimation):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:bLoopAnimation):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (2133979316) Localized String: (루프 - 애니메이션이 끝에 도달했을 때 계속 반복시켜야 할까요?)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (2133979316) Localized String: (애니메이션이 끝에 도달하면 계속해서 루핑시킬것인지 입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:Sequence):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:Sequence):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (421436424) Localized String: (시퀀스 - 재생할 애니메이션 시퀀스 애셋입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (421436424) Localized String: (재생할 애니메이션 시퀀스 애셋입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:PlayRate):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:PlayRate):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-1274923958) Localized String: (재생 속도 - 재생 속도 배수입니다. 음수가 될 수 있으며, 그러면 애니메이션이 거꾸로 재생됩니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (-1274923958) Localized String: (플레이 속도 배수입니다. 음수가 되면 애니메이션이 역방향으로 재생됩니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:StartPosition):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:AnimNode_SequencePlayer:StartPosition):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (771611000) Localized String: (시작 위치 - 시작 위치로 재초기화할 때만 적용됩니다.
 반복하면, 1회전 후 0.f 부터 시작됩니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (771611000) Localized String: (시작 위치로, 재초기화시에만 적용됩니다.
 루핑을 하면, 1회전 후 0.f 부터 시작할 것입니다.)
-[2017.04.15-02.58.20:995][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:CameraFilmbackSettings:SensorHeight):
+[2017.04.15-11.02.36:933][  0]LogTextLocalizationManager:Warning: Loaded localization resources contain conflicting entries for (Namespace:UObjectToolTips, Key:CameraFilmbackSettings:SensorHeight):
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/ToolTips/ko/ToolTips.locres) Source String Hash: (-1311569777) Localized String: (센서 높이 - 필름백 또는 디지털 센서의 세로 크기로, mm 단위입니다.)
 Localization Resource: (C:/Program Files/Epic Games/UE_4.15/Engine/Content/Localization/Engine/ko/Engine.locres) Source String Hash: (-1311569777) Localized String: (필름백 또는 디지털 센서의 세로 크기로, mm 단위입니다.)
-[2017.04.15-02.58.27:445][  0]LogD3D11RHI: D3D11 adapters:
-[2017.04.15-02.58.27:503][  0]LogD3D11RHI:    0. 'NVIDIA GeForce GTX 970' (Feature Level 11_0)
-[2017.04.15-02.58.27:503][  0]LogD3D11RHI:       4058/0/4055 MB DedicatedVideo/DedicatedSystem/SharedSystem, Outputs:1, VendorId:0x10de
-[2017.04.15-02.58.27:530][  0]LogD3D11RHI:    1. 'Microsoft Basic Render Driver' (Feature Level 11_0)
-[2017.04.15-02.58.27:530][  0]LogD3D11RHI:       0/0/4055 MB DedicatedVideo/DedicatedSystem/SharedSystem, Outputs:0, VendorId:0x1414
-[2017.04.15-02.58.27:530][  0]LogD3D11RHI: Chosen D3D11 Adapter: 0
-[2017.04.15-02.58.27:544][  0]LogD3D11RHI: Creating new Direct3DDevice
-[2017.04.15-02.58.27:544][  0]LogD3D11RHI:     GPU DeviceId: 0x13c2 (for the marketing name, search the web for "GPU Device Id")
-[2017.04.15-02.58.27:544][  0]LogWindows: EnumDisplayDevices:
-[2017.04.15-02.58.27:544][  0]LogWindows:    0. 'NVIDIA GeForce GTX 970' (P:1 D:1)
-[2017.04.15-02.58.27:545][  0]LogWindows:    1. 'NVIDIA GeForce GTX 970' (P:0 D:0)
-[2017.04.15-02.58.27:545][  0]LogWindows:    2. 'NVIDIA GeForce GTX 970' (P:0 D:0)
-[2017.04.15-02.58.27:546][  0]LogWindows:    3. 'NVIDIA GeForce GTX 970' (P:0 D:0)
-[2017.04.15-02.58.27:546][  0]LogWindows: DebugString: FoundDriverCount:4 
-[2017.04.15-02.58.27:546][  0]LogD3D11RHI:     Adapter Name: NVIDIA GeForce GTX 970
-[2017.04.15-02.58.27:546][  0]LogD3D11RHI:   Driver Version: 376.53 (internal:21.21.13.7653, unified:376.53)
-[2017.04.15-02.58.27:546][  0]LogD3D11RHI:      Driver Date: 12-29-2016
-[2017.04.15-02.58.27:546][  0]LogRHI: Texture pool is 1361 MB (70% of 1945 MB)
-[2017.04.15-02.58.27:629][  0]LogD3D11RHI: Async texture creation enabled
-[2017.04.15-02.58.28:026][  0]LogD3D11RHI: GPU Timing Frequency: 1000.000000 (Debug: 2 1)
-[2017.04.15-02.58.28:178][  0]LogShaderCompilers: Guid format shader working directory is -16 characters bigger than the processId version (../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Intermediate/Shaders/WorkingDirectory/10856/).
-[2017.04.15-02.58.28:280][  0]LogShaderCompilers: Cleaned the shader compiler working directory 'C:/Users/syj/AppData/Local/Temp/UnrealShaderWorkingDir/3B53FA5D48C32BFEA4528387221FBD66/'.
-[2017.04.15-02.58.28:280][  0]LogShaderCompilers:Display: Using Local Shader Compiler.
-[2017.04.15-02.58.37:674][  0]LogTemp:Display: Loaded TP AllDesktopTargetPlatform
-[2017.04.15-02.58.37:777][  0]LogTemp:Display: Loaded TP MacClientTargetPlatform
-[2017.04.15-02.58.37:880][  0]LogTemp:Display: Loaded TP MacNoEditorTargetPlatform
-[2017.04.15-02.58.37:982][  0]LogTemp:Display: Loaded TP MacServerTargetPlatform
-[2017.04.15-02.58.38:218][  0]LogTemp:Display: Loaded TP MacTargetPlatform
-[2017.04.15-02.58.38:337][  0]LogTemp:Display: Loaded TP WindowsClientTargetPlatform
-[2017.04.15-02.58.38:449][  0]LogTemp:Display: Loaded TP WindowsNoEditorTargetPlatform
-[2017.04.15-02.58.38:576][  0]LogTemp:Display: Loaded TP WindowsServerTargetPlatform
-[2017.04.15-02.58.38:732][  0]LogTemp:Display: Loaded TP WindowsTargetPlatform
-[2017.04.15-02.58.38:929][  0]LogTemp:Display: Loaded TP AndroidTargetPlatform
-[2017.04.15-02.58.39:077][  0]LogTemp:Display: Loaded TP Android_ASTCTargetPlatform
-[2017.04.15-02.58.39:211][  0]LogTemp:Display: Loaded TP Android_ATCTargetPlatform
-[2017.04.15-02.58.39:341][  0]LogTemp:Display: Loaded TP Android_DXTTargetPlatform
-[2017.04.15-02.58.39:472][  0]LogTemp:Display: Loaded TP Android_ETC1TargetPlatform
-[2017.04.15-02.58.39:595][  0]LogTemp:Display: Loaded TP Android_ETC2TargetPlatform
-[2017.04.15-02.58.39:836][  0]LogTemp:Display: Loaded TP Android_MultiTargetPlatform
-[2017.04.15-02.58.39:836][  0]LogTemp:Display: Loaded TP Android_PVRTCTargetPlatform
-[2017.04.15-02.58.39:948][  0]LogTemp:Display: Loaded TP HTML5TargetPlatform
-[2017.04.15-02.58.40:307][  0]LogTemp:Display: Loaded TP IOSTargetPlatform
-[2017.04.15-02.58.40:367][  0]LogTemp:Display: Loaded TP TVOSTargetPlatform
-[2017.04.15-02.58.40:485][  0]LogTemp:Display: Loaded TP LinuxClientTargetPlatform
-[2017.04.15-02.58.40:611][  0]LogTemp:Display: Loaded TP LinuxNoEditorTargetPlatform
-[2017.04.15-02.58.40:737][  0]LogTemp:Display: Loaded TP LinuxServerTargetPlatform
-[2017.04.15-02.58.40:907][  0]LogTemp:Display: Loaded TP LinuxTargetPlatform
-[2017.04.15-02.58.40:907][  0]LogTargetPlatformManager:Display: Building Assets For Windows
-[2017.04.15-02.58.42:868][  0]LogDerivedDataCache:Display: Max Cache Size: 512 MB
-[2017.04.15-02.58.48:945][  0]LogDerivedDataCache: Loaded boot cache 6.08s 96MB C:/Users/syj/AppData/Local/UnrealEngine/4.15/DerivedDataCache/Boot.ddc.
-[2017.04.15-02.58.48:945][  0]LogDerivedDataCache:Display: Loaded Boot cache: C:/Users/syj/AppData/Local/UnrealEngine/4.15/DerivedDataCache/Boot.ddc
-[2017.04.15-02.58.48:945][  0]LogDerivedDataCache: FDerivedDataBackendGraph:  Pak pak cache file ../../../../../../Users/syj/Documents/lordoftank/LordOfTank/DerivedDataCache/DDC.ddp not found, will not use a pak cache.
-[2017.04.15-02.58.48:945][  0]LogDerivedDataCache: Unable to find inner node Pak for hierarchical cache Hierarchy.
-[2017.04.15-02.58.48:945][  0]LogDerivedDataCache: FDerivedDataBackendGraph:  CompressedPak pak cache file ../../../../../../Users/syj/Documents/lordoftank/LordOfTank/DerivedDataCache/Compressed.ddp not found, will not use a pak cache.
-[2017.04.15-02.58.48:945][  0]LogDerivedDataCache: Unable to find inner node CompressedPak for hierarchical cache Hierarchy.
-[2017.04.15-02.58.49:211][  0]LogDerivedDataCache:Display: Pak cache opened for reading ../../../Engine/DerivedDataCache/Compressed.ddp.
-[2017.04.15-02.58.49:249][  0]LogDerivedDataCache: Using Local data cache path C:/Users/syj/AppData/Local/UnrealEngine/Common/DerivedDataCache: Writable
-[2017.04.15-02.58.49:259][  0]LogSlate: Using Freetype 2.6.0
-[2017.04.15-02.58.49:260][  0]LogSlate: SlateFontCache - WITH_FREETYPE: 1, WITH_HARFBUZZ: 1
-[2017.04.15-02.58.49:260][  0]LogSlate: SlateFontCache - WITH_FREETYPE: 1, WITH_HARFBUZZ: 1
-[2017.04.15-02.59.04:265][  0]LogInit: Selected Device Profile: [Windows]
-[2017.04.15-02.59.04:268][  0]LogContentStreaming: Texture pool size is 0.00 MB
-[2017.04.15-02.59.04:727][  0]LogMeshUtilities: Using QuadricMeshReduction for automatic static mesh reduction
-[2017.04.15-02.59.04:932][  0]LogSimplygon: Simplygon DLL not present - disabling.
-[2017.04.15-02.59.05:078][  0]LogMeshUtilities: Using SimplygonSwarm for distributed automatic mesh merging
-[2017.04.15-02.59.05:079][  0]LogMeshUtilities: No automatic skeletal mesh reduction module available
-[2017.04.15-02.59.05:079][  0]LogMeshUtilities: No automatic mesh merging module available
-[2017.04.15-02.59.06:290][  0]LogNetVersion: GetLocalNetworkVersion: CL: 3299760, ProjectName: lordoftank, ProjectVersion: , EngineNetworkVersion: 2, GameNetworkVersion: 0, NetworkChecksum: 665150540
-[2017.04.15-02.59.06:467][  0]LogAssetRegistry: FAssetRegistry took 0.0216 seconds to start up
-[2017.04.15-02.59.06:697][  0]LogPackageLocalizationCache: Processed 3 localized package path(s) for 2 prioritized culture(s) in 0.185942 seconds
-[2017.04.15-02.59.06:703][  0]LogUObjectArray: 32493 objects as part of root set at end of initial load.
-[2017.04.15-02.59.06:703][  0]LogUObjectAllocator: 7077032 out of 0 bytes used by permanent object pool.
-[2017.04.15-02.59.06:703][  0]LogUObjectArray: CloseDisregardForGC: 0/0 objects in disregard for GC pool
-[2017.04.15-02.59.06:872][  0]LogInit: WinSock: version 1.1 (2.2), MaxSocks=32767, MaxUdp=65467
-[2017.04.15-03.00.27:575][  0]LogTcpMessaging: Initializing TcpMessaging bridge
-[2017.04.15-03.00.27:888][  0]LogUdpMessaging: Initializing bridge on interface 0.0.0.0:0 to multicast group 230.0.0.1:6666.
-[2017.04.15-03.00.37:550][  0]LogStats: FPlatformStackWalk::StackWalkAndDump -  3.078 s
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: === Handled ensure: ===
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: 
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: Ensure condition failed: !AttachmentRules.bWeldSimulatedBodies [File:D:\Build\++UE4+Release-4.15+Compile\Sync\Engine\Source\Runtime\Engine\Private\Components\SceneComponent.cpp] [Line: 1623]
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: AttachToComponent when called from a constructor cannot weld simulated bodies. Consider calling SetupAttachment directly instead.
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: Stack: 
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x00000000498195E6
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x00000000495C9B82
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x00000000495DB666
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Engine.dll!0x0000000032130BDB
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-5530.dll!ALOTPlayer::ALOTPlayer() [c:\users\syj\documents\lordoftank\lordoftank\source\lordoftank\private\pawn\lotplayer.cpp:39]
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-5530.dll!InternalConstructor<ALOTPlayer>()
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B34200F
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B4D9F60
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B4BC160
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B345637
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x0000000049477173
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000004963C70A
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x000000005F08B4F2
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x000000005F08B838
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E0592951
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E0596A02
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E058E96A
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E058EBBA
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E05A0A29
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E05A22B6
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: KERNEL32.DLL!0x000000006A8B8364
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: ntdll.dll!0x000000006D1E70D1
-[2017.04.15-03.00.37:550][  0]LogOutputDevice:Error: 
-[2017.04.15-03.00.37:560][  0]LogStats:                SubmitErrorReport -  0.000 s
-[2017.04.15-03.01.01:401][  0]LogStats:                    SendNewReport - 23.840 s
-[2017.04.15-03.01.01:401][  0]LogStats:             FDebug::EnsureFailed - 26.966 s
-[2017.04.15-03.01.01:402][  0]LogStats: FPlatformStackWalk::StackWalkAndDump -  0.001 s
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: === Handled ensure: ===
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: 
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: Ensure condition failed: AttachmentRules.LocationRule == EAttachmentRule::KeepRelative && AttachmentRules.RotationRule == EAttachmentRule::KeepRelative && AttachmentRules.ScaleRule == EAttachmentRule::KeepRelative [File:D:\Build\++UE4+Release-4.15+Compile\Sync\Engine\Source\Runtime\Engine\Private\Components\SceneComponent.cpp] [Line: 1624]
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: AttachToComponent when called from a constructor is only setting up attachment and will always be treated as KeepRelative. Consider calling SetupAttachment directly instead.
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: Stack: 
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x00000000498195E6
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x00000000495C9B82
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x00000000495DB666
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Engine.dll!0x0000000032130C55
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-5530.dll!ALOTPlayer::ALOTPlayer() [c:\users\syj\documents\lordoftank\lordoftank\source\lordoftank\private\pawn\lotplayer.cpp:39]
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-5530.dll!InternalConstructor<ALOTPlayer>()
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B34200F
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B4D9F60
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B4BC160
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000004B345637
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x0000000049477173
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000004963C70A
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x000000005F08B4F2
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x000000005F08B838
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E0592951
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E0596A02
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E058E96A
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E058EBBA
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E05A0A29
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000E05A22B6
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: KERNEL32.DLL!0x000000006A8B8364
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: ntdll.dll!0x000000006D1E70D1
-[2017.04.15-03.01.01:402][  0]LogOutputDevice:Error: 
-[2017.04.15-03.01.01:409][  0]LogStats:                SubmitErrorReport -  0.000 s
-[2017.04.15-03.01.01:678][  0]LogStats:                    SendNewReport -  0.270 s
-[2017.04.15-03.01.01:678][  0]LogStats:             FDebug::EnsureFailed -  0.278 s
-[2017.04.15-03.01.30:364][  0]LogMaterial: Uniform references updated for custom material expression Custom.
-[2017.04.15-03.01.35:783][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
-[2017.04.15-03.01.37:258][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
-[2017.04.15-03.01.38:108][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
-[2017.04.15-03.01.38:928][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
-[2017.04.15-03.01.56:329][  0]LogAutomationTest:Warning: Smoke tests took > 2s to run: 2.35s
-[2017.04.15-03.01.59:166][  0]LogEngine: Initializing Engine...
-[2017.04.15-03.01.59:567][  0]LogHMD: Oculus plugin initialized. Version: 4.15.1-3348071+++UE4+Release-4.15, LibOVR: 1.13.0, SDK: 1.10.0, built Mar 15 2017, 16:59:09
-[2017.04.15-03.02.00:111][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.02.00:111][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.02.00:111][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.02.00:111][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.02.00:111][  0]OCULUS: Debug: [HMDState] Using default profile default
-[2017.04.15-03.02.00:111][  0]OCULUS: Info: IAD changed to 63.5mm
-[2017.04.15-03.02.05:357][  0]LogAIModule: Creating AISystem for world Untitled
-[2017.04.15-03.02.07:532][  0]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
-[2017.04.15-03.02.07:640][  0]LogInit: FAudioDevice initialized.
-[2017.04.15-03.02.08:114][  0]LogDerivedDataCache: Saved boot cache 0.46s 96MB C:/Users/syj/AppData/Local/UnrealEngine/4.15/DerivedDataCache/Boot.ddc.
-[2017.04.15-03.02.08:366][  0]LogInit: Texture streaming: Enabled
-[2017.04.15-03.02.10:546][  0]LogEngineSessionManager: EngineSessionManager initialized
-[2017.04.15-03.02.10:580][  0]LogEngineSessionManager: EngineSessionManager sent abnormal shutdown report. Type=Crashed, SessionId={ACC22DE9-4030-DEBB-5FF9-D3AD0C405364}
-[2017.04.15-03.02.13:382][  0]LogInit: Transaction tracking system initialized
-[2017.04.15-03.02.17:693][  0]BlueprintLog: New page: 에디터 로드
-[2017.04.15-03.02.34:452][  0]LocalizationService: 정보 현지화 서비스가 비활성화되었습니다.
-[2017.04.15-03.02.43:460][  0]LogConsoleResponse:Display: 
-[2017.04.15-03.02.49:422][  0]LogCook:Display: Max memory allowance for cook 16384mb min free memory 0mb
-[2017.04.15-03.02.49:422][  0]LogCook:Display: Mobile HDR setting 1
-[2017.04.15-03.02.51:798][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/' took 2.42s
-[2017.04.15-03.03.06:796][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
-[2017.04.15-03.03.06:990][  0]Cmd: MAP LOAD FILE="../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Content/LOTMaps/StartMap.umap" TEMPLATE=0 SHOWPROGRESS=1 FEATURELEVEL=3
-[2017.04.15-03.03.07:453][  0]LightingResults: New page: 라이팅 빌드
-[2017.04.15-03.03.08:114][  0]MapCheck: New page: 맵 체크
-[2017.04.15-03.03.08:114][  0]LightingResults: New page: 라이팅 빌드
-[2017.04.15-03.03.34:925][  0]LogAIModule: Creating AISystem for world StartMap
-[2017.04.15-03.03.47:380][  0]LogEditorServer: Finished looking for orphan Actors (0.000 secs)
-[2017.04.15-03.03.47:671][  0]Cmd: MAP CHECKDEP NOCLEARLOG
-[2017.04.15-03.03.47:954][  0]MapCheck: 정보 맵 체크 완료: 오류 0 회, 경고 0 회, 소요 시간 282.408ms.
-[2017.04.15-03.03.47:954][  0]LogFileHelpers: Loading map 'StartMap' took 41.016
-[2017.04.15-03.03.54:713][  0]LogCollectionManager: Loaded 1 collections in 0.003186 seconds
-[2017.04.15-03.03.55:684][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Saved/Collections/' took 0.01s
-[2017.04.15-03.03.55:684][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/Developers/syj/Collections/' took 0.01s
-[2017.04.15-03.03.55:684][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/Collections/' took 0.01s
-[2017.04.15-03.03.55:684][  0]LogCollectionManager: Rebuilt the GUID cache for 1 collections in 0.000004 seconds
-[2017.04.15-03.03.55:684][  0]LogCollectionManager: Rebuilt the hierarchy cache for 1 collections in 0.000000 seconds
-[2017.04.15-03.03.55:889][  0]LogContentBrowser: Native class hierarchy populated in 0.2045 seconds. Added 2258 classes and 461 folders.
-[2017.04.15-03.03.56:837][  0]LogStats: UGameplayTagsManager::ConstructGameplayTagTree: Construct from data asset -  0.000 s
-[2017.04.15-03.03.56:962][  0]LogStats: UGameplayTagsManager::ConstructGameplayTagTree: GameplayTagTreeChangedEvent.Broadcast -  0.032 s
-[2017.04.15-03.03.57:600][  0]LogContentBrowser: Native class hierarchy updated for 'WidgetCarousel' in 0.1316 seconds. Added 0 classes and 0 folders.
-[2017.04.15-03.04.09:971][  0]LogContentBrowser: Native class hierarchy updated for 'AddContentDialog' in 0.1401 seconds. Added 0 classes and 0 folders.
-[2017.04.15-03.04.10:877][  0]LogContentBrowser: Native class hierarchy updated for 'SceneOutliner' in 0.1357 seconds. Added 1 classes and 2 folders.
-[2017.04.15-03.04.18:220][  0]LogCrashTracker: Crashtracker disabled due to settings.
-[2017.04.15-03.04.19:394][  0]LogUObjectGlobals:Warning: 'Class 없음.' 오브젝트를 찾는 데 실패했습니다.
-[2017.04.15-03.04.19:964][  0]LogContentBrowser: Native class hierarchy updated for 'HierarchicalLODOutliner' in 0.1290 seconds. Added 1 classes and 2 folders.
-[2017.04.15-03.04.19:965][  0]LogLoad: (Engine Initialization) Total time: 394.23 seconds
-[2017.04.15-03.04.19:965][  0]LogLoad: (Engine Initialization) Total Blueprint compile time: 4.04 seconds
-[2017.04.15-03.04.19:980][  0]LogExternalProfiler: Found external profiler: VSPerf
-[2017.04.15-03.04.19:980][  0]LogExternalProfiler: Using external profiler: VSPerf
-[2017.04.15-03.04.20:609][  0]LogOcInput: OculusInput pre-init called
-[2017.04.15-03.04.20:843][  0]LogOcInput: OculusInput is initialized. Init status 0. Runtime version: 1.13.0
-[2017.04.15-03.04.22:570][  0]LogContentStreaming: Texture pool size now 1000 MB
-[2017.04.15-03.04.23:180][  0]LogSlate: Took 0.107960 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K)
-[2017.04.15-03.04.23:349][  0]LogSlate: Took 0.155286 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/NanumGothic.ttf' (4243K)
-[2017.04.15-03.04.23:369][  0]LogSlate: Took 0.018695 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Bold.ttf' (160K)
-[2017.04.15-03.04.23:551][  0]LogSlate: Took 0.117595 seconds to synchronously load lazily loaded font '../../../Engine/Content/Editor/Slate/Fonts/FontAwesome.ttf' (139K)
-[2017.04.15-03.04.25:913][  0]LogRenderer: Reallocating scene render targets to support 1168x576 NumSamples 1 (Frame:2).
-[2017.04.15-03.04.25:913][  0]LogSlate: Took 0.018260 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Light.ttf' (159K)
-[2017.04.15-03.04.29:094][  4]LogAssetRegistry: Asset discovery search completed in 322.6488 seconds
-[2017.04.15-03.04.29:094][  4]LogCollectionManager: Rebuilt the object cache for 1 collections in 0.000007 seconds (found 0 objects)
-[2017.04.15-03.04.29:094][  4]LogCollectionManager: Fixed up redirectors for 1 collections in 0.000019 seconds (updated 0 objects)
-[2017.04.15-03.08.49:762][786]LogHotReload: New module detected: UE4Editor-LordOfTank-4002.dll
-[2017.04.15-03.08.50:776][790]LogHotReload: Starting Hot-Reload from IDE
-[2017.04.15-03.08.50:794][790]LogSlate: Took 0.013170 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Light.ttf' (159K)
-[2017.04.15-03.08.51:164][790]LogContentBrowser: Native class hierarchy updated for 'LordOfTank' in 0.1434 seconds. Added 13 classes and 8 folders.
-[2017.04.15-03.08.51:166][790]Display: HotReload successful (10 functions remapped  0 scriptstructs remapped)
-[2017.04.15-03.08.51:458][790]LogContentBrowser: Native class hierarchy populated in 0.1468 seconds. Added 2260 classes and 465 folders.
-[2017.04.15-03.08.51:518][790]Display: HotReload took  0.7s.
-[2017.04.15-03.11.19:204][233]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.11.19:204][233]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.11.19:204][233]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.11.19:204][233]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.11.19:204][233]OCULUS: Debug: [HMDState] Using default profile default
-[2017.04.15-03.11.19:204][233]OCULUS: Info: IAD changed to 63.5mm
-[2017.04.15-03.11.19:204][233]LogHMD: New ovr session is created
-[2017.04.15-03.11.19:204][233]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
-[2017.04.15-03.11.19:228][233]LogHMD: Reallocation of eye buffer was requested
-[2017.04.15-03.11.19:231][233]LogHMD: Allocated a new swap texture set (size 2404 x 1472, mipcount = 1), 0x000001EBB3F3BB80
-[2017.04.15-03.11.19:327][233]LogRenderer: Reallocating scene render targets to support 1920x1080 NumSamples 1 (Frame:679).
-[2017.04.15-03.11.24:146][235]LogHMD: Allocated a new mirror texture (size 1936 x 1056)
-[2017.04.15-03.11.24:146][235]LogRenderer: Reallocating scene render targets to support 2404x1472 NumSamples 1 (Frame:680).
-[2017.04.15-03.11.26:436][242]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(713fcll)
-[2017.04.15-03.11.27:107][243]LogHMD: Destroying ovr session
-[2017.04.15-03.11.27:107][243]LogHMD: Freeing textureSet 0x000001EBB3F3BB80
-[2017.04.15-03.11.27:112][243]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(713fcll)
-[2017.04.15-03.11.27:145][243]LogHMD: Orientation wasn't applied to a camera in frame 11
-[2017.04.15-03.11.27:145][243]LogHMD: Orientation wasn't applied to a camera in frame 11
-[2017.04.15-03.11.27:147][243]LogHMD:Error: Can't create a mirror texture, error = -1002
-[2017.04.15-03.11.27:147][243]OCULUS: Error: Invalid ovrSession provided.
-[2017.04.15-03.11.27:281][244]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.11.27:281][244]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.11.27:281][244]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.11.27:281][244]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.11.27:281][244]OCULUS: Debug: [HMDState] Using default profile default
-[2017.04.15-03.11.27:281][244]OCULUS: Info: IAD changed to 63.5mm
-[2017.04.15-03.11.27:281][244]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(713fcll)
-[2017.04.15-03.11.27:281][244]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(713fcll)
-[2017.04.15-03.11.27:281][244]LogHMD: New ovr session is created
-[2017.04.15-03.11.27:285][244]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
-[2017.04.15-03.11.28:786][407]LogTemp: Repeting last play command: 선택된 뷰포트
-[2017.04.15-03.11.28:797][407]LogBlueprintUserMessages: Early PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
-[2017.04.15-03.11.28:797][407]LogPlayLevel: PlayLevel: No blueprints needed recompiling
-[2017.04.15-03.11.28:835][407]PIE: New page: PIE 세션: StartMap (2017. 4. 15. 오후 9:11:28)
-[2017.04.15-03.11.28:835][407]LogPlayLevel: Creating play world package: /Game/LOTMaps/UEDPIE_0_StartMap
-[2017.04.15-03.11.28:854][407]LogPlayLevel: PIE: StaticDuplicateObject took: (0.018932s)
-[2017.04.15-03.11.28:855][407]LogAIModule: Creating AISystem for world StartMap
-[2017.04.15-03.11.28:855][407]LogPlayLevel: PIE: World Init took: (0.000805s)
-[2017.04.15-03.11.28:855][407]LogPlayLevel: PIE: Created PIE world by copying editor world from /Game/LOTMaps/StartMap.StartMap to /Game/LOTMaps/UEDPIE_0_StartMap.StartMap (0.020007s)
-[2017.04.15-03.11.28:913][407]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
-[2017.04.15-03.11.28:928][407]LogInit: FAudioDevice initialized.
-[2017.04.15-03.11.29:029][407]LogLoad: Game class is 'test_C'
-[2017.04.15-03.11.29:042][407]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_StartMap.StartMap up for play (max tick rate 0) at 2017.04.15-12.11.29
-[2017.04.15-03.11.29:043][407]LogWorld: Bringing up level for play took: 0.006054
-[2017.04.15-03.11.29:313][407]LogContentBrowser: Native class hierarchy updated for 'MovieSceneCapture' in 0.1351 seconds. Added 11 classes and 0 folders.
-[2017.04.15-03.11.29:315][407]PIE: 정보 /Game/LOTMaps/UEDPIE_0_StartMap 에 대한 에디터에서 플레이 시작 시간: 0.199
-[2017.04.15-03.11.29:315][407]LogBlueprintUserMessages: Late PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
-[2017.04.15-03.13.55:234][545]LogBlueprintUserMessages: Early EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
-[2017.04.15-03.13.55:235][545]LogHMD: Destroying ovr session
-[2017.04.15-03.13.55:244][545]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(713fcll)
-[2017.04.15-03.13.55:341][545]LogBlueprintUserMessages: Late EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
-[2017.04.15-03.13.55:381][546]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.13.55:381][546]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.13.55:382][546]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
-[2017.04.15-03.13.55:382][546]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
-[2017.04.15-03.13.55:382][546]OCULUS: Debug: [HMDState] Using default profile default
-[2017.04.15-03.13.55:382][546]OCULUS: Info: IAD changed to 63.5mm
-[2017.04.15-03.13.55:382][546]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(713fcll)
-[2017.04.15-03.13.55:382][546]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(713fcll)
-[2017.04.15-03.13.55:382][546]LogHMD: New ovr session is created
-[2017.04.15-03.13.55:385][546]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
-[2017.04.15-03.14.38:093][ 62]LogHotReload: New module detected: UE4Editor-LordOfTank-7304.dll
-[2017.04.15-03.14.38:774][ 65]LogHotReload: Starting Hot-Reload from IDE
-[2017.04.15-03.14.38:922][ 65]LogHotReload: Re-instancing Projectile after hot-reload.
-[2017.04.15-03.14.39:070][ 65]LogHotReload: Re-instancing ArmorPiercingProjectile after hot-reload.
-[2017.04.15-03.14.39:210][ 65]LogHotReload: Re-instancing CommonProjectile after hot-reload.
-[2017.04.15-03.14.39:794][ 65]LogHotReload: Re-instancing HomingProjectile after hot-reload.
-[2017.04.15-03.14.40:070][ 65]LogContentBrowser: Native class hierarchy updated for 'LordOfTank' in 0.1340 seconds. Added 13 classes and 8 folders.
-[2017.04.15-03.14.40:072][ 65]Display: HotReload successful (10 functions remapped  0 scriptstructs remapped)
-[2017.04.15-03.14.40:310][ 65]LogContentBrowser: Native class hierarchy populated in 0.1330 seconds. Added 2260 classes and 465 folders.
-[2017.04.15-03.14.40:314][ 65]Display: HotReload took  1.5s.
-[2017.04.15-03.15.15:321][950]Cmd: OBJ SAVEPACKAGE PACKAGE="/Game/LOTMaps/StartMap" FILE="../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Content/LOTMaps/StartMap.umap" SILENT=true AUTOSAVING=false KEEPDIRTY=false
-[2017.04.15-03.15.16:794][950]LogSavePackage: Save=571.16ms
-[2017.04.15-03.15.16:794][950]LogSavePackage: Moving '../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Saved/StartMapCD28206246E7B27C342097972D7415B1.tmp' to '../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Content/LOTMaps/StartMap.umap'
-[2017.04.15-03.15.16:823][950]LogSavePackage:Display: Finished SavePackage ../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Content/LOTMaps/StartMap.umap
-[2017.04.15-03.15.17:123][950]LogSlate: Took 0.174288 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K)
-[2017.04.15-03.15.17:125][950]LogFileHelpers: Saving map 'StartMap' took 2.986
-[2017.04.15-03.15.17:797][951]Cmd: QUIT_EDITOR
-[2017.04.15-03.15.18:692][951]LogHMD: Destroying ovr session
-[2017.04.15-03.15.18:706][951]LogWindowsTextInputMethodSystem:Display: IME system now activated using TSF (Microsoft 입력기).
-[2017.04.15-03.15.18:728][951]LogExit: Preparing to exit.
-[2017.04.15-03.15.19:616][951]LogDirectoryWatcher: A directory notification for 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/' was aborted.
-[2017.04.15-03.15.19:760][951]LogExit: Editor shut down
-[2017.04.15-03.15.19:760][951]LogExit: Transaction tracking system shut down
-[2017.04.15-03.15.19:994][951]LogObj: Freed 0b from 0 cluster array pools.
-[2017.04.15-03.15.19:994][951]LogExit: Object subsystem successfully closed.
-[2017.04.15-03.15.20:013][951]LogD3D11RHI: Shutdown
-[2017.04.15-03.15.20:013][951]LogD3D11RHI: CleanupD3DDevice
-[2017.04.15-03.15.20:129][951]LogD3D11RHI: ~FD3D11DynamicRHI
-[2017.04.15-03.15.20:153][951]LogModuleManager: Shutting down and abandoning module LordOfTank (504)
-[2017.04.15-03.15.20:153][951]LogModuleManager: Shutting down and abandoning module MovieSceneCapture (503)
-[2017.04.15-03.15.20:154][951]LogModuleManager: Shutting down and abandoning module HierarchicalLODOutliner (500)
-[2017.04.15-03.15.20:154][951]LogModuleManager: Shutting down and abandoning module CrashTracker (498)
-[2017.04.15-03.15.20:154][951]LogModuleManager: Shutting down and abandoning module SceneOutliner (496)
-[2017.04.15-03.15.20:154][951]LogModuleManager: Shutting down and abandoning module AddContentDialog (494)
-[2017.04.15-03.15.20:154][951]LogDirectoryWatcher: A directory notification for 'C:/Program Files/Epic Games/UE_4.15/FeaturePacks/' was aborted.
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module WidgetCarousel (493)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module EditorWidgets (490)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module CollectionManager (488)
-[2017.04.15-03.15.20:155][951]LogDirectoryWatcher: A directory notification for 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/Collections/' was aborted.
-[2017.04.15-03.15.20:155][951]LogDirectoryWatcher: A directory notification for 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/Developers/syj/Collections/' was aborted.
-[2017.04.15-03.15.20:155][951]LogDirectoryWatcher: A directory notification for 'C:/Users/syj/Documents/lordoftank/LordOfTank/Saved/Collections/' was aborted.
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module StatsViewer (486)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module FoliageEdit (484)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module LandscapeEditor (482)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module SceneDepthPickerMode (480)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module ActorPickerMode (478)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module GeometryMode (476)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module TextureAlignMode (474)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module BspMode (472)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module HardwareSurvey (470)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module SequenceRecorderSections (468)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AutomationWorker (466)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module MatineeToLevelSequence (464)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module LevelSequenceEditor (462)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module PlacementMode (461)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module WmfMediaFactory (458)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module WmfMediaEditor (456)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module MfMediaFactory (454)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module MfMediaEditor (452)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AvfMediaFactory (450)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AvfMediaEditor (448)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AndroidMediaFactory (446)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module Media (445)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AndroidMediaEditor (442)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module CharacterAI (440)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AudioCapture (438)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module SequenceRecorder (437)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module SmartSnapping (434)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module SessionServices (432)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module ViewportSnapping (430)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module ViewportInteraction (428)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module LogVisualizer (426)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module IntroTutorials (424)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module GameProjectGeneration (423)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module EditorLiveStreaming (420)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module IOSPlatformEditor (418)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module HTML5PlatformEditor (416)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AndroidPlatformEditor (414)
-[2017.04.15-03.15.20:155][951]LogModuleManager: Shutting down and abandoning module AndroidDeviceDetection (413)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module IOSRuntimeSettings (410)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module AndroidRuntimeSettings (408)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module InputBindingEditor (406)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module NiagaraEditor (404)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module MergeActors (402)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module SizeMap (400)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module TreeMap (398)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module ReferenceViewer (396)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module LocalizationDashboard (394)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module LocalizationService (393)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module HardwareTargeting (390)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module DeviceProfileEditor (388)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module UndoHistory (386)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module UserFeedback (384)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module XmlParser (382)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module Blutility (380)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module ProjectSettingsViewer (378)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module ProjectTargetPlatformEditor (377)
-[2017.04.15-03.15.20:692][951]LogModuleManager: Shutting down and abandoning module EditorSettingsViewer (374)
-[2017.04.15-03.15.20:693][951]LogModuleManager: Shutting down and abandoning module SettingsEditor (372)
-[2017.04.15-03.15.20:693][951]LogModuleManager: Shutting down and abandoning module ProjectLauncher (370)
-[2017.04.15-03.15.20:693][951]LogModuleManager: Shutting down and abandoning module SessionFrontend (368)
-[2017.04.15-03.15.20:693][951]LogModuleManager: Shutting down and abandoning module ProfilerClient (366)
-[2017.04.15-03.15.20:693][951]LogModuleManager: Shutting down and abandoning module DeviceManager (364)
-[2017.04.15-03.15.20:693][951]LogModuleManager: Shutting down and abandoning module TargetDeviceServices (363)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module AutomationController (360)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module AutomationWindow (358)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module Layers (356)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module ComponentVisualizers (354)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module DetailCustomizations (352)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module PackagesDialog (350)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module Persona (348)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module AnimGraph (347)
-[2017.04.15-03.15.20:736][951]LogModuleManager: Shutting down and abandoning module Kismet (344)
-[2017.04.15-03.15.20:737][951]LogModuleManager: Shutting down and abandoning module GraphEditor (342)
-[2017.04.15-03.15.20:737][951]LogModuleManager: Shutting down and abandoning module ClassViewer (340)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module Toolbox (338)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module ModuleUI (336)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module MovieSceneTools (334)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module OutputLog (332)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module GammaUI (330)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module Documentation (328)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module Niagara (326)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module StreamingPauseRendering (324)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module AnalyticsET (322)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module PortalServices (320)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module PortalRpc (318)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module MessagingRpc (316)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module AIModule (314)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module GameplayDebugger (313)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module AITestSuite (311)
-[2017.04.15-03.15.20:738][951]LogModuleManager: Shutting down and abandoning module ProfilerService (308)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module TaskGraph (306)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module SteamVRController (304)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module SteamVR (302)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module ProceduralMeshComponentEditor (300)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module ProceduralMeshComponent (298)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module OculusLibrary (296)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module OculusInput (294)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module MobilePatchingUtils (292)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module CustomMeshComponent (290)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module CableComponent (288)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module ArchVisCharacter (286)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module MediaPlayerEditor (282)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module HTML5Networking (280)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module AlembicImporter (278)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module AlembicLibrary (277)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module GeometryCache (276)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module GeometryCacheEd (275)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module SuperSearchEditor (270)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module SuperSearch (269)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module SpeedTreeImporter (266)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module PluginBrowser (264)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module MobileLauncherProfileWizard (262)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module EpicSurvey (260)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module VisualStudioSourceCodeAccess (258)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module DesktopPlatform (257)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module UObjectPlugin (254)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module SubversionSourceControl (252)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module PerforceSourceControl (250)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module GitSourceControl (248)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module SourceControl (247)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module LightPropagationVolumeEditor (244)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module PaperTiledImporter (242)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module PaperSpriteSheetImporter (240)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module Paper2DEditor (238)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module MeshPaint (237)
-[2017.04.15-03.15.20:989][951]LogModuleManager: Shutting down and abandoning module LevelEditor (235)
-[2017.04.15-03.15.20:990][951]LogModuleManager: Shutting down and abandoning module PixelInspectorModule (234)
-[2017.04.15-03.15.20:990][951]LogModuleManager: Shutting down and abandoning module MainFrame (232)
-[2017.04.15-03.15.20:990][951]LogModuleManager: Shutting down and abandoning module HotReload (231)
-[2017.04.15-03.15.20:990][951]LogDirectoryWatcher: A directory notification for 'C:/Users/syj/Documents/lordoftank/LordOfTank/Binaries/Win64' was aborted.
-[2017.04.15-03.15.20:991][951]LogModuleManager: Shutting down and abandoning module ContentBrowser (227)
-[2017.04.15-03.15.20:992][951]LogModuleManager: Shutting down and abandoning module PhysXVehiclesEditor (222)
-[2017.04.15-03.15.20:992][951]LogModuleManager: Shutting down and abandoning module PhysXVehicles (220)
-[2017.04.15-03.15.20:992][951]LogModuleManager: Shutting down and abandoning module LocationServicesBPLibrary (218)
-[2017.04.15-03.15.20:992][951]LogModuleManager: Shutting down and abandoning module UdpMessaging (216)
-[2017.04.15-03.15.21:093][951]LogModuleManager: Shutting down and abandoning module TcpMessaging (214)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module GameplayTagsEditor (212)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module FacialAnimationEditor (210)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module FacialAnimation (208)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module LightPropagationVolumeRuntime (206)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module Paper2D (204)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module WindowsMoviePlayer (202)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module WmfMedia (200)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module MfMedia (198)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module MediaAssets (196)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module GameLiveStreaming (194)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module VREditor (192)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module GameplayTasksEditor (190)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module BehaviorTreeEditor (188)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module FunctionalTesting (186)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module CollisionAnalyzer (184)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module UMG (182)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module UMGEditor (181)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module Sequencer (180)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module AssetTools (178)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module MessageLog (177)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module WorkspaceMenuStructure (176)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module SlateReflector (170)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module Slate (168)
-[2017.04.15-03.15.21:193][951]LogModuleManager: Shutting down and abandoning module EditorStyle (166)
-[2017.04.15-03.15.21:197][951]LogModuleManager: Shutting down and abandoning module SourceCodeAccess (164)
-[2017.04.15-03.15.21:197][951]LogModuleManager: Shutting down and abandoning module HeadMountedDisplay (162)
-[2017.04.15-03.15.21:197][951]LogModuleManager: Shutting down and abandoning module XAudio2 (160)
-[2017.04.15-03.15.21:197][951]LogModuleManager: Shutting down and abandoning module Networking (158)
-[2017.04.15-03.15.21:197][951]LogModuleManager: Shutting down and abandoning module Core (154)
-[2017.04.15-03.15.21:197][951]LogModuleManager: Shutting down and abandoning module AssetRegistry (152)
-[2017.04.15-03.15.21:611][951]LogDirectoryWatcher: A directory notification for '../../../Engine/Content/' was aborted.
-[2017.04.15-03.15.21:611][951]LogDirectoryWatcher: A directory notification for '../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Content/' was aborted.
-[2017.04.15-03.15.21:611][951]LogDirectoryWatcher: A directory notification for '../../../Engine/Plugins/2D/Paper2D/Content/' was aborted.
-[2017.04.15-03.15.21:611][951]LogModuleManager: Shutting down and abandoning module DirectoryWatcher (151)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module KismetCompiler (148)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module PhysXFormats (146)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module MeshUtilities (144)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module SimplygonSwarm (143)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module SimplygonMeshReduction (141)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module QuadricMeshReduction (139)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module PropertyEditor (137)
-[2017.04.15-03.15.21:613][951]LogModuleManager: Shutting down and abandoning module DerivedDataCache (134)
-[2017.04.15-03.15.21:703][951]LogDerivedDataCache: Shutdown
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TargetPlatform (132)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module VulkanShaderFormat (131)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module ShaderFormatOpenGL (129)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module ShaderFormatD3D (127)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module MetalShaderFormat (125)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TextureFormatUncompressed (123)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TextureFormatPVR (121)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TextureFormatDXT (119)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TextureFormatIntelISPCTexComp (117)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TextureFormatASTC (115)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module ImageWrapper (114)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TextureFormatAndroid (111)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module AudioFormatOpus (109)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module AudioFormatOgg (107)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module AudioFormatADPCM (105)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module LinuxTargetPlatform (103)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module LinuxServerTargetPlatform (101)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module LinuxNoEditorTargetPlatform (99)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module LinuxClientTargetPlatform (97)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module TVOSTargetPlatform (95)
-[2017.04.15-03.15.21:703][951]LogModuleManager: Shutting down and abandoning module Messaging (93)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module IOSTargetPlatform (91)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module HTML5TargetPlatform (89)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Android_PVRTCTargetPlatform (87)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Android_MultiTargetPlatform (85)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Android_ETC2TargetPlatform (83)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Android_ETC1TargetPlatform (81)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Android_DXTTargetPlatform (79)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Android_ATCTargetPlatform (77)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Android_ASTCTargetPlatform (75)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module AndroidTargetPlatform (73)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module WindowsTargetPlatform (71)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module WindowsServerTargetPlatform (69)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module WindowsNoEditorTargetPlatform (67)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module WindowsClientTargetPlatform (65)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module MacTargetPlatform (63)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module MacServerTargetPlatform (61)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module MacNoEditorTargetPlatform (59)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module MacClientTargetPlatform (57)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module AllDesktopTargetPlatform (55)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module InputCore (52)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module Settings (50)
-[2017.04.15-03.15.21:704][951]LogModuleManager: Shutting down and abandoning module OculusRift (48)
-[2017.04.15-03.15.21:705][951]LogHMD: Oculus shutdown.
-[2017.04.15-03.15.21:705][951]LogModuleManager: Shutting down and abandoning module GearVR (46)
-[2017.04.15-03.15.21:705][951]LogModuleManager: Shutting down and abandoning module ExampleDeviceProfileSelector (44)
-[2017.04.15-03.15.21:705][951]LogModuleManager: Shutting down and abandoning module OnlineBlueprintSupport (42)
-[2017.04.15-03.15.21:705][951]LogModuleManager: Shutting down and abandoning module OnlineSubsystem (38)
-[2017.04.15-03.15.21:705][951]LogOnline:Display: Unloading online subsystem: NULL
-[2017.04.15-03.15.21:705][951]LogModuleManager: Shutting down and abandoning module XMPP (37)
-[2017.04.15-03.15.21:705][951]LogModuleManager: Shutting down and abandoning module HTTP (35)
-[2017.04.15-03.15.21:705][951]LogHttp:Display: Http module shutting down, but needs to wait on 1 outstanding Http requests:
-[2017.04.15-03.15.21:705][951]LogHttp:Display: 	verb=[POST] url=[https://datarouter.ol.epicgames.com/datarouter/api/v1/public/data?SessionID=%7BF99A2F9A-4885-1081-A2CF-7B8CC1E2154D%7D&AppID=UEEditor.Rocket.Release&AppVersion=4.15.1-3348071%2B%2B%2BUE4%2BRelease-4.15&UserID=b7af4be64c2f7f90e80caf93515ecd3d%7C625225da24bf49bd9dcc94f8eb08c150%7C1e33b659-c911-4b61-b646-24cd5b71aa09&AppEnvironment=datacollector-binary&UploadType=eteventstream] status=Processing
-[2017.04.15-03.15.21:731][951]LogModuleManager: Shutting down and abandoning module SSL (34)
-[2017.04.15-03.15.21:733][951]LogModuleManager: Shutting down and abandoning module AudioEditor (30)
-[2017.04.15-03.15.21:733][951]LogModuleManager: Shutting down and abandoning module TextureCompressor (28)
-[2017.04.15-03.15.21:733][951]LogModuleManager: Shutting down and abandoning module ShaderCore (26)
-[2017.04.15-03.15.21:733][951]LogModuleManager: Shutting down and abandoning module Landscape (24)
-[2017.04.15-03.15.21:733][951]LogModuleManager: Shutting down and abandoning module SlateRHIRenderer (22)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module OpenGLDrv (20)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module D3D11RHI (18)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module AnimGraphRuntime (16)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module Renderer (14)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module Engine (12)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module CoreUObject (10)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module NetworkFile (8)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module StreamingFile (6)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module SandboxFile (4)
-[2017.04.15-03.15.21:735][951]LogModuleManager: Shutting down and abandoning module PakFile (2)
-[2017.04.15-03.15.21:737][951]LogExit: Exiting.
-[2017.04.15-03.15.21:742][951]Log file closed, 04/15/17 12:15:21
+[2017.04.15-11.02.49:557][  0]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(205b8ll)
+[2017.04.15-11.02.49:557][  0]LogD3D11RHI: D3D11 adapters:
+[2017.04.15-11.02.49:613][  0]LogD3D11RHI:    0. 'NVIDIA GeForce GTX 970' (Feature Level 11_0)
+[2017.04.15-11.02.49:613][  0]LogD3D11RHI:       4058/0/4055 MB DedicatedVideo/DedicatedSystem/SharedSystem, Outputs:1, VendorId:0x10de
+[2017.04.15-11.02.49:644][  0]LogD3D11RHI:    1. 'Microsoft Basic Render Driver' (Feature Level 11_0)
+[2017.04.15-11.02.49:644][  0]LogD3D11RHI:       0/0/4055 MB DedicatedVideo/DedicatedSystem/SharedSystem, Outputs:0, VendorId:0x1414
+[2017.04.15-11.02.49:644][  0]LogD3D11RHI: Chosen D3D11 Adapter: 0
+[2017.04.15-11.02.49:667][  0]LogD3D11RHI: Creating new Direct3DDevice
+[2017.04.15-11.02.49:667][  0]LogD3D11RHI:     GPU DeviceId: 0x13c2 (for the marketing name, search the web for "GPU Device Id")
+[2017.04.15-11.02.49:667][  0]LogWindows: EnumDisplayDevices:
+[2017.04.15-11.02.49:667][  0]LogWindows:    0. 'NVIDIA GeForce GTX 970' (P:1 D:1)
+[2017.04.15-11.02.49:668][  0]LogWindows:    1. 'NVIDIA GeForce GTX 970' (P:0 D:0)
+[2017.04.15-11.02.49:669][  0]LogWindows:    2. 'NVIDIA GeForce GTX 970' (P:0 D:0)
+[2017.04.15-11.02.49:669][  0]LogWindows:    3. 'NVIDIA GeForce GTX 970' (P:0 D:0)
+[2017.04.15-11.02.49:670][  0]LogWindows: DebugString: FoundDriverCount:4 
+[2017.04.15-11.02.49:670][  0]LogD3D11RHI:     Adapter Name: NVIDIA GeForce GTX 970
+[2017.04.15-11.02.49:699][  0]LogD3D11RHI:   Driver Version: 376.53 (internal:21.21.13.7653, unified:376.53)
+[2017.04.15-11.02.49:699][  0]LogD3D11RHI:      Driver Date: 12-29-2016
+[2017.04.15-11.02.49:708][  0]LogRHI: Texture pool is 1361 MB (70% of 1945 MB)
+[2017.04.15-11.02.49:785][  0]LogD3D11RHI: Async texture creation enabled
+[2017.04.15-11.02.50:440][  0]LogD3D11RHI: GPU Timing Frequency: 1000.000000 (Debug: 2 3)
+[2017.04.15-11.02.50:897][  0]LogShaderCompilers: Guid format shader working directory is -15 characters bigger than the processId version (../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Intermediate/Shaders/WorkingDirectory/8468/).
+[2017.04.15-11.02.50:897][  0]LogShaderCompilers: Cleaned the shader compiler working directory 'C:/Users/syj/AppData/Local/Temp/UnrealShaderWorkingDir/5C04E55346478FDADD2259B50403B59A/'.
+[2017.04.15-11.02.50:897][  0]LogShaderCompilers:Display: Using Local Shader Compiler.
+[2017.04.15-11.03.07:344][  0]LogTemp:Display: Loaded TP AllDesktopTargetPlatform
+[2017.04.15-11.03.07:443][  0]LogTemp:Display: Loaded TP MacClientTargetPlatform
+[2017.04.15-11.03.07:542][  0]LogTemp:Display: Loaded TP MacNoEditorTargetPlatform
+[2017.04.15-11.03.07:643][  0]LogTemp:Display: Loaded TP MacServerTargetPlatform
+[2017.04.15-11.03.07:773][  0]LogTemp:Display: Loaded TP MacTargetPlatform
+[2017.04.15-11.03.07:873][  0]LogTemp:Display: Loaded TP WindowsClientTargetPlatform
+[2017.04.15-11.03.07:971][  0]LogTemp:Display: Loaded TP WindowsNoEditorTargetPlatform
+[2017.04.15-11.03.08:069][  0]LogTemp:Display: Loaded TP WindowsServerTargetPlatform
+[2017.04.15-11.03.08:159][  0]LogTemp:Display: Loaded TP WindowsTargetPlatform
+[2017.04.15-11.03.08:267][  0]LogTemp:Display: Loaded TP AndroidTargetPlatform
+[2017.04.15-11.03.08:366][  0]LogTemp:Display: Loaded TP Android_ASTCTargetPlatform
+[2017.04.15-11.03.08:469][  0]LogTemp:Display: Loaded TP Android_ATCTargetPlatform
+[2017.04.15-11.03.08:571][  0]LogTemp:Display: Loaded TP Android_DXTTargetPlatform
+[2017.04.15-11.03.08:679][  0]LogTemp:Display: Loaded TP Android_ETC1TargetPlatform
+[2017.04.15-11.03.08:780][  0]LogTemp:Display: Loaded TP Android_ETC2TargetPlatform
+[2017.04.15-11.03.08:988][  0]LogTemp:Display: Loaded TP Android_MultiTargetPlatform
+[2017.04.15-11.03.08:988][  0]LogTemp:Display: Loaded TP Android_PVRTCTargetPlatform
+[2017.04.15-11.03.09:074][  0]LogTemp:Display: Loaded TP HTML5TargetPlatform
+[2017.04.15-11.03.09:319][  0]LogTemp:Display: Loaded TP IOSTargetPlatform
+[2017.04.15-11.03.09:377][  0]LogTemp:Display: Loaded TP TVOSTargetPlatform
+[2017.04.15-11.03.09:478][  0]LogTemp:Display: Loaded TP LinuxClientTargetPlatform
+[2017.04.15-11.03.09:581][  0]LogTemp:Display: Loaded TP LinuxNoEditorTargetPlatform
+[2017.04.15-11.03.09:683][  0]LogTemp:Display: Loaded TP LinuxServerTargetPlatform
+[2017.04.15-11.03.09:796][  0]LogTemp:Display: Loaded TP LinuxTargetPlatform
+[2017.04.15-11.03.09:796][  0]LogTargetPlatformManager:Display: Building Assets For Windows
+[2017.04.15-11.03.12:326][  0]LogDerivedDataCache:Display: Max Cache Size: 512 MB
+[2017.04.15-11.03.13:202][  0]LogDerivedDataCache: Loaded boot cache 0.88s 96MB C:/Users/syj/AppData/Local/UnrealEngine/4.15/DerivedDataCache/Boot.ddc.
+[2017.04.15-11.03.13:202][  0]LogDerivedDataCache:Display: Loaded Boot cache: C:/Users/syj/AppData/Local/UnrealEngine/4.15/DerivedDataCache/Boot.ddc
+[2017.04.15-11.03.13:202][  0]LogDerivedDataCache: FDerivedDataBackendGraph:  Pak pak cache file ../../../../../../Users/syj/Documents/lordoftank/LordOfTank/DerivedDataCache/DDC.ddp not found, will not use a pak cache.
+[2017.04.15-11.03.13:202][  0]LogDerivedDataCache: Unable to find inner node Pak for hierarchical cache Hierarchy.
+[2017.04.15-11.03.13:202][  0]LogDerivedDataCache: FDerivedDataBackendGraph:  CompressedPak pak cache file ../../../../../../Users/syj/Documents/lordoftank/LordOfTank/DerivedDataCache/Compressed.ddp not found, will not use a pak cache.
+[2017.04.15-11.03.13:202][  0]LogDerivedDataCache: Unable to find inner node CompressedPak for hierarchical cache Hierarchy.
+[2017.04.15-11.03.13:328][  0]LogDerivedDataCache:Display: Pak cache opened for reading ../../../Engine/DerivedDataCache/Compressed.ddp.
+[2017.04.15-11.03.13:364][  0]LogDerivedDataCache: Using Local data cache path C:/Users/syj/AppData/Local/UnrealEngine/Common/DerivedDataCache: Writable
+[2017.04.15-11.03.13:564][  0]LogSlate: Using Freetype 2.6.0
+[2017.04.15-11.03.13:706][  0]LogSlate: SlateFontCache - WITH_FREETYPE: 1, WITH_HARFBUZZ: 1
+[2017.04.15-11.03.13:706][  0]LogSlate: SlateFontCache - WITH_FREETYPE: 1, WITH_HARFBUZZ: 1
+[2017.04.15-11.03.24:499][  0]LogInit: Selected Device Profile: [Windows]
+[2017.04.15-11.03.24:525][  0]LogContentStreaming: Texture pool size is 0.00 MB
+[2017.04.15-11.03.25:456][  0]LogMeshUtilities: Using QuadricMeshReduction for automatic static mesh reduction
+[2017.04.15-11.03.25:571][  0]LogSimplygon: Simplygon DLL not present - disabling.
+[2017.04.15-11.03.25:685][  0]LogMeshUtilities: Using SimplygonSwarm for distributed automatic mesh merging
+[2017.04.15-11.03.25:685][  0]LogMeshUtilities: No automatic skeletal mesh reduction module available
+[2017.04.15-11.03.25:685][  0]LogMeshUtilities: No automatic mesh merging module available
+[2017.04.15-11.03.30:779][  0]LogNetVersion: GetLocalNetworkVersion: CL: 3299760, ProjectName: lordoftank, ProjectVersion: , EngineNetworkVersion: 2, GameNetworkVersion: 0, NetworkChecksum: 665150540
+[2017.04.15-11.03.30:937][  0]LogAssetRegistry: FAssetRegistry took 0.0220 seconds to start up
+[2017.04.15-11.03.31:361][  0]LogPackageLocalizationCache: Processed 3 localized package path(s) for 2 prioritized culture(s) in 0.331620 seconds
+[2017.04.15-11.03.31:390][  0]LogUObjectArray: 32493 objects as part of root set at end of initial load.
+[2017.04.15-11.03.31:390][  0]LogUObjectAllocator: 7077032 out of 0 bytes used by permanent object pool.
+[2017.04.15-11.03.31:390][  0]LogUObjectArray: CloseDisregardForGC: 0/0 objects in disregard for GC pool
+[2017.04.15-11.03.31:560][  0]LogInit: WinSock: version 1.1 (2.2), MaxSocks=32767, MaxUdp=65467
+[2017.04.15-11.03.57:676][  0]LogTcpMessaging: Initializing TcpMessaging bridge
+[2017.04.15-11.03.57:755][  0]LogUdpMessaging: Initializing bridge on interface 0.0.0.0:0 to multicast group 230.0.0.1:6666.
+[2017.04.15-11.04.01:598][  0]LogStats: FPlatformStackWalk::StackWalkAndDump -  0.719 s
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: === Handled ensure: ===
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: 
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: Ensure condition failed: !AttachmentRules.bWeldSimulatedBodies [File:D:\Build\++UE4+Release-4.15+Compile\Sync\Engine\Source\Runtime\Engine\Private\Components\SceneComponent.cpp] [Line: 1623]
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: AttachToComponent when called from a constructor cannot weld simulated bodies. Consider calling SetupAttachment directly instead.
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: Stack: 
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000E0395E6
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DDE9B82
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DDFB666
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Engine.dll!0x00000000FC800BDB
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-7304.dll!ALOTPlayer::ALOTPlayer() [c:\users\syj\documents\lordoftank\lordoftank\source\lordoftank\private\pawn\lotplayer.cpp:39]
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-7304.dll!InternalConstructor<ALOTPlayer>()
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E64200F
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E7D9F60
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E7BC160
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E645637
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DC97173
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DE5C70A
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x0000000015A3B4F2
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x0000000015A3B838
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5B2951
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5B6A02
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5AE96A
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5AEBBA
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5C0A29
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5C22B6
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: KERNEL32.DLL!0x0000000033BA8364
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: ntdll.dll!0x0000000033CB70D1
+[2017.04.15-11.04.01:598][  0]LogOutputDevice:Error: 
+[2017.04.15-11.04.01:605][  0]LogStats:                SubmitErrorReport -  0.000 s
+[2017.04.15-11.04.03:513][  0]LogStats:                    SendNewReport -  1.908 s
+[2017.04.15-11.04.03:513][  0]LogStats:             FDebug::EnsureFailed -  2.655 s
+[2017.04.15-11.04.03:514][  0]LogStats: FPlatformStackWalk::StackWalkAndDump -  0.001 s
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: === Handled ensure: ===
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: 
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: Ensure condition failed: AttachmentRules.LocationRule == EAttachmentRule::KeepRelative && AttachmentRules.RotationRule == EAttachmentRule::KeepRelative && AttachmentRules.ScaleRule == EAttachmentRule::KeepRelative [File:D:\Build\++UE4+Release-4.15+Compile\Sync\Engine\Source\Runtime\Engine\Private\Components\SceneComponent.cpp] [Line: 1624]
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: AttachToComponent when called from a constructor is only setting up attachment and will always be treated as KeepRelative. Consider calling SetupAttachment directly instead.
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: Stack: 
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000E0395E6
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DDE9B82
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DDFB666
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Engine.dll!0x00000000FC800C55
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-7304.dll!ALOTPlayer::ALOTPlayer() [c:\users\syj\documents\lordoftank\lordoftank\source\lordoftank\private\pawn\lotplayer.cpp:39]
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-LordOfTank-7304.dll!InternalConstructor<ALOTPlayer>()
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E64200F
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E7D9F60
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E7BC160
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-CoreUObject.dll!0x000000000E645637
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DC97173
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Core.dll!0x000000000DE5C70A
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x0000000015A3B4F2
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor-Projects.dll!0x0000000015A3B838
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5B2951
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5B6A02
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5AE96A
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5AEBBA
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5C0A29
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: UE4Editor.exe!0x00000000DB5C22B6
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: KERNEL32.DLL!0x0000000033BA8364
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: ntdll.dll!0x0000000033CB70D1
+[2017.04.15-11.04.03:514][  0]LogOutputDevice:Error: 
+[2017.04.15-11.04.03:524][  0]LogStats:                SubmitErrorReport -  0.000 s
+[2017.04.15-11.04.04:143][  0]LogStats:                    SendNewReport -  0.619 s
+[2017.04.15-11.04.04:143][  0]LogStats:             FDebug::EnsureFailed -  0.630 s
+[2017.04.15-11.04.10:714][  0]LogMaterial: Uniform references updated for custom material expression Custom.
+[2017.04.15-11.04.12:060][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
+[2017.04.15-11.04.12:698][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
+[2017.04.15-11.04.12:863][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
+[2017.04.15-11.04.12:979][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
+[2017.04.15-11.04.16:574][  0]LogEngine: Initializing Engine...
+[2017.04.15-11.04.16:583][  0]LogHMD: Oculus plugin initialized. Version: 4.15.1-3348071+++UE4+Release-4.15, LibOVR: 1.13.0, SDK: 1.10.0, built Mar 15 2017, 16:59:09
+[2017.04.15-11.04.17:073][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.04.17:073][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.04.17:073][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.04.17:073][  0]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.04.17:073][  0]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.04.17:073][  0]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.04.17:526][  0]LogAIModule: Creating AISystem for world Untitled
+[2017.04.15-11.04.17:612][  0]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
+[2017.04.15-11.04.17:636][  0]LogInit: FAudioDevice initialized.
+[2017.04.15-11.04.17:704][  0]LogDerivedDataCache: Saved boot cache 0.07s 96MB C:/Users/syj/AppData/Local/UnrealEngine/4.15/DerivedDataCache/Boot.ddc.
+[2017.04.15-11.04.17:725][  0]LogInit: Texture streaming: Enabled
+[2017.04.15-11.04.17:956][  0]LogEngineSessionManager: EngineSessionManager initialized
+[2017.04.15-11.04.18:767][  0]LogInit: Transaction tracking system initialized
+[2017.04.15-11.04.22:022][  0]BlueprintLog: New page: 에디터 로드
+[2017.04.15-11.04.26:165][  0]LocalizationService: 정보 현지화 서비스가 비활성화되었습니다.
+[2017.04.15-11.04.28:569][  0]LogConsoleResponse:Display: 
+[2017.04.15-11.04.35:204][  0]LogCook:Display: Max memory allowance for cook 16384mb min free memory 0mb
+[2017.04.15-11.04.35:204][  0]LogCook:Display: Mobile HDR setting 1
+[2017.04.15-11.04.35:810][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/' took 0.08s
+[2017.04.15-11.04.38:548][  0]SourceControl: 정보 소스 콘트롤이 꺼졌습니다.
+[2017.04.15-11.04.38:579][  0]Cmd: MAP LOAD FILE="../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Content/LOTMaps/StartMap.umap" TEMPLATE=0 SHOWPROGRESS=1 FEATURELEVEL=3
+[2017.04.15-11.04.38:586][  0]LightingResults: New page: 라이팅 빌드
+[2017.04.15-11.04.38:739][  0]MapCheck: New page: 맵 체크
+[2017.04.15-11.04.38:739][  0]LightingResults: New page: 라이팅 빌드
+[2017.04.15-11.04.53:060][  0]LogAIModule: Creating AISystem for world StartMap
+[2017.04.15-11.05.00:857][  0]LogEditorServer: Finished looking for orphan Actors (0.000 secs)
+[2017.04.15-11.05.00:932][  0]Cmd: MAP CHECKDEP NOCLEARLOG
+[2017.04.15-11.05.01:069][  0]MapCheck: 정보 맵 체크 완료: 오류 0 회, 경고 0 회, 소요 시간 136.951ms.
+[2017.04.15-11.05.01:069][  0]LogFileHelpers: Loading map 'StartMap' took 22.493
+[2017.04.15-11.05.02:740][  0]LogCollectionManager: Loaded 1 collections in 0.039902 seconds
+[2017.04.15-11.05.02:988][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Saved/Collections/' took 0.01s
+[2017.04.15-11.05.02:988][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/Developers/syj/Collections/' took 0.01s
+[2017.04.15-11.05.02:988][  0]LogFileCache: Scanning file cache for directory 'C:/Users/syj/Documents/lordoftank/LordOfTank/Content/Collections/' took 0.01s
+[2017.04.15-11.05.02:988][  0]LogCollectionManager: Rebuilt the GUID cache for 1 collections in 0.000006 seconds
+[2017.04.15-11.05.02:988][  0]LogCollectionManager: Rebuilt the hierarchy cache for 1 collections in 0.000000 seconds
+[2017.04.15-11.05.03:184][  0]LogContentBrowser: Native class hierarchy populated in 0.1946 seconds. Added 2258 classes and 461 folders.
+[2017.04.15-11.05.03:244][  0]LogStats: UGameplayTagsManager::ConstructGameplayTagTree: Construct from data asset -  0.000 s
+[2017.04.15-11.05.03:244][  0]LogStats: UGameplayTagsManager::ConstructGameplayTagTree: GameplayTagTreeChangedEvent.Broadcast -  0.000 s
+[2017.04.15-11.05.03:558][  0]LogContentBrowser: Native class hierarchy updated for 'WidgetCarousel' in 0.1318 seconds. Added 0 classes and 0 folders.
+[2017.04.15-11.05.05:036][  0]LogContentBrowser: Native class hierarchy updated for 'AddContentDialog' in 0.1432 seconds. Added 0 classes and 0 folders.
+[2017.04.15-11.05.05:339][  0]LogContentBrowser: Native class hierarchy updated for 'SceneOutliner' in 0.1460 seconds. Added 1 classes and 2 folders.
+[2017.04.15-11.05.06:436][  0]LogCrashTracker: Crashtracker disabled due to settings.
+[2017.04.15-11.05.07:036][  0]LogUObjectGlobals:Warning: 'Class 없음.' 오브젝트를 찾는 데 실패했습니다.
+[2017.04.15-11.05.07:530][  0]LogContentBrowser: Native class hierarchy updated for 'HierarchicalLODOutliner' in 0.1382 seconds. Added 1 classes and 2 folders.
+[2017.04.15-11.05.07:530][  0]LogLoad: (Engine Initialization) Total time: 170.42 seconds
+[2017.04.15-11.05.07:530][  0]LogLoad: (Engine Initialization) Total Blueprint compile time: 0.61 seconds
+[2017.04.15-11.05.07:530][  0]LogExternalProfiler: Found external profiler: VSPerf
+[2017.04.15-11.05.07:530][  0]LogExternalProfiler: Using external profiler: VSPerf
+[2017.04.15-11.05.07:900][  0]LogOcInput: OculusInput pre-init called
+[2017.04.15-11.05.07:938][  0]LogOcInput: OculusInput is initialized. Init status 0. Runtime version: 1.13.0
+[2017.04.15-11.05.08:056][  0]LogContentStreaming: Texture pool size now 1000 MB
+[2017.04.15-11.05.08:206][  0]LogSlate: Took 0.063457 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K)
+[2017.04.15-11.05.08:370][  0]LogSlate: Took 0.160247 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/NanumGothic.ttf' (4243K)
+[2017.04.15-11.05.08:399][  0]LogSlate: Took 0.026857 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Bold.ttf' (160K)
+[2017.04.15-11.05.08:427][  0]LogSlate: Took 0.022207 seconds to synchronously load lazily loaded font '../../../Engine/Content/Editor/Slate/Fonts/FontAwesome.ttf' (139K)
+[2017.04.15-11.05.09:104][  0]LogRenderer: Reallocating scene render targets to support 1168x576 NumSamples 1 (Frame:2).
+[2017.04.15-11.05.09:104][  0]LogSlate: Took 0.043511 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Light.ttf' (159K)
+[2017.04.15-11.05.12:075][  5]LogAssetRegistry: Asset discovery search completed in 101.1598 seconds
+[2017.04.15-11.05.12:075][  5]LogCollectionManager: Rebuilt the object cache for 1 collections in 0.000032 seconds (found 0 objects)
+[2017.04.15-11.05.12:075][  5]LogCollectionManager: Fixed up redirectors for 1 collections in 0.000056 seconds (updated 0 objects)
+[2017.04.15-11.13.55:193][575]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.13.55:193][575]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.14.03:527][599]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.14.03:527][599]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.14.03:527][599]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.14.03:527][599]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.14.03:527][599]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.14.03:527][599]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.14.03:527][599]LogHMD: New ovr session is created
+[2017.04.15-11.14.03:528][599]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
+[2017.04.15-11.14.03:619][599]LogHMD: Reallocation of eye buffer was requested
+[2017.04.15-11.14.03:622][599]LogHMD: Allocated a new swap texture set (size 2404 x 1472, mipcount = 1), 0x0000019D24DC7620
+[2017.04.15-11.14.03:680][599]LogRenderer: Reallocating scene render targets to support 1920x1080 NumSamples 1 (Frame:8).
+[2017.04.15-11.14.10:005][600]LogEditorViewport: Clicking on Actor (context menu): Brush (Brush1)
+[2017.04.15-11.14.10:273][600]LogHMD: Orientation wasn't applied to a camera in frame 2
+[2017.04.15-11.14.10:273][600]LogHMD: Orientation wasn't applied to a camera in frame 2
+[2017.04.15-11.14.10:290][600]LogHMD: Allocated a new mirror texture (size 1936 x 1056)
+[2017.04.15-11.14.10:308][600]LogRenderer: Reallocating scene render targets to support 2404x1472 NumSamples 1 (Frame:9).
+[2017.04.15-11.14.10:557][600]LogHMD: Orientation wasn't applied to a camera in frame 2
+[2017.04.15-11.14.10:557][600]LogHMD: Orientation wasn't applied to a camera in frame 2
+[2017.04.15-11.14.11:819][732]LogHMD: Destroying ovr session
+[2017.04.15-11.14.11:820][732]LogHMD: Freeing textureSet 0x0000019D24DC7620
+[2017.04.15-11.14.11:829][732]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.14.12:255][733]Cmd: SELECT NONE
+[2017.04.15-11.14.12:431][733]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.14.12:431][733]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.14.12:431][733]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.14.12:431][733]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.14.12:431][733]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.14.12:431][733]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.14.12:431][733]LogHMD: New ovr session is created
+[2017.04.15-11.14.12:431][733]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
+[2017.04.15-11.14.35:223][315]LogTemp: Repeting last play command: 선택된 뷰포트
+[2017.04.15-11.14.35:285][315]LogBlueprintUserMessages: Early PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.14.35:293][315]LogPlayLevel: PlayLevel: No blueprints needed recompiling
+[2017.04.15-11.14.35:384][315]PIE: New page: PIE 세션: StartMap (2017. 4. 16. 오전 5:14:35)
+[2017.04.15-11.14.35:410][315]LogPlayLevel: Creating play world package: /Game/LOTMaps/UEDPIE_0_StartMap
+[2017.04.15-11.14.35:491][315]LogPlayLevel: PIE: StaticDuplicateObject took: (0.080550s)
+[2017.04.15-11.14.35:491][315]LogAIModule: Creating AISystem for world StartMap
+[2017.04.15-11.14.35:492][315]LogPlayLevel: PIE: World Init took: (0.000853s)
+[2017.04.15-11.14.35:504][315]LogPlayLevel: PIE: Created PIE world by copying editor world from /Game/LOTMaps/StartMap.StartMap to /Game/LOTMaps/UEDPIE_0_StartMap.StartMap (0.095214s)
+[2017.04.15-11.14.35:650][315]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
+[2017.04.15-11.14.35:665][315]LogInit: FAudioDevice initialized.
+[2017.04.15-11.14.35:877][315]LogLoad: Game class is 'StartGameMode'
+[2017.04.15-11.14.36:020][315]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_StartMap.StartMap up for play (max tick rate 0) at 2017.04.15-20.14.36
+[2017.04.15-11.14.36:152][315]LogWorld: Bringing up level for play took: 0.184881
+[2017.04.15-11.14.36:805][315]LogContentBrowser: Native class hierarchy updated for 'MovieSceneCapture' in 0.1364 seconds. Added 11 classes and 0 folders.
+[2017.04.15-11.14.36:847][315]PIE: 정보 /Game/LOTMaps/UEDPIE_0_StartMap 에 대한 에디터에서 플레이 시작 시간: 1.733
+[2017.04.15-11.14.36:848][315]LogBlueprintUserMessages: Late PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.14.37:682][356]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.14.37:682][356]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.14.42:828][959]LogNet: Browse: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.14.42:828][959]LogLoadingSplash: Loading begins
+[2017.04.15-11.14.42:834][959]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D568897C0
+[2017.04.15-11.14.42:842][959]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.14.42:842][959]LogHMD: FOculusRiftSplash::Show
+[2017.04.15-11.14.42:842][959]LogLoad: LoadMap: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.14.43:045][959]Cmd: MEM
+[2017.04.15-11.14.43:054][959]LogMemory: Platform Memory Stats for Windows
+[2017.04.15-11.14.43:054][959]LogMemory: Process Physical Memory: 1554.27 MB used, 1587.66 MB peak
+[2017.04.15-11.14.43:054][959]LogMemory: Process Virtual Memory: 2412.76 MB used, 2755.20 MB peak
+[2017.04.15-11.14.43:054][959]LogMemory: Physical Memory: 6601.14 MB used,  1509.91 MB free, 8111.06 MB total
+[2017.04.15-11.14.43:054][959]LogMemory: Virtual Memory: 3341.58 MB used,  1509.91 MB free, 134217728.00 MB total
+[2017.04.15-11.14.43:054][959]LogMemory: 
+[2017.04.15-11.14.43:054][959]Allocator Stats for TBB: (not implemented)
+[2017.04.15-11.14.43:794][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 ' Set Active ' 함수는 컨스트럭션 스크립트에서 호출하기에 안전하지 않습니다.
+[2017.04.15-11.14.43:812][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 [0746.70] Comment_BP 컴파일에 성공했습니다만, 경고가 1 회 있습니다. [소요시간 85 ms] (/Game/Blueprints/Tutorial_Blueprints/Course/Comment_BP.Comment_BP)
+[2017.04.15-11.14.43:812][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 [0746.71] Comment_BP 컴파일에 성공했습니다만, 경고가 2 회 있습니다. [소요시간 0 ms] (/Game/Blueprints/Tutorial_Blueprints/Course/Comment_BP.Comment_BP)
+[2017.04.15-11.14.43:812][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 [0746.71] Comment_BP 컴파일에 성공했습니다만, 경고가 3 회 있습니다. [소요시간 0 ms] (/Game/Blueprints/Tutorial_Blueprints/Course/Comment_BP.Comment_BP)
+[2017.04.15-11.14.43:851][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 ' Set Active ' 함수는 컨스트럭션 스크립트에서 호출하기에 안전하지 않습니다.
+[2017.04.15-11.14.43:858][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 [0746.75] Comment_BP 컴파일에 성공했습니다만, 경고가 1 회 있습니다. [소요시간 29 ms] (/Game/Blueprints/Tutorial_Blueprints/Course/Comment_BP.Comment_BP)
+[2017.04.15-11.14.43:858][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 [0746.75] Comment_BP 컴파일에 성공했습니다만, 경고가 2 회 있습니다. [소요시간 0 ms] (/Game/Blueprints/Tutorial_Blueprints/Course/Comment_BP.Comment_BP)
+[2017.04.15-11.14.43:858][959]LogBlueprint:Warning: [Compiler Comment_BP] 경고 [0746.75] Comment_BP 컴파일에 성공했습니다만, 경고가 3 회 있습니다. [소요시간 0 ms] (/Game/Blueprints/Tutorial_Blueprints/Course/Comment_BP.Comment_BP)
+[2017.04.15-11.14.50:984][959]LogAIModule: Creating AISystem for world TutorialMap
+[2017.04.15-11.14.50:985][959]LogLoad: Game class is 'Training_Mode_C'
+[2017.04.15-11.14.51:340][959]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_TutorialMap.TutorialMap up for play (max tick rate 0) at 2017.04.15-20.14.51
+[2017.04.15-11.14.51:353][959]LogWorld: Bringing up level for play took: 0.366574
+[2017.04.15-11.14.51:434][959]LogLoadingSplash: Loading ends
+[2017.04.15-11.14.51:434][959]LogHMD: FOculusRiftSplash::Hide
+[2017.04.15-11.14.51:434][959]LogHMD: Freeing textureSet 0x0000019D568897C0
+[2017.04.15-11.14.51:438][959]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D56888ED0
+[2017.04.15-11.14.51:438][959]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.14.51:438][959]LogLoad: Took 8.596136 seconds to LoadMap(/Game/LOTMaps/TutorialMap)
+[2017.04.15-11.14.51:927][982]OCULUS: Error: Prediction interval too high: 0.102791 s, clamping at 0.100000 s
+[2017.04.15-11.14.54:933][335]OCULUS: Error: Prediction interval too high: 6.508463 s, clamping at 0.100000 s
+[2017.04.15-11.14.57:941][686]OCULUS: Error: Prediction interval too high: 12.849574 s, clamping at 0.100000 s
+[2017.04.15-11.15.00:945][ 37]OCULUS: Error: Prediction interval too high: 19.212750 s, clamping at 0.100000 s
+[2017.04.15-11.15.03:952][389]OCULUS: Error: Prediction interval too high: 25.583115 s, clamping at 0.100000 s
+[2017.04.15-11.15.06:958][737]OCULUS: Error: Prediction interval too high: 31.867071 s, clamping at 0.100000 s
+[2017.04.15-11.15.09:961][ 90]OCULUS: Error: Prediction interval too high: 38.286492 s, clamping at 0.100000 s
+[2017.04.15-11.15.12:965][444]OCULUS: Error: Prediction interval too high: 44.718282 s, clamping at 0.100000 s
+[2017.04.15-11.15.15:971][796]OCULUS: Error: Prediction interval too high: 51.080599 s, clamping at 0.100000 s
+[2017.04.15-11.15.18:972][140]OCULUS: Error: Prediction interval too high: 57.242308 s, clamping at 0.100000 s
+[2017.04.15-11.15.21:976][492]OCULUS: Error: Prediction interval too high: 63.655595 s, clamping at 0.100000 s
+[2017.04.15-11.15.24:978][842]OCULUS: Error: Prediction interval too high: 69.948040 s, clamping at 0.100000 s
+[2017.04.15-11.15.27:981][194]OCULUS: Error: Prediction interval too high: 76.364120 s, clamping at 0.100000 s
+[2017.04.15-11.15.30:986][547]OCULUS: Error: Prediction interval too high: 82.712012 s, clamping at 0.100000 s
+[2017.04.15-11.15.33:992][885]OCULUS: Error: Prediction interval too high: 88.811365 s, clamping at 0.100000 s
+[2017.04.15-11.15.36:991][241]OCULUS: Error: Prediction interval too high: 95.317337 s, clamping at 0.100000 s
+[2017.04.15-11.15.39:997][598]OCULUS: Error: Prediction interval too high: 101.733658 s, clamping at 0.100000 s
+[2017.04.15-11.15.43:003][948]OCULUS: Error: Prediction interval too high: 108.088251 s, clamping at 0.100000 s
+[2017.04.15-11.15.46:009][299]OCULUS: Error: Prediction interval too high: 114.471732 s, clamping at 0.100000 s
+[2017.04.15-11.15.49:009][650]OCULUS: Error: Prediction interval too high: 120.814391 s, clamping at 0.100000 s
+[2017.04.15-11.15.52:016][  3]OCULUS: Error: Prediction interval too high: 127.177606 s, clamping at 0.100000 s
+[2017.04.15-11.15.55:025][359]OCULUS: Error: Prediction interval too high: 133.753726 s, clamping at 0.100000 s
+[2017.04.15-11.15.58:033][712]OCULUS: Error: Prediction interval too high: 140.108206 s, clamping at 0.100000 s
+[2017.04.15-11.16.01:041][ 63]OCULUS: Error: Prediction interval too high: 146.511611 s, clamping at 0.100000 s
+[2017.04.15-11.16.04:046][405]OCULUS: Error: Prediction interval too high: 152.503382 s, clamping at 0.100000 s
+[2017.04.15-11.16.07:048][752]OCULUS: Error: Prediction interval too high: 158.804099 s, clamping at 0.100000 s
+[2017.04.15-11.16.10:049][ 92]OCULUS: Error: Prediction interval too high: 164.862150 s, clamping at 0.100000 s
+[2017.04.15-11.16.12:957][418]LogBlueprintUserMessages: Early EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.16.12:957][418]LogHMD: Destroying ovr session
+[2017.04.15-11.16.12:957][418]LogHMD: Freeing textureSet 0x0000019D56888ED0
+[2017.04.15-11.16.13:009][418]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.16.13:125][418]LogBlueprintUserMessages: Late EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.16.13:211][419]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.16.13:211][419]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.16.13:211][419]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.16.13:211][419]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.16.13:211][419]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.16.13:211][419]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.16.13:211][419]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.16.13:211][419]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.16.13:211][419]LogHMD: New ovr session is created
+[2017.04.15-11.16.13:211][419]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
+[2017.04.15-11.16.36:918][612]LogSlate: Took 0.000261 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Light.ttf' (159K)
+[2017.04.15-11.16.45:976][639]LogSlate: Took 0.092447 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Light.ttf' (159K)
+[2017.04.15-11.16.49:269][639]LogSlate: Took 0.000236 seconds to synchronously load lazily loaded font '../../../Engine/Content/Slate/Fonts/Roboto-Regular.ttf' (155K)
+[2017.04.15-11.16.49:971][639]LogSavePackage: Save=1640.93ms
+[2017.04.15-11.16.49:971][639]LogSavePackage: Moving '../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Saved/StartMap_Auto14BE389D74D6D7899C4C96E8AA4D3E57D.tmp' to '../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Saved/Autosaves/Game/LOTMaps/StartMap_Auto1.umap'
+[2017.04.15-11.16.50:404][639]LogSavePackage:Display: Finished SavePackage ../../../../../../Users/syj/Documents/lordoftank/LordOfTank/Saved/Autosaves/Game/LOTMaps/StartMap_Auto1.umap
+[2017.04.15-11.16.50:531][639]LogFileHelpers: Editor autosave (incl. sublevels) for '/Game/LOTMaps/StartMap' took 4.457
+[2017.04.15-11.16.50:531][639]LogFileHelpers: Editor autosave (incl. sublevels) for all levels took 4.457
+[2017.04.15-11.18.39:080][280]LogTemp: Repeting last play command: 선택된 뷰포트
+[2017.04.15-11.18.39:090][280]LogBlueprintUserMessages: Early PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.18.39:090][280]LogPlayLevel: PlayLevel: No blueprints needed recompiling
+[2017.04.15-11.18.39:090][280]PIE: New page: PIE 세션: StartMap (2017. 4. 16. 오전 5:18:39)
+[2017.04.15-11.18.39:091][280]LogPlayLevel: Creating play world package: /Game/LOTMaps/UEDPIE_0_StartMap
+[2017.04.15-11.18.39:124][280]LogPlayLevel: PIE: StaticDuplicateObject took: (0.033095s)
+[2017.04.15-11.18.39:124][280]LogAIModule: Creating AISystem for world StartMap
+[2017.04.15-11.18.39:125][280]LogPlayLevel: PIE: World Init took: (0.000905s)
+[2017.04.15-11.18.39:125][280]LogPlayLevel: PIE: Created PIE world by copying editor world from /Game/LOTMaps/StartMap.StartMap to /Game/LOTMaps/UEDPIE_0_StartMap.StartMap (0.034334s)
+[2017.04.15-11.18.39:164][280]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
+[2017.04.15-11.18.39:178][280]LogInit: FAudioDevice initialized.
+[2017.04.15-11.18.39:210][280]LogLoad: Game class is 'StartGameMode'
+[2017.04.15-11.18.39:217][280]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_StartMap.StartMap up for play (max tick rate 0) at 2017.04.15-20.18.39
+[2017.04.15-11.18.39:218][280]LogWorld: Bringing up level for play took: 0.006193
+[2017.04.15-11.18.39:219][280]PIE: 정보 /Game/LOTMaps/UEDPIE_0_StartMap 에 대한 에디터에서 플레이 시작 시간: 0.105
+[2017.04.15-11.18.39:219][280]LogBlueprintUserMessages: Late PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.19.02:019][484]LogBlueprintUserMessages: Early EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.19.02:021][484]LogHMD: Destroying ovr session
+[2017.04.15-11.19.02:028][484]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.19.02:053][484]LogBlueprintUserMessages: Late EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.19.02:091][485]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.19.02:091][485]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.19.02:091][485]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.19.02:091][485]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.19.02:091][485]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.19.02:091][485]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.19.02:091][485]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.19.02:091][485]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.19.02:091][485]LogHMD: New ovr session is created
+[2017.04.15-11.19.02:092][485]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
+[2017.04.15-11.19.11:455][593]LogBlueprintUserMessages: Early PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.19.11:455][593]LogPlayLevel: PlayLevel: No blueprints needed recompiling
+[2017.04.15-11.19.11:455][593]PIE: New page: PIE 세션: StartMap (2017. 4. 16. 오전 5:19:11)
+[2017.04.15-11.19.11:456][593]LogPlayLevel: Creating play world package: /Game/LOTMaps/UEDPIE_0_StartMap
+[2017.04.15-11.19.11:472][593]LogPlayLevel: PIE: StaticDuplicateObject took: (0.016883s)
+[2017.04.15-11.19.11:473][593]LogAIModule: Creating AISystem for world StartMap
+[2017.04.15-11.19.11:474][593]LogPlayLevel: PIE: World Init took: (0.001075s)
+[2017.04.15-11.19.11:474][593]LogPlayLevel: PIE: Created PIE world by copying editor world from /Game/LOTMaps/StartMap.StartMap to /Game/LOTMaps/UEDPIE_0_StartMap.StartMap (0.018260s)
+[2017.04.15-11.19.11:509][593]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
+[2017.04.15-11.19.11:523][593]LogInit: FAudioDevice initialized.
+[2017.04.15-11.19.11:558][593]LogLoad: Game class is 'StartGameMode'
+[2017.04.15-11.19.11:564][593]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_StartMap.StartMap up for play (max tick rate 0) at 2017.04.15-20.19.11
+[2017.04.15-11.19.11:565][593]LogWorld: Bringing up level for play took: 0.006398
+[2017.04.15-11.19.11:566][593]PIE: 정보 /Game/LOTMaps/UEDPIE_0_StartMap 에 대한 에디터에서 플레이 시작 시간: 0.452
+[2017.04.15-11.19.11:566][593]LogBlueprintUserMessages: Late PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.19.17:227][265]LogNet: Browse: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.19.17:227][265]LogLoadingSplash: Loading begins
+[2017.04.15-11.19.17:229][265]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D2A5D9210
+[2017.04.15-11.19.17:229][265]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.19.17:229][265]LogHMD: FOculusRiftSplash::Show
+[2017.04.15-11.19.17:229][265]LogLoad: LoadMap: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.19.17:241][265]LogHMD: FOculusRiftSplash::Tick, DELTA > 0.5 secs, ie: 0.0070 265.9718
+[2017.04.15-11.19.17:243][265]Cmd: MEM
+[2017.04.15-11.19.17:252][265]LogMemory: Platform Memory Stats for Windows
+[2017.04.15-11.19.17:252][265]LogMemory: Process Physical Memory: 1672.55 MB used, 1961.77 MB peak
+[2017.04.15-11.19.17:252][265]LogMemory: Process Virtual Memory: 2779.03 MB used, 3284.93 MB peak
+[2017.04.15-11.19.17:252][265]LogMemory: Physical Memory: 6558.99 MB used,  1552.07 MB free, 8111.06 MB total
+[2017.04.15-11.19.17:252][265]LogMemory: Virtual Memory: 3697.96 MB used,  1552.07 MB free, 134217728.00 MB total
+[2017.04.15-11.19.17:252][265]LogMemory: 
+[2017.04.15-11.19.17:252][265]Allocator Stats for TBB: (not implemented)
+[2017.04.15-11.19.17:417][265]LogAIModule: Creating AISystem for world TutorialMap
+[2017.04.15-11.19.17:417][265]LogLoad: Game class is 'Training_Mode_C'
+[2017.04.15-11.19.17:490][265]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_TutorialMap.TutorialMap up for play (max tick rate 0) at 2017.04.15-20.19.17
+[2017.04.15-11.19.17:490][265]LogWorld: Bringing up level for play took: 0.071089
+[2017.04.15-11.19.17:493][265]LogLoadingSplash: Loading ends
+[2017.04.15-11.19.17:493][265]LogHMD: FOculusRiftSplash::Hide
+[2017.04.15-11.19.17:493][265]LogHMD: Freeing textureSet 0x0000019D2A5D9210
+[2017.04.15-11.19.17:497][265]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D24DC62E0
+[2017.04.15-11.19.17:499][265]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.19.17:499][265]LogLoad: Took 0.269835 seconds to LoadMap(/Game/LOTMaps/TutorialMap)
+[2017.04.15-11.19.17:590][273]OCULUS: Error: Prediction interval too high: 0.112720 s, clamping at 0.100000 s
+[2017.04.15-11.19.20:590][622]OCULUS: Error: Prediction interval too high: 6.403863 s, clamping at 0.100000 s
+[2017.04.15-11.19.23:593][964]OCULUS: Error: Prediction interval too high: 12.525022 s, clamping at 0.100000 s
+[2017.04.15-11.19.26:593][312]OCULUS: Error: Prediction interval too high: 18.798202 s, clamping at 0.100000 s
+[2017.04.15-11.19.29:598][650]OCULUS: Error: Prediction interval too high: 24.810848 s, clamping at 0.100000 s
+[2017.04.15-11.19.32:597][988]OCULUS: Error: Prediction interval too high: 30.812686 s, clamping at 0.100000 s
+[2017.04.15-11.19.46:600][637]OCULUS: Error: Prediction interval too high: 21.388196 s, clamping at 0.100000 s
+[2017.04.15-11.19.49:227][851]LogClass:Warning: Enum '/Game/LOTAssets/TankAssets/Blueprints/Components/LBXArcDrawType_ENUM.LBXArcDrawType_ENUM' was upgraded to use FText to store its display name data. Please re-save this asset to avoid issues with localization and determinstic cooking.
+[2017.04.15-11.19.49:718][851]LogContentBrowser: Native class hierarchy updated for 'BlueprintGraph' in 0.1357 seconds. Added 112 classes and 0 folders.
+[2017.04.15-11.19.51:327][851]OCULUS: Error: Prediction interval too high: 22.079829 s, clamping at 0.100000 s
+[2017.04.15-11.19.51:327][851]LogSlate: Took 0.008769 seconds to synchronously load lazily loaded font '../../../Engine/Content/Editor/Slate/Fonts/Roboto-BoldCondensed.ttf' (158K)
+[2017.04.15-11.19.52:498][852]LogSlate: Took 0.023530 seconds to synchronously load lazily loaded font '../../../Engine/Content/Editor/Slate/Fonts/Roboto-Italic.ttf' (157K)
+[2017.04.15-11.19.55:027][978]OCULUS: Error: Prediction interval too high: 20.240015 s, clamping at 0.100000 s
+[2017.04.15-11.19.58:042][110]OCULUS: Error: Prediction interval too high: 19.452585 s, clamping at 0.100000 s
+[2017.04.15-11.20.01:051][254]OCULUS: Error: Prediction interval too high: 17.242253 s, clamping at 0.100000 s
+[2017.04.15-11.20.04:335][407]OCULUS: Error: Prediction interval too high: 15.269318 s, clamping at 0.100000 s
+[2017.04.15-11.20.07:603][562]OCULUS: Error: Prediction interval too high: 14.069731 s, clamping at 0.100000 s
+[2017.04.15-11.20.10:772][717]OCULUS: Error: Prediction interval too high: 12.602889 s, clamping at 0.100000 s
+[2017.04.15-11.20.14:175][883]OCULUS: Error: Prediction interval too high: 11.903951 s, clamping at 0.100000 s
+[2017.04.15-11.20.17:788][ 47]OCULUS: Error: Prediction interval too high: 10.065555 s, clamping at 0.100000 s
+[2017.04.15-11.20.21:667][247]OCULUS: Error: Prediction interval too high: 7.061161 s, clamping at 0.100000 s
+[2017.04.15-11.20.24:655][475]OCULUS: Error: Prediction interval too high: 8.929429 s, clamping at 0.100000 s
+[2017.04.15-11.20.27:664][822]OCULUS: Error: Prediction interval too high: 15.163957 s, clamping at 0.100000 s
+[2017.04.15-11.20.30:667][167]OCULUS: Error: Prediction interval too high: 21.358189 s, clamping at 0.100000 s
+[2017.04.15-11.20.33:668][512]OCULUS: Error: Prediction interval too high: 27.557161 s, clamping at 0.100000 s
+[2017.04.15-11.20.36:676][862]OCULUS: Error: Prediction interval too high: 33.869294 s, clamping at 0.100000 s
+[2017.04.15-11.20.39:678][209]OCULUS: Error: Prediction interval too high: 40.118580 s, clamping at 0.100000 s
+[2017.04.15-11.20.42:686][554]OCULUS: Error: Prediction interval too high: 46.314059 s, clamping at 0.100000 s
+[2017.04.15-11.20.45:686][901]OCULUS: Error: Prediction interval too high: 52.552778 s, clamping at 0.100000 s
+[2017.04.15-11.20.48:690][250]OCULUS: Error: Prediction interval too high: 58.904751 s, clamping at 0.100000 s
+[2017.04.15-11.20.51:694][596]OCULUS: Error: Prediction interval too high: 65.062819 s, clamping at 0.100000 s
+[2017.04.15-11.20.54:697][943]OCULUS: Error: Prediction interval too high: 71.444753 s, clamping at 0.100000 s
+[2017.04.15-11.20.57:702][291]OCULUS: Error: Prediction interval too high: 77.641044 s, clamping at 0.100000 s
+[2017.04.15-11.21.00:711][638]OCULUS: Error: Prediction interval too high: 83.859107 s, clamping at 0.100000 s
+[2017.04.15-11.21.03:709][987]OCULUS: Error: Prediction interval too high: 90.112604 s, clamping at 0.100000 s
+[2017.04.15-11.21.06:710][338]OCULUS: Error: Prediction interval too high: 96.558411 s, clamping at 0.100000 s
+[2017.04.15-11.21.09:650][675]LogBlueprintUserMessages: Early EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.21.09:655][675]LogHMD: Destroying ovr session
+[2017.04.15-11.21.09:655][675]LogHMD: Freeing textureSet 0x0000019D24DC62E0
+[2017.04.15-11.21.09:665][675]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.21.09:690][675]LogBlueprintUserMessages: Late EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.21.09:735][676]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.21.09:735][676]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.21.09:735][676]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.21.09:735][676]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.21.09:735][676]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.21.09:735][676]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.21.09:735][676]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.21.09:735][676]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.21.09:735][676]LogHMD: New ovr session is created
+[2017.04.15-11.21.09:737][676]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
+[2017.04.15-11.23.11:591][239]LogHotReload: New module detected: UE4Editor-LordOfTank-1409.dll
+[2017.04.15-11.23.13:292][245]LogHotReload: Starting Hot-Reload from IDE
+[2017.04.15-11.23.14:488][245]LogHotReload: Re-instancing CommonProjectile after hot-reload.
+[2017.04.15-11.23.15:596][245]LogContentBrowser: Native class hierarchy updated for 'LordOfTank' in 0.1424 seconds. Added 13 classes and 8 folders.
+[2017.04.15-11.23.15:599][245]Display: HotReload successful (10 functions remapped  0 scriptstructs remapped)
+[2017.04.15-11.23.16:225][245]LogContentBrowser: Native class hierarchy populated in 0.1425 seconds. Added 2260 classes and 465 folders.
+[2017.04.15-11.23.16:320][245]Display: HotReload took  3.0s.
+[2017.04.15-11.23.20:589][397]LogTemp: Repeting last play command: 선택된 뷰포트
+[2017.04.15-11.23.20:625][397]LogBlueprintUserMessages: Early PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.23.20:626][397]LogPlayLevel: PlayLevel: No blueprints needed recompiling
+[2017.04.15-11.23.20:626][397]PIE: New page: PIE 세션: StartMap (2017. 4. 16. 오전 5:23:20)
+[2017.04.15-11.23.20:626][397]LogPlayLevel: Creating play world package: /Game/LOTMaps/UEDPIE_0_StartMap
+[2017.04.15-11.23.20:659][397]LogPlayLevel: PIE: StaticDuplicateObject took: (0.033030s)
+[2017.04.15-11.23.20:660][397]LogAIModule: Creating AISystem for world StartMap
+[2017.04.15-11.23.20:660][397]LogPlayLevel: PIE: World Init took: (0.001332s)
+[2017.04.15-11.23.20:660][397]LogPlayLevel: PIE: Created PIE world by copying editor world from /Game/LOTMaps/StartMap.StartMap to /Game/LOTMaps/UEDPIE_0_StartMap.StartMap (0.034631s)
+[2017.04.15-11.23.20:738][397]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
+[2017.04.15-11.23.20:753][397]LogInit: FAudioDevice initialized.
+[2017.04.15-11.23.20:783][397]LogLoad: Game class is 'StartGameMode'
+[2017.04.15-11.23.20:791][397]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_StartMap.StartMap up for play (max tick rate 0) at 2017.04.15-20.23.20
+[2017.04.15-11.23.20:791][397]LogWorld: Bringing up level for play took: 0.006834
+[2017.04.15-11.23.20:804][397]PIE: 정보 /Game/LOTMaps/UEDPIE_0_StartMap 에 대한 에디터에서 플레이 시작 시간: -0.31
+[2017.04.15-11.23.20:804][397]LogBlueprintUserMessages: Late PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.23.24:527][798]LogNet: Browse: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.23.24:527][798]LogLoadingSplash: Loading begins
+[2017.04.15-11.23.24:530][798]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D01A15920
+[2017.04.15-11.23.24:530][798]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.23.24:530][798]LogHMD: FOculusRiftSplash::Show
+[2017.04.15-11.23.24:530][798]LogLoad: LoadMap: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.23.24:532][798]LogHMD: FOculusRiftSplash::Tick, DELTA > 0.5 secs, ie: 0.0081 247.2994
+[2017.04.15-11.23.24:586][798]Cmd: MEM
+[2017.04.15-11.23.24:600][798]LogMemory: Platform Memory Stats for Windows
+[2017.04.15-11.23.24:600][798]LogMemory: Process Physical Memory: 1584.90 MB used, 2055.37 MB peak
+[2017.04.15-11.23.24:600][798]LogMemory: Process Virtual Memory: 2898.63 MB used, 3284.93 MB peak
+[2017.04.15-11.23.24:600][798]LogMemory: Physical Memory: 6632.71 MB used,  1478.35 MB free, 8111.06 MB total
+[2017.04.15-11.23.24:600][798]LogMemory: Virtual Memory: 4054.93 MB used,  1478.35 MB free, 134217728.00 MB total
+[2017.04.15-11.23.24:600][798]LogMemory: 
+[2017.04.15-11.23.24:600][798]Allocator Stats for TBB: (not implemented)
+[2017.04.15-11.23.24:801][798]LogAIModule: Creating AISystem for world TutorialMap
+[2017.04.15-11.23.24:802][798]LogLoad: Game class is 'Training_Mode_C'
+[2017.04.15-11.23.24:875][798]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_TutorialMap.TutorialMap up for play (max tick rate 0) at 2017.04.15-20.23.24
+[2017.04.15-11.23.24:876][798]LogWorld: Bringing up level for play took: 0.072770
+[2017.04.15-11.23.24:879][798]LogLoadingSplash: Loading ends
+[2017.04.15-11.23.24:879][798]LogHMD: FOculusRiftSplash::Hide
+[2017.04.15-11.23.24:879][798]LogHMD: Freeing textureSet 0x0000019D01A15920
+[2017.04.15-11.23.24:882][798]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D01A15A80
+[2017.04.15-11.23.24:883][798]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.23.24:883][798]LogLoad: Took 0.352727 seconds to LoadMap(/Game/LOTMaps/TutorialMap)
+[2017.04.15-11.23.25:009][807]OCULUS: Error: Prediction interval too high: 0.104256 s, clamping at 0.100000 s
+[2017.04.15-11.23.28:012][139]OCULUS: Error: Prediction interval too high: 5.939641 s, clamping at 0.100000 s
+[2017.04.15-11.23.31:016][484]OCULUS: Error: Prediction interval too high: 12.132634 s, clamping at 0.100000 s
+[2017.04.15-11.23.34:018][830]OCULUS: Error: Prediction interval too high: 18.366132 s, clamping at 0.100000 s
+[2017.04.15-11.23.37:024][179]OCULUS: Error: Prediction interval too high: 24.659694 s, clamping at 0.100000 s
+[2017.04.15-11.23.40:026][527]OCULUS: Error: Prediction interval too high: 30.954965 s, clamping at 0.100000 s
+[2017.04.15-11.23.43:028][873]OCULUS: Error: Prediction interval too high: 37.156032 s, clamping at 0.100000 s
+[2017.04.15-11.23.46:036][213]OCULUS: Error: Prediction interval too high: 43.189098 s, clamping at 0.100000 s
+[2017.04.15-11.23.49:038][555]OCULUS: Error: Prediction interval too high: 49.295165 s, clamping at 0.100000 s
+[2017.04.15-11.23.52:046][903]OCULUS: Error: Prediction interval too high: 55.610059 s, clamping at 0.100000 s
+[2017.04.15-11.23.55:048][253]OCULUS: Error: Prediction interval too high: 61.941763 s, clamping at 0.100000 s
+[2017.04.15-11.23.58:051][596]OCULUS: Error: Prediction interval too high: 68.077688 s, clamping at 0.100000 s
+[2017.04.15-11.24.01:056][936]OCULUS: Error: Prediction interval too high: 74.126296 s, clamping at 0.100000 s
+[2017.04.15-11.24.04:058][278]OCULUS: Error: Prediction interval too high: 80.282253 s, clamping at 0.100000 s
+[2017.04.15-11.24.04:254][301]LogBlueprintUserMessages: Early EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.24.04:257][301]LogHMD: Destroying ovr session
+[2017.04.15-11.24.04:258][301]LogHMD: Freeing textureSet 0x0000019D01A15A80
+[2017.04.15-11.24.04:267][301]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.24.04:293][301]LogBlueprintUserMessages: Late EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.24.04:339][302]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.24.04:339][302]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.24.04:339][302]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.24.04:339][302]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.24.04:339][302]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.24.04:339][302]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.24.04:339][302]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.24.04:339][302]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.24.04:339][302]LogHMD: New ovr session is created
+[2017.04.15-11.24.04:339][302]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080
+[2017.04.15-11.27.29:041][ 64]LogHotReload: New module detected: UE4Editor-LordOfTank-2098.dll
+[2017.04.15-11.27.30:047][ 68]LogHotReload: Starting Hot-Reload from IDE
+[2017.04.15-11.27.30:234][ 68]LogHotReload: Re-instancing Projectile after hot-reload.
+[2017.04.15-11.27.30:415][ 68]LogHotReload: Re-instancing ArmorPiercingProjectile after hot-reload.
+[2017.04.15-11.27.30:599][ 68]LogHotReload: Re-instancing CommonProjectile after hot-reload.
+[2017.04.15-11.27.31:572][ 68]LogHotReload: Re-instancing HomingProjectile after hot-reload.
+[2017.04.15-11.27.31:896][ 68]LogContentBrowser: Native class hierarchy updated for 'LordOfTank' in 0.1410 seconds. Added 13 classes and 8 folders.
+[2017.04.15-11.27.31:899][ 68]Display: HotReload successful (10 functions remapped  0 scriptstructs remapped)
+[2017.04.15-11.27.32:444][ 68]LogContentBrowser: Native class hierarchy populated in 0.1505 seconds. Added 2260 classes and 465 folders.
+[2017.04.15-11.27.32:448][ 68]Display: HotReload took  2.4s.
+[2017.04.15-11.27.37:947][468]LogTemp: Repeting last play command: 선택된 뷰포트
+[2017.04.15-11.27.37:958][468]LogBlueprintUserMessages: Early PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.27.37:958][468]LogPlayLevel: PlayLevel: No blueprints needed recompiling
+[2017.04.15-11.27.37:958][468]PIE: New page: PIE 세션: StartMap (2017. 4. 16. 오전 5:27:37)
+[2017.04.15-11.27.37:958][468]LogPlayLevel: Creating play world package: /Game/LOTMaps/UEDPIE_0_StartMap
+[2017.04.15-11.27.37:978][468]LogPlayLevel: PIE: StaticDuplicateObject took: (0.019418s)
+[2017.04.15-11.27.37:979][468]LogAIModule: Creating AISystem for world StartMap
+[2017.04.15-11.27.37:979][468]LogPlayLevel: PIE: World Init took: (0.001316s)
+[2017.04.15-11.27.37:979][468]LogPlayLevel: PIE: Created PIE world by copying editor world from /Game/LOTMaps/StartMap.StartMap to /Game/LOTMaps/UEDPIE_0_StartMap.StartMap (0.021170s)
+[2017.04.15-11.27.38:064][468]LogInit: XAudio2 using '스피커(High Definition Audio 장치)' : 2 channels at 44.1 kHz using 16 bits per sample (channel mask 0x3)
+[2017.04.15-11.27.38:085][468]LogInit: FAudioDevice initialized.
+[2017.04.15-11.27.38:116][468]LogLoad: Game class is 'StartGameMode'
+[2017.04.15-11.27.38:123][468]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_StartMap.StartMap up for play (max tick rate 0) at 2017.04.15-20.27.38
+[2017.04.15-11.27.38:124][468]LogWorld: Bringing up level for play took: 0.006782
+[2017.04.15-11.27.38:125][468]PIE: 정보 /Game/LOTMaps/UEDPIE_0_StartMap 에 대한 에디터에서 플레이 시작 시간: 1.011
+[2017.04.15-11.27.38:126][468]LogBlueprintUserMessages: Late PlayInEditor Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.27.42:055][866]LogNet: Browse: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.27.42:055][866]LogLoadingSplash: Loading begins
+[2017.04.15-11.27.42:058][866]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D01A157C0
+[2017.04.15-11.27.42:058][866]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.27.42:058][866]LogHMD: FOculusRiftSplash::Show
+[2017.04.15-11.27.42:058][866]LogLoad: LoadMap: /Game/LOTMaps/TutorialMap
+[2017.04.15-11.27.42:079][866]LogHMD: FOculusRiftSplash::Tick, DELTA > 0.5 secs, ie: 0.0065 257.1916
+[2017.04.15-11.27.42:095][866]Cmd: MEM
+[2017.04.15-11.27.42:111][866]LogMemory: Platform Memory Stats for Windows
+[2017.04.15-11.27.42:111][866]LogMemory: Process Physical Memory: 624.07 MB used, 2055.37 MB peak
+[2017.04.15-11.27.42:111][866]LogMemory: Process Virtual Memory: 2905.07 MB used, 3284.93 MB peak
+[2017.04.15-11.27.42:111][866]LogMemory: Physical Memory: 5568.20 MB used,  2542.86 MB free, 8111.06 MB total
+[2017.04.15-11.27.42:111][866]LogMemory: Virtual Memory: 3856.07 MB used,  2542.86 MB free, 134217728.00 MB total
+[2017.04.15-11.27.42:111][866]LogMemory: 
+[2017.04.15-11.27.42:111][866]Allocator Stats for TBB: (not implemented)
+[2017.04.15-11.27.42:256][866]LogAIModule: Creating AISystem for world TutorialMap
+[2017.04.15-11.27.42:256][866]LogLoad: Game class is 'Training_Mode_C'
+[2017.04.15-11.27.42:335][866]LogWorld: Bringing World /Game/LOTMaps/UEDPIE_0_TutorialMap.TutorialMap up for play (max tick rate 0) at 2017.04.15-20.27.42
+[2017.04.15-11.27.42:336][866]LogWorld: Bringing up level for play took: 0.078195
+[2017.04.15-11.27.42:341][866]LogLoadingSplash: Loading ends
+[2017.04.15-11.27.42:341][866]LogHMD: FOculusRiftSplash::Hide
+[2017.04.15-11.27.42:341][866]LogHMD: Freeing textureSet 0x0000019D01A157C0
+[2017.04.15-11.27.42:344][866]LogHMD: Allocated a new swap texture set (size 16 x 16, mipcount = 5), 0x0000019D01A15500
+[2017.04.15-11.27.42:346][866]LogHMD: FOculusRiftSplash::PushBlackFrame
+[2017.04.15-11.27.42:346][866]LogLoad: Took 0.287991 seconds to LoadMap(/Game/LOTMaps/TutorialMap)
+[2017.04.15-11.27.42:453][874]OCULUS: Error: Prediction interval too high: 0.102151 s, clamping at 0.100000 s
+[2017.04.15-11.27.45:457][201]OCULUS: Error: Prediction interval too high: 5.801296 s, clamping at 0.100000 s
+[2017.04.15-11.27.48:461][529]OCULUS: Error: Prediction interval too high: 11.538263 s, clamping at 0.100000 s
+[2017.04.15-11.27.51:471][872]OCULUS: Error: Prediction interval too high: 17.672590 s, clamping at 0.100000 s
+[2017.04.15-11.27.54:480][205]OCULUS: Error: Prediction interval too high: 23.544732 s, clamping at 0.100000 s
+[2017.04.15-11.27.57:485][551]OCULUS: Error: Prediction interval too high: 29.764106 s, clamping at 0.100000 s
+[2017.04.15-11.28.00:488][898]OCULUS: Error: Prediction interval too high: 36.008936 s, clamping at 0.100000 s
+[2017.04.15-11.28.03:489][231]OCULUS: Error: Prediction interval too high: 41.904702 s, clamping at 0.100000 s
+[2017.04.15-11.28.06:491][576]OCULUS: Error: Prediction interval too high: 48.089950 s, clamping at 0.100000 s
+[2017.04.15-11.28.09:494][916]OCULUS: Error: Prediction interval too high: 54.142849 s, clamping at 0.100000 s
+[2017.04.15-11.28.12:497][259]OCULUS: Error: Prediction interval too high: 60.295773 s, clamping at 0.100000 s
+[2017.04.15-11.28.15:499][604]OCULUS: Error: Prediction interval too high: 66.477510 s, clamping at 0.100000 s
+[2017.04.15-11.28.18:505][916]OCULUS: Error: Prediction interval too high: 71.819564 s, clamping at 0.100000 s
+[2017.04.15-11.28.21:507][232]OCULUS: Error: Prediction interval too high: 77.226033 s, clamping at 0.100000 s
+[2017.04.15-11.28.24:512][569]OCULUS: Error: Prediction interval too high: 83.224874 s, clamping at 0.100000 s
+[2017.04.15-11.28.27:516][915]OCULUS: Error: Prediction interval too high: 89.432453 s, clamping at 0.100000 s
+[2017.04.15-11.28.30:517][262]OCULUS: Error: Prediction interval too high: 95.648479 s, clamping at 0.100000 s
+[2017.04.15-11.28.33:521][607]OCULUS: Error: Prediction interval too high: 101.864072 s, clamping at 0.100000 s
+[2017.04.15-11.28.36:527][947]OCULUS: Error: Prediction interval too high: 107.910767 s, clamping at 0.100000 s
+[2017.04.15-11.28.39:529][290]OCULUS: Error: Prediction interval too high: 114.086597 s, clamping at 0.100000 s
+[2017.04.15-11.28.42:530][638]OCULUS: Error: Prediction interval too high: 120.381443 s, clamping at 0.100000 s
+[2017.04.15-11.28.45:531][988]OCULUS: Error: Prediction interval too high: 126.679127 s, clamping at 0.100000 s
+[2017.04.15-11.28.48:535][340]OCULUS: Error: Prediction interval too high: 133.078077 s, clamping at 0.100000 s
+[2017.04.15-11.28.51:539][685]OCULUS: Error: Prediction interval too high: 139.286672 s, clamping at 0.100000 s
+[2017.04.15-11.28.54:543][ 25]OCULUS: Error: Prediction interval too high: 145.347793 s, clamping at 0.100000 s
+[2017.04.15-11.28.57:549][363]OCULUS: Error: Prediction interval too high: 151.302552 s, clamping at 0.100000 s
+[2017.04.15-11.29.00:556][705]OCULUS: Error: Prediction interval too high: 157.398803 s, clamping at 0.100000 s
+[2017.04.15-11.29.03:563][ 37]OCULUS: Error: Prediction interval too high: 163.353974 s, clamping at 0.100000 s
+[2017.04.15-11.29.06:563][375]OCULUS: Error: Prediction interval too high: 169.162268 s, clamping at 0.100000 s
+[2017.04.15-11.29.09:563][721]OCULUS: Error: Prediction interval too high: 175.497177 s, clamping at 0.100000 s
+[2017.04.15-11.29.09:735][741]LogBlueprintUserMessages: Early EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.29.09:737][741]LogHMD: Destroying ovr session
+[2017.04.15-11.29.09:737][741]LogHMD: Freeing textureSet 0x0000019D01A15500
+[2017.04.15-11.29.09:748][741]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.29.09:778][741]LogBlueprintUserMessages: Late EndPlayMap Detection: Level '/Game/LOTMaps/StartMap.StartMap:PersistentLevel' has LevelScriptBlueprint '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap' with GeneratedClass '/Game/LOTMaps/StartMap.StartMap_C' with ClassGeneratedBy '/Game/LOTMaps/StartMap.StartMap:PersistentLevel.StartMap'
+[2017.04.15-11.29.09:826][742]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.29.09:826][742]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.29.09:826][742]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/ProfileDB.json
+[2017.04.15-11.29.09:826][742]OCULUS: Debug: Failed to open file: C:\Users\syj\AppData\Local\Oculus/Profiles.json
+[2017.04.15-11.29.09:826][742]OCULUS: Debug: [HMDState] Using default profile default
+[2017.04.15-11.29.09:826][742]OCULUS: Info: IAD changed to 63.5mm
+[2017.04.15-11.29.09:826][742]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.29.09:826][742]OCULUS: Info: [HMDState] Requested to SetForegroundWindow(305b8ll)
+[2017.04.15-11.29.09:826][742]LogHMD: New ovr session is created
+[2017.04.15-11.29.09:827][742]LogHMD: HMD Oculus Rift DK2, res = 1920 x 1080

@@ -15,8 +15,9 @@ AProjectile::AProjectile()
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CollisionComp->SetCollisionObjectType(ECC_Vehicle);
+	//CollisionComp->SetCollisionObjectType(ECC_Vehicle);
 	CollisionComp->SetCollisionObjectType(COLLISION_PROJECTILE);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
 	//CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	//CollisionComp->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Block);
 	RootComponent = CollisionComp;
