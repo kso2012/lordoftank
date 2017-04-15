@@ -35,13 +35,13 @@ void ULOTGameInstance::ClickMultiBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serveraddr.sin_addr.s_addr = inet_addr("175.196.145.229");
 	serveraddr.sin_port = htons(SERVER_PORT);
 	retval = WSAConnect(sock, (SOCKADDR *)&serveraddr, sizeof(serveraddr), NULL, NULL, NULL, NULL);
 	if (retval != SOCKET_ERROR)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 성공"));
 
-	string a = "안녕하십니까";
+	char a = 'A';
 
 	DWORD iobyte;
 	memcpy(send_wsabuf.buf, &a, sizeof(a));

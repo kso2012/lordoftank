@@ -20,8 +20,8 @@ ACommonProjectile::ACommonProjectile()
 	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
 	
 	
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
-	TrailParticle->SetTemplate(TrailParticleAsset.Object);
+	//static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
+	//TrailParticle->SetTemplate(TrailParticleAsset.Object);
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
 	FlareParticle->SetTemplate(FlareParticleAsset.Object);
@@ -39,7 +39,7 @@ ACommonProjectile::ACommonProjectile()
 	RadialRadius = 1000.f; //Æø¹ß ¹Ý°æ
 	ImpulseStrength = 1000000.f;
 	ProjectileDamage = 10.f;
-
+	
 
 }
 

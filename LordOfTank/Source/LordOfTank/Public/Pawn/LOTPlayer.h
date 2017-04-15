@@ -73,7 +73,7 @@ public:
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void Turn(float Val);
+	
 	//포사격
 	void Fire();
 	//시점변경시 visible설정
@@ -92,10 +92,23 @@ private:
 	//탄환을 넣을 인벤토리
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 		TArray<TSubclassOf<class AProjectile>> ProjectileInventory;
+	//사격모드일 때 Barrel과 Gun 메쉬 변환.
+	void ChangeFiremodeBody();
+
+	FVector GetSegmentatTime(FVector StartLocation, FVector InitialVelocity, FVector Gravity, float time);
+
+	void DrawTrajectory();
+
+	
+
+	//버튼 클릭 시 시점변경
+	void ChangeCamera(bool bIsFireMode);
+
 	//유도미사일에게 넘겨줄 유도타겟
 	class AActor* HomingTarget;
+
 	//사격모드인가?
-	uint32 bIsFireMode : 1;
+	bool bIsFireMode;
 	//최대체력
 	float MaxHealth;
 	//최대실드량

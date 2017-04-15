@@ -9,6 +9,7 @@
 #include "Weapon/HomingProjectile.h"
 #include "Effects/TankCameraShake.h"
 #include "WheeledVehicleMovementComponent4W.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "LOTDrone.h"
 #include "LOTPlayer.h"
 
@@ -76,7 +77,7 @@ ALOTPlayer::ALOTPlayer()
 
 	
 
-	// Create a spring arm component
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
 	SpringArm->TargetOffset = FVector(0.f, 0.f, 200.f);
 	SpringArm->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
@@ -88,7 +89,7 @@ ALOTPlayer::ALOTPlayer()
 	SpringArm->bInheritRoll = false;
 
 
-	// Create camera component
+
 	MoveModeCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	MoveModeCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	MoveModeCamera->bUsePawnControlRotation = false;
@@ -142,9 +143,15 @@ void ALOTPlayer::Tick(float DeltaTime)
 
 	if (bIsFireMode)
 	{
-		TurretMesh->SetRelativeRotation(FRotator(0.0f, FireModeCamera->RelativeRotation.Yaw, 0.0f));
-		BarrelMesh->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, 0.0f, 0.0f));
+		ChangeFiremodeBody();
+		DrawTrajectory();
 	}
+}
+
+void ALOTPlayer::ChangeFiremodeBody()
+{
+	TurretMesh->SetRelativeRotation(FRotator(0.0f, FireModeCamera->RelativeRotation.Yaw, 0.0f));
+	BarrelMesh->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, 0.0f, 0.0f));
 }
 
 void ALOTPlayer::FireMode()
@@ -152,26 +159,12 @@ void ALOTPlayer::FireMode()
 	if (bIsFireMode == false)
 	{
 		bIsFireMode = true;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("포격모드!!!"));
-		MoveModeCamera->Deactivate();
-		FireModeCamera->Activate();
-		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
-		TurretMesh->SetVisibility(false, false);
-		GetMesh()->SetVisibility(false, false);
-		BarrelMesh->SetVisibility(false, false);
+		ChangeCamera(bIsFireMode);
 	}
 	else
 	{
 		bIsFireMode = false;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노포격모드!!!"));
-		MoveModeCamera->Activate();
-		FireModeCamera->Deactivate();
-
-		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
-		TurretMesh->SetVisibility(true, false);
-		GetMesh()->SetVisibility(true, false);
-		BarrelMesh->SetVisibility(true, false);
-	
+		ChangeCamera(bIsFireMode);
 	}
 }
 
@@ -198,7 +191,7 @@ void ALOTPlayer::Fire()
 			//World->SpawnActor<ALOTDrone>(ALOTDrone::StaticClass(), SpawnLocation+FVector(0.0f,0.0f,1000.f), SpawnRotation);
 			
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
-			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,1.0f,VTBlend_Linear,0.0f,true);
+			//UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,1.0f,VTBlend_Linear,0.0f,true);
 
 		}
 	}
@@ -206,10 +199,28 @@ void ALOTPlayer::Fire()
 
 }
 
-void ALOTPlayer::Turn(float Val)
+void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 {
-	
+	if (bIsFireMode == true)
+	{
+		MoveModeCamera->Deactivate();
+		FireModeCamera->Activate();
+		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
+		TurretMesh->SetVisibility(false, false);
+		GetMesh()->SetVisibility(false, false);
+		BarrelMesh->SetVisibility(false, false);
+	}
+	else if (bIsFireMode == false)
+	{
+		MoveModeCamera->Activate();
+		FireModeCamera->Deactivate();
+		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
+		TurretMesh->SetVisibility(true, false);
+		GetMesh()->SetVisibility(true, false);
+		BarrelMesh->SetVisibility(true, false);
+	}
 }
+
 
 
 
@@ -218,7 +229,7 @@ void ALOTPlayer::OnResetVR()
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
-/** Handle pressing forwards */
+
 void ALOTPlayer::MoveForward(float Val)
 {
 	if(!bIsFireMode)
@@ -226,7 +237,7 @@ void ALOTPlayer::MoveForward(float Val)
 
 }
 
-/** Handle pressing right */
+
 void ALOTPlayer::MoveRight(float Val)
 {
 	if(!bIsFireMode)
@@ -241,7 +252,7 @@ void ALOTPlayer::SetDefaultInvetory()
 		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
 		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
-		CurrentProjectile = ProjectileInventory[2];
+		CurrentProjectile = ProjectileInventory[0];
 
 	}
 }
@@ -270,6 +281,51 @@ void ALOTPlayer::ApplyDamage(float damage)
 
 	}
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CurrentHealth));
+}
+
+FVector ALOTPlayer::GetSegmentatTime(FVector StartLocation, FVector InitialVelocity, FVector Gravity, float time)
+{
+	return StartLocation + (InitialVelocity*time) + (time*time*0.5*Gravity);
+}
+
+void ALOTPlayer::DrawTrajectory()
+{
+	const FRotator SpawnRotation = GetActorRotation() + FireModeCamera->RelativeRotation;//
+
+	const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
+
+	const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
+		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(8000.f, 0.f, 0.f));
+
+	const float PathLifetime = 5.0f;
+	const float TimeInterval = 0.05f;
+	const int32 FloorTime = UKismetMathLibrary::FFloor(PathLifetime/ TimeInterval);
+
+	float time1, time2;
+	FVector point1, point2;
+
+	//타겟설정 가능한 타입을 넣을 배열
+	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
+	//비히클타입만 체크하도록 한다.
+	
+	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
+	//현재 월드를 가져온다.
+	UWorld* const World = GetWorld();
+
+	FHitResult OutHit;
+	
+	for (int32 index = 0; index < FloorTime; ++index)
+	{
+		time1 = index * TimeInterval;
+		time2 = (index + 1) * TimeInterval;
+		point1 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time1);
+		point2 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time2);
+
+		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true);
+		
+	}
+	
+	
 }
 
 
