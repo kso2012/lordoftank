@@ -36,16 +36,10 @@ void AnwtestGameModeBase::BeginPlay()
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("소켓생성전"));
 	accept_threads = new thread{ &ToCallacceptthread, this };
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("소켓 생성 성공"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("소켓 생성 성공"));
 
 
-	//-
-	/*for (auto th : worker_threads) {
-	th->join();
-	delete th;
-	}
-	accept_threads->join();*/
-	//WSACleanup();
+
 
 
 }
@@ -106,10 +100,28 @@ void AnwtestGameModeBase::Initialize_Server()
 	}
 }
 
+void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ProcessPacket 진입")));
+
+	/*unsigned char type = packet[1];
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%d"), type));*/
+
+	FVector *pos = reinterpret_cast<FVector*>(packet);
+	float x, y, z;
+	x = pos->X;
+	y = pos->Y;
+	z = pos->Z;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("X = %f, Y = %f, Z = %f"), x, y, z));
+
+	
+
+
+}
+
 void AnwtestGameModeBase::workerthread()
 {
 	DWORD io_size, key;
-	//PULONG_PTR key;
 	OverlapEx *overlap;
 	BOOL result;
 
@@ -124,15 +136,43 @@ void AnwtestGameModeBase::workerthread()
 
 		if (io_size == 0)
 		{
-
+			//closesocket(clients[key].m_s);
 		}
 
 		if (overlap->operation == OP_RECV)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
 			unsigned char *buf_ptr = overlap->socket_buf;
 			int remained = io_size;
 
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("데이터받음"));
+			while (0 < remained) { // 패킷이 다올때까지 처리해야함.
+				if (0 == clients[key].m_recv_overlap.packet_size) {
+					clients[key].m_recv_overlap.packet_size = buf_ptr[0];
+				}
+				int required = clients[key].m_recv_overlap.packet_size
+					- clients[key].previous_data;
+				if (remained >= required) {
+					memcpy(clients[key].packet + clients[key].previous_data,
+						buf_ptr,
+						required);
+					ProcessPacket(key, clients[key].packet);
+					remained -= required;
+					buf_ptr += required;
+					clients[key].m_recv_overlap.packet_size = 0;
+					clients[key].previous_data = 0;
+				}
+				else {
+					memcpy(clients[key].packet + clients[key].previous_data,
+						buf_ptr, remained);
+					clients[key].previous_data += remained;
+					remained = 0;
+					buf_ptr += remained;
+				}
+			}
+
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%c %d"), buf_ptr, io_size));
+
+
 			DWORD flags = 0;
 			WSARecv(clients[key].m_s,
 				&clients[key].m_recv_overlap.recv_buf,
