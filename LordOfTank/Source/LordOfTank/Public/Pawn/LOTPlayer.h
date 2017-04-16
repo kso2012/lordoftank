@@ -88,6 +88,8 @@ private:
 	//현재 탄환을 가리키는 포인터,TSubclassOf를 사용하는 이유는 <타입>을 상속하는 클래스만 할당하게 하기 위함.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AProjectile> CurrentProjectile;
+	//빔을 담고있는 배열
+	TArray<UParticleSystemComponent*> BeamArray;
 
 	//탄환을 넣을 인벤토리
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
@@ -99,10 +101,15 @@ private:
 
 	void DrawTrajectory();
 
-	
+	void ClearBeam();
 
 	//버튼 클릭 시 시점변경
 	void ChangeCamera(bool bIsFireMode);
+
+	//UParticleSystemComponent* TrajectoryBeam;
+	
+	//빔을 그리는 함수
+	void DrawBeam(FVector StartLocation, FVector EndLocation);
 
 	//유도미사일에게 넘겨줄 유도타겟
 	class AActor* HomingTarget;

@@ -8,8 +8,10 @@
 #include "Weapon/ArmorPiercingProjectile.h"
 #include "Weapon/HomingProjectile.h"
 #include "Effects/TankCameraShake.h"
+#include "LOTGameInstance.h"
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetArrayLibrary.h"
 #include "LOTDrone.h"
 #include "LOTPlayer.h"
 
@@ -46,8 +48,6 @@ ALOTPlayer::ALOTPlayer()
 	BarrelMesh->SetMaterial(0, BarrelMaterial.Object);
 	BarrelMesh->AttachToComponent(TurretMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Turret_BR"));
 	BarrelMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-
 	//총구에 씬컴포넌트 부착.
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
@@ -100,8 +100,6 @@ ALOTPlayer::ALOTPlayer()
 	FireModeCamera->FieldOfView = 90.f;
 	FireModeCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
 	FireModeCamera->Deactivate();
-
-
 
 	bIsFireMode = false;
 
@@ -156,6 +154,7 @@ void ALOTPlayer::ChangeFiremodeBody()
 
 void ALOTPlayer::FireMode()
 {
+	ClearBeam();
 	if (bIsFireMode == false)
 	{
 		bIsFireMode = true;
@@ -201,6 +200,7 @@ void ALOTPlayer::Fire()
 
 void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 {
+	
 	if (bIsFireMode == true)
 	{
 		MoveModeCamera->Deactivate();
@@ -290,6 +290,7 @@ FVector ALOTPlayer::GetSegmentatTime(FVector StartLocation, FVector InitialVeloc
 
 void ALOTPlayer::DrawTrajectory()
 {
+	ClearBeam();
 	const FRotator SpawnRotation = GetActorRotation() + FireModeCamera->RelativeRotation;//
 
 	const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
@@ -308,27 +309,48 @@ void ALOTPlayer::DrawTrajectory()
 	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
 	//비히클타입만 체크하도록 한다.
 	
-	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
+	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Visibility));
 	//현재 월드를 가져온다.
 	UWorld* const World = GetWorld();
 
 	FHitResult OutHit;
 	
+	
+	//for (int32 index = 0; index < 3; ++index)
 	for (int32 index = 0; index < FloorTime; ++index)
 	{
 		time1 = index * TimeInterval;
 		time2 = (index + 1) * TimeInterval;
 		point1 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time1);
 		point2 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time2);
+		DrawBeam(point1, point2);
 
-		UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true);
+		if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
+			break;
 		
 	}
-	
+}
+
+void ALOTPlayer::DrawBeam(FVector StartLocation, FVector EndLocation)
+{
+	UParticleSystemComponent* TrajectoryBeam = NewObject<UParticleSystemComponent>(this);
+	TrajectoryBeam->RegisterComponent();
+	TrajectoryBeam->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Particles/PT_ArcingAim.PT_ArcingAim")));
+
+	TrajectoryBeam->SetBeamSourcePoint(0, StartLocation, 0);
+	TrajectoryBeam->SetBeamTargetPoint(0, EndLocation, 0);
+	BeamArray.Add(TrajectoryBeam);
 	
 }
 
-
+void ALOTPlayer::ClearBeam()
+{
+	for (auto&i : BeamArray)
+	{
+		i->DestroyComponent();
+	}
+	BeamArray.Empty();
+}
 
 void ALOTPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {

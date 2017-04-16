@@ -26,4 +26,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickMultiBT();
+
+	UPROPERTY()
+		FStreamableManager AssetLoader;
 };
