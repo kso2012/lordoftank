@@ -88,9 +88,9 @@ private:
 	//현재 탄환을 가리키는 포인터,TSubclassOf를 사용하는 이유는 <타입>을 상속하는 클래스만 할당하게 하기 위함.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AProjectile> CurrentProjectile;
-	//빔을 담고있는 배열
 	TArray<UParticleSystemComponent*> BeamArray;
 
+	//빔을 담고있는 배열
 	//탄환을 넣을 인벤토리
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 		TArray<TSubclassOf<class AProjectile>> ProjectileInventory;

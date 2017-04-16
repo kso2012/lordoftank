@@ -14,6 +14,12 @@ using namespace std;
 /**
  * 
  */
+
+struct Packet
+{
+   BYTE size;
+   FVector Pos;
+};
 UCLASS()
 class LORDOFTANK_API ULOTGameInstance : public UGameInstance
 {
@@ -27,6 +33,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickMultiBT();
 
+	void SendPos(FVector pos);
+
+	WSABUF send_wsabuf;
+	char send_buffer[4000];
+	WSADATA wsa;
+	SOCKET sock;
 	UPROPERTY()
 		FStreamableManager AssetLoader;
 };

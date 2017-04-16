@@ -144,6 +144,7 @@ void ALOTPlayer::Tick(float DeltaTime)
 		ChangeFiremodeBody();
 		DrawTrajectory();
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("X= %f,Y= %f,Z= %f"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z));
 }
 
 void ALOTPlayer::ChangeFiremodeBody()
@@ -232,9 +233,13 @@ void ALOTPlayer::OnResetVR()
 
 void ALOTPlayer::MoveForward(float Val)
 {
-	if(!bIsFireMode)
+	if (!bIsFireMode) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
+		//ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)
+		ULOTGameInstance* const Test = Cast<ULOTGameInstance> (GetGameInstance());
+		Test->SendPos(GetActorLocation());
 
+	}
 }
 
 
