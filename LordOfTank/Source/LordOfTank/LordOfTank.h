@@ -12,3 +12,9 @@
 #define COLLISION_PROJECTILE	ECC_GameTraceChannel1
 #define COLLISION_PICKUP		ECC_GameTraceChannel2
 
+
+struct Packet
+{
+	BYTE size;
+	FVector Pos;
+};

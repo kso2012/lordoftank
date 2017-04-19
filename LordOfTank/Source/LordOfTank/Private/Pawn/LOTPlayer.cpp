@@ -115,6 +115,7 @@ void ALOTPlayer::BeginPlay()
 	Super::BeginPlay();
 	SetDefaultInvetory();
 	OnResetVR();
+	
 
 
 }
@@ -144,7 +145,7 @@ void ALOTPlayer::Tick(float DeltaTime)
 		ChangeFiremodeBody();
 		DrawTrajectory();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Blue, FString::Printf(TEXT("X= %f,Y= %f,Z= %f"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z));
+	
 }
 
 void ALOTPlayer::ChangeFiremodeBody()
@@ -166,6 +167,8 @@ void ALOTPlayer::FireMode()
 		bIsFireMode = false;
 		ChangeCamera(bIsFireMode);
 	}
+	ULOTGameInstance* const Test = Cast<ULOTGameInstance>(GetGameInstance());
+	Test->SendPos(GetActorLocation());
 }
 
 
@@ -191,7 +194,7 @@ void ALOTPlayer::Fire()
 			//World->SpawnActor<ALOTDrone>(ALOTDrone::StaticClass(), SpawnLocation+FVector(0.0f,0.0f,1000.f), SpawnRotation);
 			
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
-			//UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,1.0f,VTBlend_Linear,0.0f,true);
+			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,0.25f,VTBlend_Linear,0.0f,true);
 
 		}
 	}
@@ -236,8 +239,7 @@ void ALOTPlayer::MoveForward(float Val)
 	if (!bIsFireMode) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 		//ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)
-		ULOTGameInstance* const Test = Cast<ULOTGameInstance> (GetGameInstance());
-		Test->SendPos(GetActorLocation());
+	
 
 	}
 }
@@ -301,7 +303,7 @@ void ALOTPlayer::DrawTrajectory()
 	const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
 
 	const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
-		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(8000.f, 0.f, 0.f));
+		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(170000.f, 0.f, 0.f));
 
 	const float PathLifetime = 5.0f;
 	const float TimeInterval = 0.05f;

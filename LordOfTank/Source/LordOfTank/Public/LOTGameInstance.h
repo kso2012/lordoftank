@@ -10,16 +10,11 @@
 using namespace std;
 
 #define SERVER_PORT 4000
-
+#define WM_SOCKET    WM_USER + 1
 /**
  * 
  */
 
-struct Packet
-{
-   BYTE size;
-   FVector Pos;
-};
 UCLASS()
 class LORDOFTANK_API ULOTGameInstance : public UGameInstance
 {
@@ -34,11 +29,13 @@ public:
 		void ClickMultiBT();
 
 	void SendPos(FVector pos);
+	HWND main_window_handle = NULL;
 
 	WSABUF send_wsabuf;
 	char send_buffer[4000];
 	WSADATA wsa;
 	SOCKET sock;
+	LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 	UPROPERTY()
 		FStreamableManager AssetLoader;
 };
