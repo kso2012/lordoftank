@@ -14,11 +14,6 @@
 #include "nwtestGameModeBase.generated.h"
 
 using namespace std;
-#define OP_RECV 1
-#define OP_SEND 2
-#define MAX_USER 10
-#define SERVER_PORT 4000
-#define MAX_BUF_SIZE 4000
 
 struct OverlapEx
 {
@@ -38,7 +33,6 @@ struct Client {
 	int previous_data;
 	unsigned char packet[MAX_BUF_SIZE];
 };
-
 
 /**
 *
@@ -73,6 +67,7 @@ public:
 	thread* accept_threads;
 	bool threadkey;
 	float tesking;
+	void ProcessPacket(int id, unsigned char *packet);
 
 
 };
