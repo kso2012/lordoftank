@@ -106,6 +106,9 @@ ALOTPlayer::ALOTPlayer()
 	MaxHealth = 100.f;
 	CurrentHealth = MaxHealth;
 
+	// 초기 AP를 100으로 설정
+	AP = 100.f;
+
 
 	
 }
@@ -116,7 +119,6 @@ void ALOTPlayer::BeginPlay()
 	SetDefaultInvetory();
 	OnResetVR();
 	
-
 
 }
 

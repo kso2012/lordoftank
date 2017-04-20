@@ -6,6 +6,11 @@
 #include "LordOfTankGameModeBase.h"
 
 
+void PlayerInfo::InsertPawn(ALOTPlayer *T, ALOTDrone *D) {
+	Tank = T;
+	Drone = D;
+	AP = Tank->getAP();
+}
 
 
 ALordOfTankGameModeBase::ALordOfTankGameModeBase()
@@ -15,6 +20,7 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 	//if (PlayerPawnBPClass.Class != NULL)
 	//{
 	DefaultPawnClass = ALOTPlayer::StaticClass();
+	PlayerCount = 0;
 	//}
 	
 }

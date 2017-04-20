@@ -84,6 +84,11 @@ public:
 	UFUNCTION()
 	void ApplyDamage(float damage);
 
+	//AP를 반환하는 함수
+	float getAP() {
+		return AP;
+	}
+
 private:
 	//현재 탄환을 가리키는 포인터,TSubclassOf를 사용하는 이유는 <타입>을 상속하는 클래스만 할당하게 하기 위함.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
@@ -122,7 +127,8 @@ private:
 	float MaxShield;
 	//현재체력
 	float CurrentHealth;
-
+	//현재AP
+	float AP;
 
 
 
