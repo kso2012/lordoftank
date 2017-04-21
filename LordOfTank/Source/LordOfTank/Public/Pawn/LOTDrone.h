@@ -18,7 +18,8 @@ class LORDOFTANK_API ALOTDrone : public APawn
 {
 	GENERATED_BODY()
 
-		//비행기 몸통 메쉬
+	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class USceneComponent* Root;
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* BabylonMesh;
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -118,6 +119,8 @@ private:
 	UPROPERTY(Category = Yaw, EditAnywhere)
 		float MinSpeed;
 
+	UParticleSystemComponent* Beam;
+
 
 	float CurrentForwardSpeed;
 
@@ -144,6 +147,13 @@ private:
 	uint32 bIsDetectMode : 1;
 
 	class AActor* HomingTarget;
+
+	//날개와 몸통 애니메이션 지정.
+	void SetAnim();
+	//타겟팅시 레이져를 그려주는 함수.
+	void DrawBeam(FVector StartLocation, FVector EndLocation);
+
+	void ClearBeam();
 
 public:
 

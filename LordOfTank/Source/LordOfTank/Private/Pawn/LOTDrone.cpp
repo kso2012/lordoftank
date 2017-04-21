@@ -66,9 +66,14 @@ ALOTDrone::ALOTDrone()
 	};
 	static FConstructorStatics ConstructorStatics;
 
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
+
 	BabylonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh"));
 	BabylonMesh->SetStaticMesh(ConstructorStatics.BabylonMesh.Get());
-	RootComponent = BabylonMesh;
+	BabylonMesh->SetupAttachment(Root);
+
+	BabylonMesh->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f));
 
 	BabylonMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh1"));
 	BabylonMesh1->SetStaticMesh(ConstructorStatics.BabylonMesh1.Get());
@@ -113,14 +118,11 @@ ALOTDrone::ALOTDrone()
 	BabylonMesh11 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh11"));
 	BabylonMesh11->SetStaticMesh(ConstructorStatics.BabylonMesh11.Get());
 	BabylonMesh11->SetupAttachment(BabylonMesh10);
-
-	BabylonMesh12 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh12"));
-	BabylonMesh12->SetStaticMesh(ConstructorStatics.BabylonMesh12.Get());
-	BabylonMesh12->SetupAttachment(BabylonMesh11);
+	
 
 	BabylonMesh13 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh13"));
 	BabylonMesh13->SetStaticMesh(ConstructorStatics.BabylonMesh13.Get());
-	BabylonMesh13->SetupAttachment(BabylonMesh12);
+	BabylonMesh13->SetupAttachment(BabylonMesh11);
 
 	BabylonMesh14 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh14"));
 	BabylonMesh14->SetStaticMesh(ConstructorStatics.BabylonMesh14.Get());
@@ -145,22 +147,28 @@ ALOTDrone::ALOTDrone()
 	BabylonMesh19 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh19"));
 	BabylonMesh19->SetStaticMesh(ConstructorStatics.BabylonMesh19.Get());
 	BabylonMesh19->SetupAttachment(BabylonMesh18);
-
+	//몸통 메쉬
 	BabylonMesh20 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh20"));
 	BabylonMesh20->SetStaticMesh(ConstructorStatics.BabylonMesh20.Get());
-	BabylonMesh20->SetupAttachment(BabylonMesh19);
-
+	BabylonMesh20->SetupAttachment(BabylonMesh);
+	//날개 몸통
 	BabylonMesh21 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh21"));
 	BabylonMesh21->SetStaticMesh(ConstructorStatics.BabylonMesh21.Get());
-	BabylonMesh21->SetupAttachment(BabylonMesh20);
-
+	BabylonMesh21->SetupAttachment(BabylonMesh);
+	//날개2
 	BabylonMesh22 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh22"));
 	BabylonMesh22->SetStaticMesh(ConstructorStatics.BabylonMesh22.Get());
 	BabylonMesh22->SetupAttachment(BabylonMesh21);
 
+	//날개에 붙은 뼈대1
 	BabylonMesh23 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh23"));
 	BabylonMesh23->SetStaticMesh(ConstructorStatics.BabylonMesh23.Get());
 	BabylonMesh23->SetupAttachment(BabylonMesh22);
+
+	//날개에 붙은 뼈대2
+	BabylonMesh12 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh12"));
+	BabylonMesh12->SetStaticMesh(ConstructorStatics.BabylonMesh12.Get());
+	BabylonMesh12->SetupAttachment(BabylonMesh21);
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
 	SpringArm->SetupAttachment(RootComponent);
@@ -168,7 +176,8 @@ ALOTDrone::ALOTDrone()
 	SpringArm->SocketOffset = FVector(0.f, 0.f, 60.f);
 	SpringArm->bEnableCameraLag = false;
 	SpringArm->CameraLagSpeed = 15.f;
-
+	SpringArm->SetRelativeRotation(FRotator(-30.f, 0.0f, 0.0f));
+	SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
@@ -180,6 +189,7 @@ ALOTDrone::ALOTDrone()
 	DetectCamera->SetupAttachment(RootComponent);
 	DetectCamera->Deactivate();
 
+	
 										
 	Acceleration = 500.f;
 	TurnSpeed = 50.f;
@@ -225,7 +235,8 @@ void ALOTDrone::Tick(float DeltaTime)
 
 	Super::Tick(DeltaTime);
 
-
+	SetAnim();
+	
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("위방향 속도= %f,앞방향 속도 = %f"), CurrentUpwardSpeed, CurrentForwardSpeed));
 }
 
@@ -250,6 +261,7 @@ void ALOTDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 
 void ALOTDrone::SetTarget()
 {
+	//ClearBeam();
 	//타겟설정 가능한 타입을 넣을 배열
 	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
 	//비히클타입만 체크하도록 한다.
@@ -257,7 +269,7 @@ void ALOTDrone::SetTarget()
 	//현재 월드를 가져온다.
 	UWorld* const World = GetWorld();
 	//벡터의 시작점
-	FVector StartTrace = DetectCamera->K2_GetComponentLocation();
+	FVector StartTrace = DetectCamera->K2_GetComponentLocation()+ DetectCamera->GetForwardVector() *500;
 	//벡터의 끝점
 	FVector EndTrace = StartTrace + DetectCamera->GetForwardVector() * 500000;
 	//결과를 담을 구조체변수
@@ -265,7 +277,9 @@ void ALOTDrone::SetTarget()
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
 	if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, OutHit, true)) {
 		HomingTarget = OutHit.GetActor();
-		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
+		HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
+		//DrawBeam(StartTrace, EndTrace);
 	}
 }
 
@@ -300,6 +314,7 @@ void ALOTDrone::MoveForwardInput(float Val)
 		float TempClamp = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 		CurrentForwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 500.f) ? 0.f : TempClamp;
 	}
+	
 
 
 }
@@ -352,6 +367,24 @@ void ALOTDrone::MoveUpwardInput(float Val)
 
 }
 
+void ALOTDrone::DrawBeam(FVector StartLocation, FVector EndLocation)
+{
+	Beam = NewObject<UParticleSystemComponent>(this);
+	Beam->RegisterComponent();
+	Beam->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Particles/PT_ArcingAim.PT_ArcingAim")));
+
+	Beam->SetBeamSourcePoint(0, StartLocation, 0);
+	Beam->SetBeamTargetPoint(0, EndLocation, 0);
+
+	
+
+}
+
+void ALOTDrone::ClearBeam()
+{
+	Beam->DestroyComponent();
+}
+
 void ALOTDrone::MoveRightInput(float Val)
 {
 
@@ -371,6 +404,12 @@ void ALOTDrone::MoveRightInput(float Val)
 	CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
 	CurrentRollSpeed = 0.f;
 
+}
+
+void ALOTDrone::SetAnim()
+{
+	BabylonMesh20->AddLocalRotation(FRotator(0.f, 0.f, CurrentYawSpeed/TurnSpeed));
+	BabylonMesh21->AddLocalRotation(FRotator(0.f, 0.f, 1.0f));
 }
 
 void ALOTDrone::DetectMode()
