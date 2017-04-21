@@ -130,6 +130,12 @@ private:
 	//현재AP
 	float AP;
 
+	float MinShootingPower;
+
+	float MaxShootingPower;
+	//발사 파워
+	float CurShootingPower;
+
 
 
 

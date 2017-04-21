@@ -109,6 +109,12 @@ ALOTPlayer::ALOTPlayer()
 	// 초기 AP를 100으로 설정
 	AP = 100.f;
 
+	MinShootingPower=10.f;
+
+	MaxShootingPower= 85000.f;
+	//발사 파워
+	CurShootingPower= MinShootingPower;
+
 
 	
 }
@@ -130,7 +136,7 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	check(InputComponent);
 	InputComponent->BindAxis("Forward", this, &ALOTPlayer::MoveForward);
 	InputComponent->BindAxis("Right", this, &ALOTPlayer::MoveRight);
-	InputComponent->BindAction("Fire", IE_Pressed, this, &ALOTPlayer::Fire);
+	InputComponent->BindAction("Fire", IE_Released, this, &ALOTPlayer::Fire);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTPlayer::FireMode);
 
 
