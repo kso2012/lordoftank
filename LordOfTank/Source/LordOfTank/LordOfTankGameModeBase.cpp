@@ -3,15 +3,12 @@
 #include "LordOfTank.h"
 #include "LOTDrone.h"
 #include "LOTPlayer.h"
+#include "PlayerInfo.h"
 #include "LordOfTankGameModeBase.h"
 
 
-void PlayerInfo::InsertPawn(ALOTPlayer *T, ALOTDrone *D) {
-	Tank = T;
-	Drone = D;
-	AP = Tank->getAP();
-}
 
+PlayerInfo Info = PlayerInfo::PlayerInfo();
 
 ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 {
@@ -21,6 +18,7 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 	//{
 	DefaultPawnClass = ALOTPlayer::StaticClass();
 	PlayerCount = 0;
+	PlayerTurn = 0;
 	//}
 	
 }
@@ -30,4 +28,22 @@ void ALordOfTankGameModeBase::StartPlay()
 	Super::StartPlay();
 
 	
+}
+
+
+
+void ALordOfTankGameModeBase::SavePlayerInfo(ALOTPlayer *T, ALOTDrone *D, int PlayerNum) {
+	Info.InsertPawn(T, D, PlayerNum);
+	ALordOfTankGameModeBase::IncreasePlayerCount();
+}
+
+void ALordOfTankGameModeBase::IncreasePlayerCount() {
+	ALordOfTankGameModeBase::PlayerCount ++;
+}
+
+
+float ALordOfTankGameModeBase::ReturnProjectileVelocity() {
+	//ALordOfTankGameModeBase *mode = this;
+	ALOTPlayer *Tank = Info.ReturnData(PlayerTurn).ReturnTank();
+	return (*Tank).ReturnVelocity();
 }

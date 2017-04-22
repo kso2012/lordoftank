@@ -5,6 +5,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "LOTPlayer.h"
 #include "LOTDrone.h"
+#include "PlayerInfo.h"
 #include "LordOfTankGameModeBase.generated.h"
 
 /**
@@ -12,20 +13,6 @@
  */
 
 
-class PlayerInfo {
-public:
-	PlayerInfo();
-
-	//탱크를 저장할 ALOTPlayer 포인터
-	ALOTPlayer *Tank;
-	//드론을 저장할 ALOTDrone 포인터
-	ALOTDrone *Drone;
-	//AP를 저장할 변수
-	float AP;
-
-	//탱크와 드론을 받아서 PlayerInfo 내 포인터에 저장하는 함수
-	void InsertPawn(ALOTPlayer *, ALOTDrone *);
-};
 
 class FHouse
 {
@@ -46,13 +33,23 @@ public:
 
 	virtual void StartPlay() override; 
 
-	//UPROPERTY(BlueprintReadWrite)
-		//PlayerInfo * whichTurn;
-
 	//플레이어를 비교하기 위한 카운터
 	UPROPERTY(BlueprintReadWrite)
 		int PlayerCount;
 
+	//플레이어 턴
+	UPROPERTY(BlueprintReadWrite)
+		int PlayerTurn;
 
+	//플레이어 데이터를 저장하는 함수
+	UFUNCTION(BlueprintCallable)
+		void SavePlayerInfo(ALOTPlayer *T, ALOTDrone *D, int PlayerNum);
+
+	//플레이어가 데이터에 저장되면 플레이어 카운트를 증가시킴
+	UFUNCTION(BlueprintCallable)
+		void IncreasePlayerCount();
+
+	//발사된 투사체의 속도를 반환하는 함수
+	float ReturnProjectileVelocity();
 
 };
