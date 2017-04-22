@@ -70,8 +70,16 @@ public:
 
 	void OnResetVR();
 
+	////void SetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
+	//UFUNCTION(BlueprintCallable, Category = "CustomFunc")
+	//	void ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
+
+
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	//UFUNCTION(BlueprintCallable, Category = "Animation")
+//		UWheeledVehicleMovementComponent* 
 
 	
 	//포사격
@@ -136,7 +144,6 @@ private:
 	//발사 파워
 	float CurShootingPower;
 
-
-
+	
 
 };

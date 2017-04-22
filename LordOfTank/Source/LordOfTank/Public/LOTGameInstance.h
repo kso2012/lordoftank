@@ -5,12 +5,13 @@
 #include "WinSock2.h"
 #include <iostream>
 #include <string>
+#include <thread>
 #include "Engine/GameInstance.h"
 #include "LOTGameInstance.generated.h"
 using namespace std;
 
-#define SERVER_PORT 4000
 #define WM_SOCKET    WM_USER + 1
+#define BUF_SIZE 1024
 /**
  * 
  */
@@ -23,19 +24,35 @@ class LORDOFTANK_API ULOTGameInstance : public UGameInstance
 public:
 	
 	ULOTGameInstance();
+	//~ULOTGameInstance();
 
+	/*UFUNCTION(BlueprintCallable, Category = "MultiBTClick")
+		void ClickMultiBT();*/
 
-	UFUNCTION(BlueprintCallable, Category = "MenuClick")
-		void ClickMultiBT();
+	UFUNCTION(BlueprintCallable, Category = "EntBTClick")
+		void ClickEntBT();
 
-	void SendPos(FVector pos);
-	HWND main_window_handle = NULL;
-
-	WSABUF send_wsabuf;
 	char send_buffer[4000];
 	WSADATA wsa;
+	WSABUF   recv_wsabuf;
+	char   recv_buffer[BUF_SIZE];
+	char   packet_buffer[BUF_SIZE];
+	DWORD      in_packet_size = 0;
+	int      saved_packet_size = 0;
 	SOCKET sock;
-	LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+	thread* event_thread;
+	WSAEVENT myevent;
+	HWND main_window_handle = NULL;
+	WSABUF send_wsabuf;
+	bool bIsConnected;
+	void SendPos(FVector pos, UWheeledVehicleMovementComponent* VehicleComponent);
+	void eventThread();
+	static void ToCalleventThread(LPVOID p);
+	void ReadPacket(SOCKET sock);
+	void ProcessPacket(char *ptr);
 	UPROPERTY()
 		FStreamableManager AssetLoader;
+private:
+	
+
 };

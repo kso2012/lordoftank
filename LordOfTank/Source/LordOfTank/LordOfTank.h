@@ -12,24 +12,71 @@
 #define COLLISION_PROJECTILE	ECC_GameTraceChannel1
 #define COLLISION_PICKUP		ECC_GameTraceChannel2
 
+#define OP_RECV 1
+#define OP_SEND 2
+#define MAX_USER 2
+#define SERVER_PORT 4000
+#define MAX_BUF_SIZE 4000
+#define CS_ROOM_CLICK 3
+
+#define SC_MOVE_PLAYER 1
+
+#pragma pack (push, 1)
 
 struct Packet
 {
 	BYTE size;
-	FVector Pos;
+	class UWheeledVehicleMovementComponent* VehicleMovement;
 };
 
-//struct PlayerInfoa {
-//
-//
-//	//탱크를 저장할 ALOTPlayer 포인터
-//	ALOTPlayer* Tank;
-//	//드론을 저장할 ALOTDrone 포인터
-//	ALOTDrone* Drone;
-//	//AP를 저장할 변수
-//	float AP;
-//
-//	//탱크와 드론을 받아서 PlayerInfo 내 포인터에 저장하는 함수
-//	void InsertPawn(ALOTPlayer *, ALOTDrone *);
-//
-//};
+struct cs_packet_room_click
+{
+	BYTE size;
+	BYTE type;
+	int roomNum;
+};
+
+struct cs_packet_info
+{
+	BYTE size;
+	BYTE type;
+	FString name;
+};
+
+struct cs_packet_tank_move
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct cs_packet_tank_shot
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct cs_packet_dron_move
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct cs_packet_dron_targeting
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct sc_packet_tank_move
+{
+	BYTE size;
+	int num;
+	WORD id;
+};
+
+struct Room
+{
+
+};
+
+#pragma pack (pop)

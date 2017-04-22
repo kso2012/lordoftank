@@ -160,6 +160,7 @@ void ALOTPlayer::ChangeFiremodeBody()
 {
 	TurretMesh->SetRelativeRotation(FRotator(0.0f, FireModeCamera->RelativeRotation.Yaw, 0.0f));
 	BarrelMesh->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, 0.0f, 0.0f));
+
 }
 
 void ALOTPlayer::FireMode()
@@ -175,8 +176,7 @@ void ALOTPlayer::FireMode()
 		bIsFireMode = false;
 		ChangeCamera(bIsFireMode);
 	}
-	ULOTGameInstance* const Test = Cast<ULOTGameInstance>(GetGameInstance());
-	Test->SendPos(GetActorLocation());
+	
 }
 
 
@@ -244,11 +244,13 @@ void ALOTPlayer::OnResetVR()
 
 void ALOTPlayer::MoveForward(float Val)
 {
+	//SetVehicleMovement();
 	if (!bIsFireMode) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
+		ULOTGameInstance* const Test = Cast<ULOTGameInstance>(GetGameInstance());
+		//GetVehicleMovementComponent()->set
+		//Test->SendPos(GetActorLocation(),GetVehicleMovementComponent());
 		//ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)
-	
-
 	}
 }
 
@@ -257,6 +259,7 @@ void ALOTPlayer::MoveRight(float Val)
 {
 	if(!bIsFireMode)
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
+	GetMesh();
 
 }
 
@@ -376,4 +379,15 @@ void ALOTPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimit
 		;
 	}
 }
+
+
+//void ALOTPlayer::ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent)
+//{
+//	if (MovementComponent)
+//	{
+//		SetVehicleMovement();
+//	}
+//	//SetVehicleMovement(MovementComponent);
+//	
+//}
 

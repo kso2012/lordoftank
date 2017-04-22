@@ -15,7 +15,6 @@ class LORDOFTANK_API AStartGameMode : public AGameModeBase
 	
 public:
 	AStartGameMode();
-
 	
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 		void test();
