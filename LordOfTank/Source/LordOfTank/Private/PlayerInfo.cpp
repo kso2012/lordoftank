@@ -14,6 +14,10 @@ void PlayerInfo::InsertPawn(ALOTPlayer *T, ALOTDrone *D, int PlayerNum) {
 	SavedPlayer.SavePlayerInfo(PlayerNum, T, D, AP);
 }
 
+PlayerInfo PlayerInfo::ReturnData(int PN) {
+	return SavedPlayer.ReturnData(PN);
+}
+
 PlayerInfoSaved::PlayerInfoSaved() {
 
 }

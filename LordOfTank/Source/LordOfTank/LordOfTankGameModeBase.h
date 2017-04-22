@@ -37,11 +37,19 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 		int PlayerCount;
 
+	//플레이어 턴
+	UPROPERTY(BlueprintReadWrite)
+		int PlayerTurn;
+
+	//플레이어 데이터를 저장하는 함수
 	UFUNCTION(BlueprintCallable)
 		void SavePlayerInfo(ALOTPlayer *T, ALOTDrone *D, int PlayerNum);
 
-
+	//플레이어가 데이터에 저장되면 플레이어 카운트를 증가시킴
 	UFUNCTION(BlueprintCallable)
 		void IncreasePlayerCount();
+
+	//발사된 투사체의 속도를 반환하는 함수
+	float ReturnProjectileVelocity();
 
 };

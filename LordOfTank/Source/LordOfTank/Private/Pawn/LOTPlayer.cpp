@@ -17,6 +17,7 @@
 
 
 
+float ALOTPlayer::CurShootingPower = 10.f;
 
 ALOTPlayer::ALOTPlayer()
 {
@@ -113,7 +114,7 @@ ALOTPlayer::ALOTPlayer()
 
 	MaxShootingPower= 85000.f;
 	//발사 파워
-	CurShootingPower= MinShootingPower;
+	CurShootingPower= 10.f;
 
 
 	
@@ -124,6 +125,7 @@ void ALOTPlayer::BeginPlay()
 	Super::BeginPlay();
 	SetDefaultInvetory();
 	OnResetVR();
+	PrimaryActorTick.bCanEverTick = true;
 	
 
 }
@@ -136,10 +138,11 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	check(InputComponent);
 	InputComponent->BindAxis("Forward", this, &ALOTPlayer::MoveForward);
 	InputComponent->BindAxis("Right", this, &ALOTPlayer::MoveRight);
+	InputComponent->BindAction("ControlPower", IE_Pressed, this, &ALOTPlayer::ControlPower);
 	InputComponent->BindAction("Fire", IE_Released, this, &ALOTPlayer::Fire);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTPlayer::FireMode);
 
-
+	
 }
 
 
@@ -148,11 +151,18 @@ void ALOTPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (bIsShoot) {
+		CurShootingPower++;
+		if (CurShootingPower > MaxShootingPower)
+			CurShootingPower = MaxShootingPower;
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Red, FString::Printf(TEXT("%d"), CurShootingPower));
+	}
 	if (bIsFireMode)
 	{
 		ChangeFiremodeBody();
 		DrawTrajectory();
 	}
+
 	
 }
 
@@ -180,6 +190,9 @@ void ALOTPlayer::FireMode()
 }
 
 
+void ALOTPlayer::ControlPower() {
+	bIsShoot = true;
+}
 
 
 void ALOTPlayer::Fire()
@@ -207,7 +220,8 @@ void ALOTPlayer::Fire()
 		}
 	}
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
-
+	CurShootingPower = MinShootingPower;
+	bIsShoot = false;
 }
 
 void ALOTPlayer::ChangeCamera(bool bIsFireMode)
@@ -311,7 +325,7 @@ void ALOTPlayer::DrawTrajectory()
 	const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
 
 	const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
-		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(170000.f, 0.f, 0.f));
+		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
 
 	const float PathLifetime = 5.0f;
 	const float TimeInterval = 0.05f;
@@ -377,3 +391,6 @@ void ALOTPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimit
 	}
 }
 
+float ALOTPlayer::ReturnVelocity() {
+	return getPower();
+}

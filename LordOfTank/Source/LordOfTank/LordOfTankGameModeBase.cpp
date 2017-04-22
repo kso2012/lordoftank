@@ -18,6 +18,7 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 	//{
 	DefaultPawnClass = ALOTPlayer::StaticClass();
 	PlayerCount = 0;
+	PlayerTurn = 0;
 	//}
 	
 }
@@ -38,4 +39,11 @@ void ALordOfTankGameModeBase::SavePlayerInfo(ALOTPlayer *T, ALOTDrone *D, int Pl
 
 void ALordOfTankGameModeBase::IncreasePlayerCount() {
 	ALordOfTankGameModeBase::PlayerCount ++;
+}
+
+
+float ALordOfTankGameModeBase::ReturnProjectileVelocity() {
+	//ALordOfTankGameModeBase *mode = this;
+	ALOTPlayer *Tank = Info.ReturnData(PlayerTurn).ReturnTank();
+	return (*Tank).ReturnVelocity();
 }

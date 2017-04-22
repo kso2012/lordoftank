@@ -83,13 +83,22 @@ public:
 	//탱크에게 데미지를 전달.
 	UFUNCTION()
 	void ApplyDamage(float damage);
+	//파워 조절
+	void ControlPower();
 
 	//AP를 반환하는 함수
 	float getAP() {
 		return AP;
 	}
 
+	//발사체 속도를 반환하는 함수
+	float ReturnVelocity();
+
+	float getPower() { return CurShootingPower; }
+
 private:
+
+
 	//현재 탄환을 가리키는 포인터,TSubclassOf를 사용하는 이유는 <타입>을 상속하는 클래스만 할당하게 하기 위함.
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 		TSubclassOf<class AProjectile> CurrentProjectile;
@@ -119,6 +128,7 @@ private:
 	//유도미사일에게 넘겨줄 유도타겟
 	class AActor* HomingTarget;
 
+
 	//사격모드인가?
 	bool bIsFireMode;
 	//최대체력
@@ -133,8 +143,12 @@ private:
 	float MinShootingPower;
 
 	float MaxShootingPower;
+
 	//발사 파워
-	float CurShootingPower;
+	static float CurShootingPower;
+
+	//발사중인가?
+	bool bIsShoot;
 
 
 

@@ -31,6 +31,12 @@ private:
 public:
 	//탱크와 드론을 받아서 PlayerInfo 내 포인터에 저장하는 함수
 	void InsertPawn(ALOTPlayer *, ALOTDrone *, int);
+
+	//플레이어 정보를 리턴
+	PlayerInfo ReturnData(int);
+
+	//탱크를 리턴
+	ALOTPlayer *ReturnTank() { return Tank; };
 };
 
 class LORDOFTANK_API PlayerInfoSaved {
@@ -40,4 +46,7 @@ public:
 	PlayerInfo PlayerInfoData[2];
 
 	void SavePlayerInfo(int, ALOTPlayer *, ALOTDrone *, float);
+
+	//플레이어 정보를 리턴
+	PlayerInfo ReturnData(int PN) { return PlayerInfoData[PN]; };
 };
