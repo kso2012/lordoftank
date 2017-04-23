@@ -200,6 +200,7 @@ void ALOTPlayer::FireStart()
 void ALOTPlayer::FireEnd()
 {
 	bIsPushFire = false;
+	ClearBeam();
 	if (CurrentProjectile != NULL && bIsFireMode)
 	{
 		const FRotator SpawnRotation = GetActorRotation()+ FireModeCamera->RelativeRotation;//
@@ -267,6 +268,7 @@ void ALOTPlayer::MoveForward(float Val)
 	//SetVehicleMovement();
 	if (!bIsFireMode) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
+		
 		ULOTGameInstance* const Test = Cast<ULOTGameInstance>(GetGameInstance());
 		//GetVehicleMovementComponent()->set
 		//Test->SendPos(GetActorLocation(),GetVehicleMovementComponent());
