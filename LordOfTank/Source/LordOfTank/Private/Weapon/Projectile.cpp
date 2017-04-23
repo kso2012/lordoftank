@@ -46,11 +46,11 @@ AProjectile::AProjectile()
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 85000.f;
-	ProjectileMovement->MaxSpeed = 85000.f;
+	ProjectileMovement->InitialSpeed = 0.f;
+	ProjectileMovement->MaxSpeed = 0.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
-	ProjectileMovement->ProjectileGravityScale = 10.f;
+	ProjectileMovement->ProjectileGravityScale = 1.f;
 
 }
 
@@ -59,7 +59,7 @@ void AProjectile::BeginPlay()
 {
 
 	Super::BeginPlay();
-
+	ProjectileMovement->InitialSpeed = 10000.f;
 }
 
 // Called every frame
@@ -78,6 +78,13 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 
 		Destroy();
 	}
+}
+
+void AProjectile::SetInitialVelocity(FVector velocity)
+{
+	
+	ProjectileMovement->SetVelocityInLocalSpace(velocity);
+
 }
 
 void AProjectile::SetHomingTarget(AActor* HomingTarget)

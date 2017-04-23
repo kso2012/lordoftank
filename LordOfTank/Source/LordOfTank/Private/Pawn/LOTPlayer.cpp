@@ -102,16 +102,16 @@ ALOTPlayer::ALOTPlayer()
 	FireModeCamera->Deactivate();
 
 	bIsFireMode = false;
-
+	bIsPushFire = false;
 	MaxHealth = 100.f;
 	CurrentHealth = MaxHealth;
 
 	// 초기 AP를 100으로 설정
 	AP = 100.f;
 
-	MinShootingPower=10.f;
-
-	MaxShootingPower= 85000.f;
+	MinShootingPower=100.f;
+	RaisingRate = 50.f;
+	MaxShootingPower= 80000.f;
 	//발사 파워
 	CurShootingPower= MinShootingPower;
 
@@ -136,7 +136,8 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	check(InputComponent);
 	InputComponent->BindAxis("Forward", this, &ALOTPlayer::MoveForward);
 	InputComponent->BindAxis("Right", this, &ALOTPlayer::MoveRight);
-	InputComponent->BindAction("Fire", IE_Released, this, &ALOTPlayer::Fire);
+	InputComponent->BindAction("Fire", IE_Released, this, &ALOTPlayer::FireEnd);
+	InputComponent->BindAction("Fire", IE_Pressed, this, &ALOTPlayer::FireStart);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTPlayer::FireMode);
 
 
@@ -151,7 +152,14 @@ void ALOTPlayer::Tick(float DeltaTime)
 	if (bIsFireMode)
 	{
 		ChangeFiremodeBody();
+		
+	}
+
+	if (bIsPushFire)
+	{
 		DrawTrajectory();
+		RaisePower();
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재파워 %f"), CurShootingPower));
 	}
 	
 }
@@ -179,12 +187,19 @@ void ALOTPlayer::FireMode()
 	
 }
 
-
-
-
-void ALOTPlayer::Fire()
+void ALOTPlayer::FireStart()
 {
-	
+	if (bIsFireMode == true)
+	{
+		bIsPushFire = true;
+		CurShootingPower = MinShootingPower;
+	}
+}
+
+
+void ALOTPlayer::FireEnd()
+{
+	bIsPushFire = false;
 	if (CurrentProjectile != NULL && bIsFireMode)
 	{
 		const FRotator SpawnRotation = GetActorRotation()+ FireModeCamera->RelativeRotation;//
@@ -194,8 +209,13 @@ void ALOTPlayer::Fire()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
-			
-			AActor* TempActor = World->SpawnActor<AActor>(CurrentProjectile, SpawnLocation, SpawnRotation);
+			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
+				FRotator(0.f,0.f,0.f), FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
+
+			AProjectile* TempActor = World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation);
+			TempActor->SetInitialVelocity(InitialVelocity);
+
+
 			//World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation)->SetHomingTarget(HomingTarget);
 			//// spawn the pickup
 			//APickup* const SpawnedPickup = World->SpawnActor<APickup>(WhatToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
@@ -303,7 +323,7 @@ void ALOTPlayer::ApplyDamage(float damage)
 
 FVector ALOTPlayer::GetSegmentatTime(FVector StartLocation, FVector InitialVelocity, FVector Gravity, float time)
 {
-	return StartLocation + (InitialVelocity*time) + (time*time*0.5*Gravity);
+	return StartLocation + (InitialVelocity*time) + (time*time*0.5f*Gravity);
 }
 
 void ALOTPlayer::DrawTrajectory()
@@ -314,7 +334,7 @@ void ALOTPlayer::DrawTrajectory()
 	const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
 
 	const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
-		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(170000.f, 0.f, 0.f));
+		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
 
 	const float PathLifetime = 5.0f;
 	const float TimeInterval = 0.05f;
@@ -359,6 +379,12 @@ void ALOTPlayer::DrawBeam(FVector StartLocation, FVector EndLocation)
 	TrajectoryBeam->SetBeamTargetPoint(0, EndLocation, 0);
 	BeamArray.Add(TrajectoryBeam);
 	
+}
+
+void ALOTPlayer::RaisePower()
+{
+	if(CurShootingPower<MaxShootingPower)
+		CurShootingPower += RaisingRate;
 }
 
 void ALOTPlayer::ClearBeam()

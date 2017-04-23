@@ -82,8 +82,10 @@ public:
 //		UWheeledVehicleMovementComponent* 
 
 	
-	//포사격
-	void Fire();
+	//사격버튼 눌렀을 때
+	void FireStart();
+	//사격버튼 떼었을 때
+	void FireEnd();
 	//시점변경시 visible설정
 	void FireMode();
 	//인벤토리생성
@@ -91,16 +93,13 @@ public:
 	//탱크에게 데미지를 전달.
 	UFUNCTION()
 	void ApplyDamage(float damage);
-	//파워 조절
-	void ControlPower();
-
+	
 	//AP를 반환하는 함수
 	float getAP() {
 		return AP;
 	}
 
-	//발사체 속도를 반환하는 함수
-	float ReturnVelocity();
+	
 
 	float getPower() { return CurShootingPower; }
 
@@ -125,6 +124,8 @@ private:
 
 	void ClearBeam();
 
+	void RaisePower();
+
 	//버튼 클릭 시 시점변경
 	void ChangeCamera(bool bIsFireMode);
 
@@ -148,15 +149,19 @@ private:
 	//현재AP
 	float AP;
 
+	float RaisingRate;
+
 	float MinShootingPower;
 
 	float MaxShootingPower;
 
 	//발사 파워
-	static float CurShootingPower;
+	float CurShootingPower;
 
 	//발사중인가?
 	bool bIsShoot;
+
+	bool bIsPushFire;
 
 	
 
