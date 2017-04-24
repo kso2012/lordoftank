@@ -25,9 +25,9 @@ public:
 	
 	ULOTGameInstance();
 	//~ULOTGameInstance();
-
-	/*UFUNCTION(BlueprintCallable, Category = "MultiBTClick")
-		void ClickMultiBT();*/
+	//virtual void FinishDestroy() override;
+	UFUNCTION(BlueprintCallable, Category = "MultiBTClick")
+		void ClickMultiBT();
 
 	UFUNCTION(BlueprintCallable, Category = "EntBTClick")
 		void ClickEntBT();
@@ -45,7 +45,8 @@ public:
 	HWND main_window_handle = NULL;
 	WSABUF send_wsabuf;
 	bool bIsConnected;
-	void SendPos(FVector pos, UWheeledVehicleMovementComponent* VehicleComponent);
+	bool bIsCreateSocket;
+	//void SendPos(FVector pos, UWheeledVehicleMovementComponent* VehicleComponent);
 	void eventThread();
 	static void ToCalleventThread(LPVOID p);
 	void ReadPacket(SOCKET sock);

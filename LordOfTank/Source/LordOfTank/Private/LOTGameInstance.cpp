@@ -9,12 +9,13 @@
 ULOTGameInstance::ULOTGameInstance()
 {
 	bIsConnected = false;
+	bIsCreateSocket = false;
 }
 
 void ULOTGameInstance::ClickEntBT()
 {
 	
-	/*int retval;
+	int retval;
 	DWORD iobyte;
 	cs_packet_room_click *a = reinterpret_cast<cs_packet_room_click *>(send_buffer);
 	a->type = CS_ROOM_CLICK;
@@ -22,78 +23,95 @@ void ULOTGameInstance::ClickEntBT()
 	a->size = sizeof(cs_packet_room_click);
 	send_wsabuf.len = sizeof(cs_packet_room_click);
 
-	retval = WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);*/
+	retval = WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+
 
 
 
 }
 
-//void ULOTGameInstance::ClickMultiBT()
+void ULOTGameInstance::ClickMultiBT()
+{
+	bIsCreateSocket = true;
+	int retval;
+
+	send_wsabuf.buf = send_buffer;
+	send_wsabuf.len = 4000;
+
+	// 윈속 초기화
+
+	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+		UE_LOG(LogTemp, Warning, TEXT("윈속 초기화 실패"))
+
+		// socket()
+		sock = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+	if (sock == INVALID_SOCKET)
+		UE_LOG(LogTemp, Warning, TEXT("소켓 생성 실패"));
+
+	// connect()
+	SOCKADDR_IN serveraddr;
+	ZeroMemory(&serveraddr, sizeof(serveraddr));
+	serveraddr.sin_family = AF_INET;
+	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	serveraddr.sin_port = htons(SERVER_PORT);
+	myevent = WSACreateEvent();
+	WSAEventSelect(sock, myevent, FD_CONNECT);
+
+	retval = WSAConnect(sock, (SOCKADDR *)&serveraddr, sizeof(serveraddr), NULL, NULL, NULL, NULL);
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("retval 값 = %d"), retval));
+	
+	//if(retval == -1){
+	event_thread = new thread{ &ToCalleventThread, this };
+	bIsConnected = true;
+	//}
+	
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 실패"));
+
+}
+
+//void ULOTGameInstance::SendPos(FVector pos, UWheeledVehicleMovementComponent* VehicleComponent)
 //{
 //	int retval;
+//	Packet *a = reinterpret_cast<Packet *>(send_buffer);
 //
-//	send_wsabuf.buf = send_buffer;
-//	send_wsabuf.len = 4000;
+//	//a->size = sizeof(Packet);
+//	//a->VehicleMovement = VehicleComponent;
+//	send_wsabuf.len = sizeof(Packet);
 //
-//	// 윈속 초기화
+//	DWORD iobyte;
 //
-//	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-//		UE_LOG(LogTemp, Warning, TEXT("윈속 초기화 실패"))
-//
-//		// socket()
-//		sock = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-//	if (sock == INVALID_SOCKET)
-//		UE_LOG(LogTemp, Warning, TEXT("소켓 생성 실패"));
-//
-//	// connect()
-//	SOCKADDR_IN serveraddr;
-//	ZeroMemory(&serveraddr, sizeof(serveraddr));
-//	serveraddr.sin_family = AF_INET;
-//	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
-//	serveraddr.sin_port = htons(SERVER_PORT);
-//	myevent = WSACreateEvent();
-//	WSAEventSelect(sock, myevent, FD_CONNECT);
-//
-//	retval = WSAConnect(sock, (SOCKADDR *)&serveraddr, sizeof(serveraddr), NULL, NULL, NULL, NULL);
-//	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("위방향 속도= %f"), retval));
-//	event_thread = new thread{ &ToCalleventThread, this };
-//	bIsConnected = true;
-//
-//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 실패"));
-//
+//	retval = WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+//	if (retval) {
+//		//int error_code = WSAGetLastError();
+//		//if (WSA_IO_PENDING != error_code)
+//			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Send Error"));
+//	}
+//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("센드 성공"));
 //}
-
-void ULOTGameInstance::SendPos(FVector pos, UWheeledVehicleMovementComponent* VehicleComponent)
-{
-	int retval;
-	Packet *a = reinterpret_cast<Packet *>(send_buffer);
-
-	//a->size = sizeof(Packet);
-	//a->VehicleMovement = VehicleComponent;
-	send_wsabuf.len = sizeof(Packet);
-
-	DWORD iobyte;
-
-	retval = WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
-	if (retval) {
-		//int error_code = WSAGetLastError();
-		//if (WSA_IO_PENDING != error_code)
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Send Error"));
-	}
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("센드 성공"));
-}
 
 void ULOTGameInstance::ProcessPacket(char *ptr)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ProcessPacket 진입")));
 	switch (ptr[1])
 	{
+	case SC_ROOM_SHOW:
+	{
+		sc_packet_room_show *my_packet = reinterpret_cast<sc_packet_room_show*>(ptr);
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("카운트 = %d 방번호 = %d"), my_packet->counts, my_packet->roomNum));
+		break;
+	}
 	case SC_MOVE_PLAYER:
 		break;
+	default:
+		break;
+		
 	}
 }
 
 void ULOTGameInstance::ReadPacket(SOCKET sock)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket 진입")));
 	DWORD iobyte, ioflag = 0;
 
 	int ret = WSARecv(sock, &recv_wsabuf, 1, &iobyte, &ioflag, NULL, NULL);
@@ -102,10 +120,11 @@ void ULOTGameInstance::ReadPacket(SOCKET sock)
 		//printf("Recv Error [%d]\n", err_code);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Recv Error")));
 	}
-
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - WSARecv후")));
 	BYTE *ptr = reinterpret_cast<BYTE *>(recv_buffer);
 
 	while (0 != iobyte) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - iobyte != 0")));
 		if (0 == in_packet_size) in_packet_size = ptr[0];
 		if (iobyte + saved_packet_size >= in_packet_size) {
 			memcpy(packet_buffer + saved_packet_size, ptr, in_packet_size - saved_packet_size);
@@ -121,6 +140,7 @@ void ULOTGameInstance::ReadPacket(SOCKET sock)
 			iobyte = 0;
 		}
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - iobyte 체크 후")));
 }
 
 void ULOTGameInstance::ToCalleventThread(LPVOID p)
@@ -138,26 +158,75 @@ void ULOTGameInstance::eventThread()
 		switch (ev.lNetworkEvents)
 		{
 		case FD_CONNECT:
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("FD_CONNECT")));
+
 			WSAEventSelect(sock, myevent, FD_READ);
 			break;
 		case FD_READ:
-			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
 			ReadPacket(sock);
 			break;
 		case FD_CLOSE:
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("FD_CLOSE")));
+
 			closesocket(sock);
 			break;
 		}
 	}
 }
 
+//void ULOTGameInstance::FinishDestroy()
+//{
+//	Super::FinishDestroy();
+//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End")));
+//	if (bIsCreateSocket)
+//	{
+//		if (bIsConnected)
+//		{
+//			closesocket(sock);
+//			event_thread->detach();
+//			delete(event_thread);
+//			WSACleanup();
+//		}
+//		else
+//		{
+//			closesocket(sock);
+//			WSACleanup();
+//		}
+//	}
+//}
+
 //ULOTGameInstance::~ULOTGameInstance()
 //{
-//	if (bIsConnected) {
-//		closesocket(sock);
-//		event_thread->detach();
-//		delete(event_thread);
-//		WSACleanup();
+//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
+//	/*if (bIsConnected) {
+//			closesocket(sock);
+//			event_thread->detach();
+//			delete(event_thread);
+//			WSACleanup();
+//		}
+//		else
+//		{
+//			closesocket(sock);
+//			WSACleanup();
+//		}
+//	*/
+//
+//
+//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End")));
+//	if (bIsCreateSocket)
+//	{
+//		if (bIsConnected)
+//		{
+//			closesocket(sock);
+//			event_thread->detach();
+//			delete(event_thread);
+//			WSACleanup();
+//		}
+//		else
+//		{
+//			closesocket(sock);
+//			WSACleanup();
+//		}
 //	}
-//	
 //}

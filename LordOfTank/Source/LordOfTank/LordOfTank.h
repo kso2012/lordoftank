@@ -15,20 +15,18 @@
 #define OP_RECV 1
 #define OP_SEND 2
 #define MAX_USER 2
+#define MAX_ROOM 1
 #define SERVER_PORT 4000
 #define MAX_BUF_SIZE 4000
+
+#define CS_FORWARD 1
+#define CS_RIGHT 2
 #define CS_ROOM_CLICK 3
 
-#define SC_MOVE_PLAYER 1
+#define SC_ROOM_SHOW 1
+#define SC_MOVE_PLAYER 2
 
 #pragma pack (push, 1)
-
-struct Packet
-{
-	BYTE size;
-	class UWheeledVehicleMovementComponent* VehicleMovement;
-};
-
 struct cs_packet_room_click
 {
 	BYTE size;
@@ -67,17 +65,20 @@ struct cs_packet_dron_targeting
 	BYTE type;
 };
 
+struct sc_packet_room_show
+{
+	BYTE size;
+	BYTE type;
+	int roomNum;
+	int counts;
+	int state;
+	bool canStart;
+};
+
 struct sc_packet_tank_move
 {
 	BYTE size;
 	int num;
 	WORD id;
 };
-
-struct Room
-{
-
-};
-
-
 #pragma pack (pop)
