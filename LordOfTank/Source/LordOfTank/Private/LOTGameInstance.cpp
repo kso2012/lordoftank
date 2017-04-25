@@ -10,6 +10,7 @@ ULOTGameInstance::ULOTGameInstance()
 {
 	bIsConnected = false;
 	bIsCreateSocket = false;
+	count = 0;
 }
 
 void ULOTGameInstance::ClickEntBT()
@@ -58,7 +59,7 @@ void ULOTGameInstance::ClickMultiBT()
 	WSAEventSelect(sock, myevent, FD_CONNECT);
 
 	retval = WSAConnect(sock, (SOCKADDR *)&serveraddr, sizeof(serveraddr), NULL, NULL, NULL, NULL);
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("retval 값 = %d"), retval));
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("retval 값 = %d"), retval));
 	
 	//if(retval == -1){
 	event_thread = new thread{ &ToCalleventThread, this };
@@ -98,7 +99,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	case SC_ROOM_SHOW:
 	{
 		sc_packet_room_show *my_packet = reinterpret_cast<sc_packet_room_show*>(ptr);
-		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("카운트 = %d 방번호 = %d"), my_packet->counts, my_packet->roomNum));
+		//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("카운트 = %d 방번호 = %d"), my_packet->counts, my_packet->roomNum));
 		break;
 	}
 	case SC_MOVE_PLAYER:
@@ -111,7 +112,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 
 void ULOTGameInstance::ReadPacket(SOCKET sock)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket 진입")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket 진입")));
 	DWORD iobyte, ioflag = 0;
 
 	int ret = WSARecv(sock, &recv_wsabuf, 1, &iobyte, &ioflag, NULL, NULL);
@@ -120,11 +121,11 @@ void ULOTGameInstance::ReadPacket(SOCKET sock)
 		//printf("Recv Error [%d]\n", err_code);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Recv Error")));
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - WSARecv후")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - WSARecv후")));
 	BYTE *ptr = reinterpret_cast<BYTE *>(recv_buffer);
 
 	while (0 != iobyte) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - iobyte != 0")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - iobyte != 0")));
 		if (0 == in_packet_size) in_packet_size = ptr[0];
 		if (iobyte + saved_packet_size >= in_packet_size) {
 			memcpy(packet_buffer + saved_packet_size, ptr, in_packet_size - saved_packet_size);
@@ -140,7 +141,7 @@ void ULOTGameInstance::ReadPacket(SOCKET sock)
 			iobyte = 0;
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - iobyte 체크 후")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ReadPacket - iobyte 체크 후")));
 }
 
 void ULOTGameInstance::ToCalleventThread(LPVOID p)
@@ -158,16 +159,16 @@ void ULOTGameInstance::eventThread()
 		switch (ev.lNetworkEvents)
 		{
 		case FD_CONNECT:
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("FD_CONNECT")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("FD_CONNECT")));
 
 			WSAEventSelect(sock, myevent, FD_READ);
 			break;
 		case FD_READ:
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
 			ReadPacket(sock);
 			break;
 		case FD_CLOSE:
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("FD_CLOSE")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("FD_CLOSE")));
 
 			closesocket(sock);
 			break;
@@ -175,58 +176,65 @@ void ULOTGameInstance::eventThread()
 	}
 }
 
-//void ULOTGameInstance::FinishDestroy()
-//{
-//	Super::FinishDestroy();
-//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End")));
-//	if (bIsCreateSocket)
-//	{
-//		if (bIsConnected)
-//		{
-//			closesocket(sock);
-//			event_thread->detach();
-//			delete(event_thread);
-//			WSACleanup();
-//		}
-//		else
-//		{
-//			closesocket(sock);
-//			WSACleanup();
-//		}
-//	}
-//}
+void ULOTGameInstance::FinishDestroy()
+{
+	/*Super::FinishDestroy();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End")));
+	if (bIsCreateSocket)
+	{
+		if (bIsConnected)
+		{
+			closesocket(sock);
+			event_thread->detach();
+			delete(event_thread);
+			WSACleanup();
+		}
+		else
+		{
+			closesocket(sock);
+			WSACleanup();
+		}
+	}*/
+	Super::FinishDestroy();
+	count += 1;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End = %d"),count));
+
+}
 
 //ULOTGameInstance::~ULOTGameInstance()
 //{
-//	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
-//	/*if (bIsConnected) {
-//			closesocket(sock);
-//			event_thread->detach();
-//			delete(event_thread);
-//			WSACleanup();
-//		}
-//		else
-//		{
-//			closesocket(sock);
-//			WSACleanup();
-//		}
-//	*/
-//
-//
-//	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End")));
-//	if (bIsCreateSocket)
-//	{
-//		if (bIsConnected)
-//		{
-//			closesocket(sock);
-//			event_thread->detach();
-//			delete(event_thread);
-//			WSACleanup();
-//		}
-//		else
-//		{
-//			closesocket(sock);
-//			WSACleanup();
-//		}
-//	}
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
+	/*if (bIsConnected) {
+			closesocket(sock);
+			event_thread->detach();
+			delete(event_thread);
+			WSACleanup();
+		}
+		else
+		{
+			closesocket(sock);
+			WSACleanup();
+		}
+	*/
+
+
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End")));
+	if (bIsCreateSocket)
+	{
+		if (bIsConnected)
+		{
+			closesocket(sock);
+			event_thread->detach();
+			delete(event_thread);
+			WSACleanup();
+		}
+		else
+		{
+			closesocket(sock);
+			WSACleanup();
+		}
+	}*/
+
+	//count += 1;
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("End1 = %d"), count));
 //}

@@ -25,13 +25,13 @@ public:
 	
 	ULOTGameInstance();
 	//~ULOTGameInstance();
-	//virtual void FinishDestroy() override;
+	virtual void FinishDestroy() override;
 	UFUNCTION(BlueprintCallable, Category = "MultiBTClick")
 		void ClickMultiBT();
 
 	UFUNCTION(BlueprintCallable, Category = "EntBTClick")
 		void ClickEntBT();
-
+	int count;
 	char send_buffer[4000];
 	WSADATA wsa;
 	WSABUF   recv_wsabuf;
