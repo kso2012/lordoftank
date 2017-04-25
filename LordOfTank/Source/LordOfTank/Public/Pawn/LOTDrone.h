@@ -155,6 +155,8 @@ private:
 
 	void ClearBeam();
 
+	void ChangePawn();
+
 public:
 
 
@@ -173,6 +175,8 @@ public:
 	//FORCEINLINE class UCameraComponent* GetCamera() const { return Camera; }
 
 	void DetectMode();
+
+	bool PossessDrone;
 
 	
 	

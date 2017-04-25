@@ -2,7 +2,10 @@
 
 #include "LordOfTank.h"
 #include "LOTDrone.h"
+#include "LOTPlayer.h"
 
+#define PawnTank 1
+#define PawnDrone 2
 
 
 ALOTDrone::ALOTDrone()
@@ -201,7 +204,8 @@ ALOTDrone::ALOTDrone()
 	bAcceleratedForward = false;
 	bHasInputUpward = false;
 	bHasInputForward = false;
-	bIsDetectMode = false;
+	bIsDetectMode = false; 
+	PossessDrone = false;
 	
 }
 
@@ -256,6 +260,8 @@ void ALOTDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	InputComponent->BindAxis("Right", this, &ALOTDrone::MoveRightInput);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTDrone::DetectMode);
 	InputComponent->BindAction("SetTarget", IE_Pressed, this, &ALOTDrone::SetTarget);
+
+	InputComponent->BindAction("ChangePawn", IE_Pressed, this, &ALOTDrone::ChangePawn);
 	
 
 }
@@ -437,4 +443,13 @@ void ALOTDrone::DetectMode()
 		
 
 	}
+}
+
+void ALOTDrone::ChangePawn()
+{
+	if (PossessDrone)
+		PossessDrone = false;
+	else
+		PossessDrone = true;
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), PossessDrone));
 }
