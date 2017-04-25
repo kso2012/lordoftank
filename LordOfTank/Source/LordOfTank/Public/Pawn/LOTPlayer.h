@@ -103,6 +103,17 @@ public:
 
 	float getPower() { return CurShootingPower; }
 
+	void SetTurn(bool b) { myTurn = b; }
+
+	bool GetTurn() { return myTurn; }
+
+	void ChangeTurn() { if (myTurn)myTurn = false;
+
+	else myTurn = true;
+	}
+
+	bool PossessTank;
+
 private:
 
 
@@ -134,6 +145,8 @@ private:
 	//빔을 그리는 함수
 	void DrawBeam(FVector StartLocation, FVector EndLocation);
 
+	void ChangePawn();
+
 	//유도미사일에게 넘겨줄 유도타겟
 	class AActor* HomingTarget;
 
@@ -149,6 +162,8 @@ private:
 	//현재AP
 	float AP;
 
+	bool myTurn;
+
 	float RaisingRate;
 
 	float MinShootingPower;
@@ -162,6 +177,7 @@ private:
 	bool bIsShoot;
 
 	bool bIsPushFire;
+
 
 	
 

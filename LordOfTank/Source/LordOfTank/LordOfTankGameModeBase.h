@@ -3,8 +3,8 @@
 #pragma once
 
 #include "GameFramework/GameModeBase.h"
-#include "LOTPlayer.h"
-#include "LOTDrone.h"
+#include "Pawn/LOTPlayer.h"
+#include "Pawn/LOTDrone.h"
 #include "PlayerInfo.h"
 #include "LordOfTankGameModeBase.generated.h"
 
@@ -12,6 +12,16 @@
  * 
  */
 
+struct PlayerInfomations
+{
+	ALOTPlayer* Tank;
+	ALOTDrone* Drone;
+	AActor* TargetActor;
+	float AP;
+	float HP;
+	int PlayerNum;
+	int ControlledPawn;
+};
 
 
 class FHouse
@@ -29,9 +39,12 @@ class LORDOFTANK_API ALordOfTankGameModeBase : public AGameModeBase
 public:
 	ALordOfTankGameModeBase();
 
-	class ALOTPlayer* MyPlayer;
+	//class ALOTPlayer* MyPlayer;
 
-	virtual void StartPlay() override; 
+	virtual void StartPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
+
 
 	//플레이어를 비교하기 위한 카운터
 	UPROPERTY(BlueprintReadWrite)
@@ -52,4 +65,14 @@ public:
 	////발사된 투사체의 속도를 반환하는 함수
 	//float ReturnProjectileVelocity();
 
+	float DroneSpawningHeight;
+
+	UFUNCTION(BlueprintCallable)
+	void ChangePawn();
+
+private:
+
+	PlayerInfomations MyPlayer;
+	PlayerInfomations EnemyPlayer; 
+	APlayerController* control;
 };

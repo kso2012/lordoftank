@@ -15,6 +15,8 @@
 #include "LOTDrone.h"
 #include "LOTPlayer.h"
 
+#define PawnTank 1
+#define PawnDrone 2
 
 
 
@@ -114,7 +116,7 @@ ALOTPlayer::ALOTPlayer()
 	MaxShootingPower= 80000.f;
 	//발사 파워
 	CurShootingPower= MinShootingPower;
-
+	PossessTank = true;
 
 	
 }
@@ -140,6 +142,7 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	InputComponent->BindAction("Fire", IE_Pressed, this, &ALOTPlayer::FireStart);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTPlayer::FireMode);
 
+	InputComponent->BindAction("ChangePawn", IE_Pressed, this, &ALOTPlayer::ChangePawn);
 
 }
 
@@ -161,7 +164,8 @@ void ALOTPlayer::Tick(float DeltaTime)
 		RaisePower();
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재파워 %f"), CurShootingPower));
 	}
-	
+
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), myTurn));
 }
 
 void ALOTPlayer::ChangeFiremodeBody()
@@ -225,10 +229,11 @@ void ALOTPlayer::FireEnd()
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
 			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,0.25f,VTBlend_Linear,0.0f,true);
 
+			ChangeTurn();
 		}
 	}
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
-
+	FireMode();
 }
 
 void ALOTPlayer::ChangeCamera(bool bIsFireMode)
@@ -406,6 +411,15 @@ void ALOTPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimit
 	{
 		;
 	}
+}
+
+void ALOTPlayer::ChangePawn()
+{
+	if (PossessTank)
+		PossessTank = false;
+	else
+		PossessTank = true;
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), PossessTank));
 }
 
 
