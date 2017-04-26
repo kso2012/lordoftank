@@ -118,6 +118,8 @@ ALOTPlayer::ALOTPlayer()
 	CurShootingPower= MinShootingPower;
 	PossessTank = true;
 
+	isNotAI = true;
+	bIsShoot = false;
 	
 }
 
@@ -228,7 +230,7 @@ void ALOTPlayer::FireEnd()
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
 			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,0.25f,VTBlend_Linear,0.0f,true);
 
-			ChangeTurn();
+			TempActor->GetTank(this);
 		}
 	}
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
@@ -432,3 +434,26 @@ void ALOTPlayer::ChangePawn()
 //	
 //}
 
+
+void ALOTPlayer::ChangeTurn() {
+	if (myTurn)
+		myTurn = false;
+	else
+		myTurn = true;
+
+	bIsShoot = false;
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Trun Changed")));
+}
+
+void ALOTPlayer::ShootAI() {
+	bIsShoot = true;
+	CurShootingPower += 500;
+	FireEnd();
+}
+
+void ALOTPlayer::Think() {
+	if (myTurn && !isNotAI && !bIsShoot) {
+		bIsFireMode = true;
+		ShootAI();
+	}
+}

@@ -8,23 +8,14 @@
 /**
  * 
  */
-
-
-
-
-
 UCLASS()
 class LORDOFTANK_API AStartGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
 public:
-
 	AStartGameMode();
 	
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 		void test();
-
-
-
 };

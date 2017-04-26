@@ -1,9 +1,0 @@
-diff a/LordOfTank/Source/LordOfTank/Private/Pawn/LOTPlayer.cpp b/LordOfTank/Source/LordOfTank/Private/Pawn/LOTPlayer.cpp	(rejected hunks)
-@@ -220,7 +220,6 @@
- 		}
- 	}
- 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("�迭���� %d"), ProjectileInventory.Num()));
--
- 	CurShootingPower = MinShootingPower;
- 	bIsShoot = false;
- }

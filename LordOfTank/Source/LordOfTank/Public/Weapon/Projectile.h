@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "LOTPlayer.h"
 #include "Projectile.generated.h"
 
 UCLASS()
@@ -63,6 +64,9 @@ public:
 
 	void SetInitialVelocity(FVector velocity);
 
-	
-	
+	ALOTPlayer *ParentTank;
+
+	void GetTank(ALOTPlayer * tank) { ParentTank = tank; }
+
+	void SendMessage() { ParentTank->ChangeTurn(); }
 };
