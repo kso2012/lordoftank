@@ -10,11 +10,87 @@
 #include "LOTGameInstance.generated.h"
 using namespace std;
 
+//#define SERVER_PORT 4000
 #define WM_SOCKET    WM_USER + 1
 #define BUF_SIZE 1024
+
 /**
- * 
- */
+*
+*/
+
+struct Packet
+{
+	BYTE size;
+	FVector Pos;
+};
+
+struct MyApp
+{
+	SOCKET sarr[WSA_MAXIMUM_WAIT_EVENTS];
+	HANDLE hEarr[WSA_MAXIMUM_WAIT_EVENTS];
+	int now;
+};
+
+
+USTRUCT(BlueprintType)
+struct FShowRoom
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		int roomNum;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		int counts;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		int state;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
+		bool canStart;
+
+	FShowRoom()
+	{
+		roomNum = 0;
+		counts = 0;
+		state = 0;
+		canStart = false;
+	}
+
+};
+
+USTRUCT(BlueprintType)
+struct FShowLobby
+{
+	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	bool canStart;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	bool isReady1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	bool isReady2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	int playerNum;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	int counts;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	FString name1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	FString name2;
+
+	FShowLobby() {
+		bool canStart = false;
+		bool isReady1 = false;
+		bool isReady2 = false;
+		int playerNum = 0;
+		int counts = 0;
+		FString name1 = "none";
+		FString name2 = "none";
+	}
+
+	
+};
+
+
+
+
 
 UCLASS()
 class LORDOFTANK_API ULOTGameInstance : public UGameInstance
@@ -22,16 +98,27 @@ class LORDOFTANK_API ULOTGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
-	
+
 	ULOTGameInstance();
-	//~ULOTGameInstance();
+
 	virtual void FinishDestroy() override;
-	UFUNCTION(BlueprintCallable, Category = "MultiBTClick")
+
+	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickMultiBT();
 
-	UFUNCTION(BlueprintCallable, Category = "EntBTClick")
-		void ClickEntBT();
-	int count;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
+		FShowRoom RoomInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "lobby")
+		FShowLobby LobbyInfo;
+
+	UPROPERTY()
+		FStreamableManager AssetLoader;
+
+	UFUNCTION(BlueprintCallable, Category = "RoomClick")
+		bool ClickRoomBT(int roomnum);
+
+
 	char send_buffer[4000];
 	WSADATA wsa;
 	WSABUF   recv_wsabuf;
@@ -44,16 +131,20 @@ public:
 	WSAEVENT myevent;
 	HWND main_window_handle = NULL;
 	WSABUF send_wsabuf;
-	bool bIsConnected;
-	bool bIsCreateSocket;
-	//void SendPos(FVector pos, UWheeledVehicleMovementComponent* VehicleComponent);
+	MyApp app;
+	WSAOVERLAPPED wsaOverlapped;
+	WSAEVENT wsaEvent;
+	bool bIsTryConnecting;
+	void SendPos(FVector pos);
 	void eventThread();
 	static void ToCalleventThread(LPVOID p);
-	void ReadPacket(SOCKET sock);
+	/*void ReadPacket(SOCKET sock);*/
+	void ReadPacket(int index);
 	void ProcessPacket(char *ptr);
-	UPROPERTY()
-		FStreamableManager AssetLoader;
-private:
-	
+	void InitEvent(SOCKET sock);
+	void connectProc(int index);
+	void DeleteSocket(int index);
+	void CloseProc(int index);
 
+	
 };
