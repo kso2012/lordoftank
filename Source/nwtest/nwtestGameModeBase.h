@@ -24,15 +24,39 @@ struct OverlapEx
 	int packet_size;
 };
 
+struct Player {
+	FVector pos;
+	class UWheeledVehicleMovementComponent*  VehicleMovement;
+};
+
 struct Client {
 	int   m_id;
 	bool is_connected;
 	SOCKET m_s;
+	Player m_player;
+	int roomNum;
+	FString name;
+	bool isReady;
+	int playerNum;
 	mutex vl_lock;
 	OverlapEx m_recv_overlap;
 	int previous_data;
-	unsigned char packet[MAX_BUF_SIZE];
+	unsigned char packet[MAX_PACKET_SIZE];
 };
+
+struct Room {
+	int roomNum;
+	int counts;
+	int state;
+	bool canStart;
+	
+	//Client clients[MAX_USER];
+	Client* client1;
+	Client* client2;
+	//int client_id1;
+	//int client_id2;
+};
+
 
 /**
 *
@@ -51,6 +75,7 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	HANDLE g_hIocp;
 	Client clients[MAX_USER];
+	Room room;
 	bool g_isshutdown;
 
 	//void error_display(char *msg, int err_no);
@@ -68,6 +93,6 @@ public:
 	bool threadkey;
 	float tesking;
 	void ProcessPacket(int id, unsigned char *packet);
-
+	void SendPacket(int id, unsigned char *packet);
 
 };
