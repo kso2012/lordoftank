@@ -151,7 +151,6 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 void ALOTPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	if (bIsFireMode)
 	{
 		ChangeFiremodeBody();

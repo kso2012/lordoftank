@@ -18,6 +18,7 @@ AStartGameMode::AStartGameMode()
 		//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("dd")));
 	}
 
+
 }
 
 void AStartGameMode::test()

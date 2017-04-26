@@ -12,6 +12,9 @@
 #define COLLISION_PROJECTILE	ECC_GameTraceChannel1
 #define COLLISION_PICKUP		ECC_GameTraceChannel2
 
+
+
+
 #define OP_RECV 1
 #define OP_SEND 2
 #define MAX_USER 2
@@ -24,7 +27,8 @@
 #define CS_ROOM_CLICK 3
 
 #define SC_ROOM_SHOW 1
-#define SC_MOVE_PLAYER 2
+#define SC_ROOM_INFO 2
+#define SC_MOVE_PLAYER 3
 
 #pragma pack (push, 1)
 struct cs_packet_room_click
@@ -72,7 +76,19 @@ struct sc_packet_room_show
 	int roomNum;
 	int counts;
 	int state;
+};
+
+struct sc_packet_room_info
+{
+	BYTE size;
+	BYTE type;
 	bool canStart;
+	bool isReady1;
+	bool isReady2;
+	int playerNum;
+	int counts;
+	FString name1;
+	FString name2;
 };
 
 struct sc_packet_tank_move
@@ -81,4 +97,5 @@ struct sc_packet_tank_move
 	int num;
 	WORD id;
 };
+
 #pragma pack (pop)
