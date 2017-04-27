@@ -186,12 +186,18 @@ private:
 	bool isNotAI;
 
 	void ShootAI();
+
+	void TurnAI();
 	
 
 
 public:
+	void CommandShoot() { ShootAI(); }
+	void CommandTurn() { TurnAI(); }
 	
 	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
 	bool GetisAI() { return !isNotAI; }
-	void Think();
+
+
+	UCameraComponent* ReturnCamera() { return MoveModeCamera; }
 };

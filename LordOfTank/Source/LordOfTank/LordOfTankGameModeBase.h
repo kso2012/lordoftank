@@ -83,4 +83,7 @@ private:
 	PlayerInfomations EnemyPlayer;
 	APlayerController* Control;
 	APlayerController* AI;
+
+
+	void Think();
 };
