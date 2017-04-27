@@ -145,21 +145,28 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 	case CS_ROOM_CLICK:
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_ROOM_CLICK 진입")));
-		cs_packet_room_click *cs_room_click = reinterpret_cast<cs_packet_room_click*>(packet);
-		room.roomNum = cs_room_click->roomNum;
-		int playerNum;
+		cs_packet_room_click *room_click = reinterpret_cast<cs_packet_room_click*>(packet);
+		room.roomNum = room_click->roomNum;
+		int playerNum = 0;
 		
 		if (room.counts == 0 && room.client1 == NULL) // 1P로 방에 들어왔을때
 		{
 			room.client1 = &clients[id];
 			room.state = 1;
 			playerNum = 1;
+			room.client1->playerNum = 1;
 		}
 		else if (room.counts == 1 && room.client1 != NULL) // 2P로 방에 들어왔을때
 		{
 			room.client2 = &clients[id];
 			room.state = 2;
 			playerNum = 2;
+		}
+		else if (room.counts == 1 && room.client1 == NULL) // 2P가 현재 있는 상태에서 1P로 들어왔을때
+		{
+			room.client1 = &clients[id];
+			room.state = 2;
+			playerNum = 1;
 		}
 		room.counts++;
 
@@ -179,13 +186,110 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		
 		room_info.name1 = "temp1";
 		room_info.name2 = "temp2";
-
+		
+		// 1. 들어온 사람한테 방의 정보를 보내준다.
 		//for(int i=0; i<MAX_USER; ++i)
-		SendPacket(id, reinterpret_cast<unsigned char*>(&room_info)); // 바뀐 방의 정보를 보내준다.
+		SendPacket(id, reinterpret_cast<unsigned char*>(&room_info)); 
 
-		// 나중에 방 늘어나면, 로비에서 기다리는사람들한테도 바뀐 것을 보내줘야함.
+		// 2. 현재 들어온 방에 있던 사람한테 갱신해줘야 한다.
+
+		// 3. 로비에서 기다리는사람들한테도 바뀐 것을 보내줘야함.
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_ROOM_CLICK 끝")));
+		break;
+	}
+	case CS_READY_CLICK:
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_READY_CLICK 진입")));
+		cs_packet_room_ready *room_ready = reinterpret_cast<cs_packet_room_ready*>(packet);
+		if (room.client1->m_id == id && room.client1->isReady == false)
+			room.client1->isReady = true;
+		else if (room.client1->m_id == id && room.client1->isReady == true)
+			room.client1->isReady = false;
+		else if (room.client2->m_id == id && room.client2->isReady == false)
+			room.client2->isReady = true;
+		else if (room.client2->m_id == id && room.client2->isReady == true)
+			room.client2->isReady = false;
+
+		if (room.counts == 2)
+		{
+			if (room.client1->isReady && room.client2->isReady)
+				room.canStart = true;
+			else
+				room.canStart = false;
+		}
+
+		sc_packet_room_ready sc_room_ready;
+		sc_room_ready.size = sizeof(sc_room_ready);
+		sc_room_ready.type = SC_ROOM_READY;
+		sc_room_ready.canStart = room.canStart;
+		sc_room_ready.isReady1 = room.client1->isReady;
+		sc_room_ready.isReady2 = false;
+		if(room.counts == 2)
+			sc_room_ready.isReady2 = room.client2->isReady;
+
+		SendPacket(id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+		break;
+	}
+	case CS_EXIT_CLICK:
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_READY_CLICK 진입")));
+		cs_packet_room_exit *room_exit = reinterpret_cast<cs_packet_room_exit*>(packet);
+		int myid = -1;
+		if (id == room.client1->m_id) // 1P가 나갔다면
+		{
+			room.client1 = NULL;
+			if (room.client2 != NULL)
+				room.state = 1;
+			else
+				room.state = 0;
+			room.canStart = false;
+			room.counts--;
+			if(room.client2 != NULL)
+				myid = room.client2->m_id;
+		}
+		else if (id == room.client2->m_id) // 2P가 나갔다면
+		{
+			room.client2 = NULL;
+			if (room.client1 != NULL)
+				room.state = 1;
+			else
+				room.state = 0;
+			room.canStart = false;
+			room.counts--;
+			if(room.client1 != NULL)
+				myid = room.client1->m_id;
+		}
+		
+		// 1. 나간 애한테는 전체 방 정보를 보내줘야 한다.
+		sc_packet_room_show room_show;
+		room_show.counts = room.counts;
+		room_show.size = sizeof(room_show);
+		room_show.type = SC_ROOM_SHOW;
+		room_show.state = room.state;
+		room_show.roomNum = room.roomNum;
+		SendPacket(id, reinterpret_cast<unsigned char*>(&room_show));
+
+		// 상대방한테는 현재 방 정보를 갱신해줘야 한다.
+		if (room.counts == 1) // 상대방이 남아있다면
+		{
+			sc_packet_room_info room_info;
+			room_info.size = sizeof(room_info);
+			room_info.type = SC_ROOM_INFO;
+			room_info.canStart = false;
+			room_info.counts = room.counts;
+			if(room.client1 != NULL)
+				room_info.isReady1 = room.client1->isReady;
+			else room_info.isReady1 = false;
+			if (room.client2 != NULL)
+				room_info.isReady2 = room.client2->isReady;
+			else room_info.isReady2 = false;
+			//room_info.name1
+			//room_info.name2
+			//room_info.playerNum
+		}
+
+		
 		break;
 	}
 	case CS_FORWARD:
