@@ -4,6 +4,7 @@
 #include "Pawn/LOTPlayer.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Weapon/CommonProjectile.h"
+#include "Weapon/Projectile.h"
 
 
 
@@ -154,6 +155,8 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		
 	}
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
+
+	AProjectile::SendMessage();
 
 	Destroy();
 }

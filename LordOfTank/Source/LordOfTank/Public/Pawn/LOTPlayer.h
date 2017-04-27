@@ -107,12 +107,12 @@ public:
 
 	bool GetTurn() { return myTurn; }
 
-	void ChangeTurn() { if (myTurn)myTurn = false;
-
-	else myTurn = true;
-	}
+	void ChangeTurn();
 
 	bool PossessTank;
+
+
+	
 
 private:
 
@@ -179,6 +179,19 @@ private:
 	bool bIsPushFire;
 
 
+	/////////////////////////////
+	// AI°ü·Ã 
+private:
+
+	bool isNotAI;
+
+	void ShootAI();
 	
 
+
+public:
+	
+	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
+	bool GetisAI() { return !isNotAI; }
+	void Think();
 };

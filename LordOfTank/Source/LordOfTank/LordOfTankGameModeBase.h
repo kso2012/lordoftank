@@ -6,6 +6,7 @@
 #include "Pawn/LOTPlayer.h"
 #include "Pawn/LOTDrone.h"
 #include "PlayerInfo.h"
+#include "AIController.h"
 #include "LordOfTankGameModeBase.generated.h"
 
 /**
@@ -54,6 +55,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 		int PlayerTurn;
 
+	/*
 	//플레이어 데이터를 저장하는 함수
 	UFUNCTION(BlueprintCallable)
 		void SavePlayerInfo(ALOTPlayer *T, ALOTDrone *D, int PlayerNum);
@@ -62,17 +64,23 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void IncreasePlayerCount();
 
-	////발사된 투사체의 속도를 반환하는 함수
-	//float ReturnProjectileVelocity();
+	//발사된 투사체의 속도를 반환하는 함수
+	float ReturnProjectileVelocity();
+	*/
 
 	float DroneSpawningHeight;
 
 	UFUNCTION(BlueprintCallable)
 	void ChangePawn();
 
+	//플레이어와 AI를 생성시키고 초기화하는 함수
+	void InitPlayer();
+	void InitAI();
+
 private:
 
 	PlayerInfomations MyPlayer;
-	PlayerInfomations EnemyPlayer; 
-	APlayerController* control;
+	PlayerInfomations EnemyPlayer;
+	APlayerController* Control;
+	APlayerController* AI;
 };

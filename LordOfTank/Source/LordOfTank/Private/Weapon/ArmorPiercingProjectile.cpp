@@ -3,6 +3,7 @@
 #include "LordOfTank.h"
 #include "Pawn/LOTPlayer.h"
 #include "Weapon/ArmorPiercingProjectile.h"
+#include "Weapon/Projectile.h"
 
 
 
@@ -50,5 +51,10 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 		}
 	}
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
+
+
+	AProjectile::SendMessage();
+
+
 	Destroy();
 }

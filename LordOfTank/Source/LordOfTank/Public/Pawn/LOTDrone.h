@@ -179,6 +179,18 @@ public:
 	bool PossessDrone;
 
 	
+	/////////////////////////////
+	// AI°ü·Ã 
+
+private:
+
+	bool isNotAI;
+
+
+public:
+
+	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
+	bool GetisAI() { return !isNotAI; }
 	
 	
 };
