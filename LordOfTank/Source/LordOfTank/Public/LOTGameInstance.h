@@ -106,6 +106,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickMultiBT();
 
+	UFUNCTION(BlueprintCallable, Category = "MenuClick")
+		void ClickReadyBT();
+
+	UFUNCTION(BlueprintCallable, Category = "MenuClick")
+		void ClickBackRoomBT();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
 		FShowRoom RoomInfo;
 

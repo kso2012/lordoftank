@@ -88,17 +88,20 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	case SC_ROOM_INFO:
 	{
 		sc_packet_room_info *my_packet = reinterpret_cast<sc_packet_room_info*>(ptr);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("방정보받음!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")));
 		LobbyInfo.canStart = my_packet->canStart;
 		LobbyInfo.counts = my_packet->counts;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("방인원 : %d"), my_packet->counts));
 		LobbyInfo.isReady1 = my_packet->isReady1;
 		LobbyInfo.isReady2 = my_packet->isReady2;
-		//strncpy(LobbyInfo.name1, my_packet->name1, sizeof(FString));
-		//strncpy(LobbyInfo.name2, my_packet->name2, sizeof(FString));
-		//FMemory::Memcpy(LobbyInfo.name1, my_packet->name1);
-		//FMemory::Memcpy(LobbyInfo.name2, my_packet->name2);
 		LobbyInfo.playerNum = my_packet->playerNum;
+		break;
+	}
+
+	case SC_ROOM_READY:
+	{
+		sc_packet_room_ready *my_packet = reinterpret_cast<sc_packet_room_ready*>(ptr);
+		LobbyInfo.canStart = my_packet->canStart;
+		LobbyInfo.isReady1 = my_packet->isReady1;
+		LobbyInfo.isReady2 = my_packet->isReady2;
 		break;
 	}
 	case SC_MOVE_PLAYER:
@@ -274,6 +277,29 @@ bool ULOTGameInstance::ClickRoomBT(int roomnum)
 	}
 	return false;
 }
+
+void ULOTGameInstance::ClickReadyBT()
+{
+	cs_packet_room_ready *room_ready = reinterpret_cast<cs_packet_room_ready *>(send_buffer);
+	room_ready->type = CS_READY_CLICK;
+	room_ready->size = sizeof(cs_packet_room_ready);
+	send_wsabuf.len = sizeof(cs_packet_room_ready);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+
+void ULOTGameInstance::ClickBackRoomBT()
+{
+	cs_packet_room_exit *room_exit = reinterpret_cast<cs_packet_room_exit *>(send_buffer);
+	room_exit->type = CS_EXIT_CLICK;
+	room_exit->size = sizeof(cs_packet_room_exit);
+	send_wsabuf.len = sizeof(cs_packet_room_exit);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+
 
 void ULOTGameInstance::FinishDestroy()
 {
