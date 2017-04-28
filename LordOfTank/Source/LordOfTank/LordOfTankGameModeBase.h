@@ -77,6 +77,8 @@ public:
 	void InitPlayer();
 	void InitAI();
 
+	void IsLookEnemyTank();
+
 private:
 
 	PlayerInfomations MyPlayer;

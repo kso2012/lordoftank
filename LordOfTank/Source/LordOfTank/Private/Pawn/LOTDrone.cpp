@@ -7,6 +7,10 @@
 #define PawnTank 1
 #define PawnDrone 2
 
+#define None 0
+#define Find 1
+#define Lost 2
+
 
 ALOTDrone::ALOTDrone()
 {
@@ -206,7 +210,12 @@ ALOTDrone::ALOTDrone()
 	bHasInputForward = false;
 	bIsDetectMode = false; 
 	PossessDrone = false;
+
+	//PawnNum = PawnDrone;
+
+	DecideCollisionState = None;
 	
+	SetViewBoxLocation();
 }
 
 
@@ -451,4 +460,42 @@ void ALOTDrone::ChangePawn()
 	else
 		PossessDrone = true;
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), PossessDrone));
+}
+
+void ALOTDrone::SetViewBoxLocation() {
+	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
+
+	ViewBox->SetupAttachment(Camera);
+
+	ViewBox->SetBoxExtent(FVector(30000, 30000, 30000));
+	
+	ViewBox->SetRelativeLocation((Camera->GetForwardVector() * 15000));
+
+	ViewBox->SetVisibility(true, true);
+
+	ViewBox->bGenerateOverlapEvents = true;
+	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTDrone::DroneFindEnemy);
+	ViewBox->OnComponentEndOverlap.AddDynamic(this, &ALOTDrone::DroneLostEnemy);
+
+
+}
+
+void ALOTDrone::DroneFindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
+	
+	//CollisionActor = SweepResult.GetActor();
+	CollisionActor = OtherActor;
+
+	DecideCollisionState = Find;
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
+
+	
+}
+
+void ALOTDrone::DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
+
+	CollisionActor = OtherActor;
+
+	DecideCollisionState = Lost;
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
 }

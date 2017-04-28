@@ -7,8 +7,11 @@
 
 #define PawnTank 1
 #define PawnDrone 2
-#define AIMove 1
-#define AIShot 2
+
+
+#define None 0
+#define Find 1
+#define Lost 2
 
 
 
@@ -125,6 +128,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 			PlayerTurn = 2;
 			EnemyPlayer.Tank->SetTurn(true);
 		}
+		IsLookEnemyTank();
 	}
 	else if (PlayerTurn == 2) {
 		if (!EnemyPlayer.Tank->GetTurn()) {
@@ -137,7 +141,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 }
 
 
-void ALordOfTankGameModeBase::Think() {
+void ALordOfTankGameModeBase::Think() {/*
 	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
 	//비히클타입만 체크하도록 한다.
 	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
@@ -161,5 +165,21 @@ void ALordOfTankGameModeBase::Think() {
 		else {
 			EnemyPlayer.Tank->CommandTurn();
 		}
+	}*/
+}
+
+
+void ALordOfTankGameModeBase::IsLookEnemyTank() {
+	if (MyPlayer.Drone->DecideCollisionState == Find) {
+		if (MyPlayer.Drone->CollisionActor == EnemyPlayer.Tank) {
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
+		}
+		MyPlayer.Drone->DecideCollisionState = None;
+	}
+	else if (MyPlayer.Drone->DecideCollisionState == Lost) {
+		if (MyPlayer.Drone->CollisionActor == EnemyPlayer.Tank) {
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
+		}
+		MyPlayer.Drone->DecideCollisionState = None;
 	}
 }
