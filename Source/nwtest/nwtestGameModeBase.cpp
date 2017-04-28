@@ -108,7 +108,7 @@ void AnwtestGameModeBase::Initialize_Server()
 	room.state = 0; // 0이면 빈방, 1이면 1명, 2면 2명, 3이면 게임 시작
 	room.counts = 0;
 	room.roomNum = 0;
-	//room.canStart = false;
+	room.canStart = false;
 	room.client1 = nullptr;
 	room.client2 = nullptr;
 	
@@ -148,52 +148,110 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		cs_packet_room_click *room_click = reinterpret_cast<cs_packet_room_click*>(packet);
 		room.roomNum = room_click->roomNum;
 		int playerNum = 0;
+		int other_id = -1;
 		
 		if (room.counts == 0 && room.client1 == NULL) // 1P로 방에 들어왔을때
 		{
 			room.client1 = &clients[id];
+			room.client1->playerNum = 1;
+			clients[id].state = 2;
 			room.state = 1;
 			playerNum = 1;
-			room.client1->playerNum = 1;
 		}
 		else if (room.counts == 1 && room.client1 != NULL) // 2P로 방에 들어왔을때
 		{
 			room.client2 = &clients[id];
+			room.client2->playerNum = 2;
+			clients[id].state = 2;
 			room.state = 2;
 			playerNum = 2;
+			other_id = room.client1->m_id;
 		}
 		else if (room.counts == 1 && room.client1 == NULL) // 2P가 현재 있는 상태에서 1P로 들어왔을때
 		{
 			room.client1 = &clients[id];
+			room.client1->playerNum = 1;
+			room.client1->state = 1;
+			clients[id].state = 2;
 			room.state = 2;
 			playerNum = 1;
+			other_id = room.client2->m_id;
+		}
+		else // 예외 처리
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Error : CS_ROOM_CLICK")));
 		}
 		room.counts++;
+		
+		// 1. 일단 들어왔으면 몇P인지 알려준다.
+		sc_packet_player_num player_num;
+		player_num.size = sizeof(player_num);
+		player_num.type = SC_PLAYER_NUM;
+		player_num.playerNum = playerNum;
+		SendPacket(id, reinterpret_cast<unsigned char*>(&player_num));
 
+		// 2. 들어온 사람한테 방의 정보를 보내준다.
 		sc_packet_room_info room_info;
 		room_info.size = sizeof(room_info);
 		room_info.type = SC_ROOM_INFO;
-		room_info.isReady1 = false;
-		room_info.isReady2 = false;
-		if (room.client1->isReady && room.client2->isReady)
+
+		if (playerNum == 1) // 들어온 사람이 1P이고
+		{
+			if (room.client2 != NULL) // 2P가 존재한다면
+			{
+				room_info.isReady1 = false;
+				room_info.isReady2 = room.client2->isReady;
+			}
+			else // 2P가 존재하지 않는다면
+			{
+				room_info.isReady1 = false;
+				room_info.isReady2 = false;
+			}
+		}
+		if (playerNum == 2) // 들어온 사람이 2P이고
+		{
+			if (room.client1 != NULL) // 1P가 존재한다면
+			{
+				room_info.isReady1 = room.client1->isReady;
+				room_info.isReady2 = false;
+			}
+			else // 1P가 존재하지 않는다면
+			{
+				room_info.isReady1 = false;
+				room_info.isReady2 = false;
+			}
+		}
+
+		if (room_info.isReady1 && room_info.isReady2) // 1P와 2P가 모두 레디를 했다면
 			room_info.canStart = true;
-		else
-			room_info.canStart = false;
-		room_info.playerNum = playerNum;
+		else room_info.canStart = false;
+
 		room_info.counts = room.counts;
 		//room_info.name1 = room.client1->name;
 		//room_info.name2 = room.client2->name;
-		
 		room_info.name1 = "temp1";
 		room_info.name2 = "temp2";
-		
-		// 1. 들어온 사람한테 방의 정보를 보내준다.
-		//for(int i=0; i<MAX_USER; ++i)
+
 		SendPacket(id, reinterpret_cast<unsigned char*>(&room_info)); 
 
 		// 2. 현재 들어온 방에 있던 사람한테 갱신해줘야 한다.
+		if(other_id != -1) // 다른 사람이 있다면.
+			SendPacket(other_id, reinterpret_cast<unsigned char*>(&room_info));
 
 		// 3. 로비에서 기다리는사람들한테도 바뀐 것을 보내줘야함.
+		sc_packet_room_show room_show;
+		room_show.size = sizeof(room_show);
+		room_show.type = SC_ROOM_SHOW;
+		room_show.counts = room.counts;
+		room_show.state = room.state;
+		room_show.roomNum = room.roomNum;
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (clients[i].is_connected == true && clients[i].state == 1) // 연결이 되어있고, 로비에 있다면
+			{
+				SendPacket(i, reinterpret_cast<unsigned char*>(&room_show));
+			}
+		}
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_ROOM_CLICK 끝")));
 		break;
@@ -202,16 +260,44 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_READY_CLICK 진입")));
 		cs_packet_room_ready *room_ready = reinterpret_cast<cs_packet_room_ready*>(packet);
-		if (room.client1->m_id == id && room.client1->isReady == false)
-			room.client1->isReady = true;
-		else if (room.client1->m_id == id && room.client1->isReady == true)
-			room.client1->isReady = false;
-		else if (room.client2->m_id == id && room.client2->isReady == false)
-			room.client2->isReady = true;
-		else if (room.client2->m_id == id && room.client2->isReady == true)
-			room.client2->isReady = false;
+		int other_id = -1;
 
-		if (room.counts == 2)
+		if (clients[id].playerNum == 1 && clients[id].isReady == false) // 1P가 눌렀을때의 처리
+		{
+			room.client1->isReady = true;
+			if(room.client2 != NULL)
+				other_id = room.client2->m_id;
+		}
+		else if (clients[id].playerNum == 1 && clients[id].isReady == true)
+		{
+			room.client1->isReady = false;
+			if (room.client2 != NULL)
+				other_id = room.client2->m_id;
+		}
+		else if (clients[id].playerNum == 2 && clients[id].isReady == false) // 2P가 눌렀을때의 처리
+		{
+			room.client2->isReady = true;
+			if (room.client1 != NULL)
+				other_id = room.client1->m_id;
+		}
+		else if (clients[id].playerNum == 2 && clients[id].isReady == true)
+		{
+			room.client2->isReady = false;
+			if (room.client1 != NULL)
+				other_id = room.client1->m_id;
+		}
+
+		// 이 코드는 참조할때 에러가 날 수도 있어서 위에껄로 수정.
+		//if (room.client1->m_id == id && room.client1->isReady == false) // 1P가 눌렀을때의 처리
+		//	room.client1->isReady = true;
+		//else if (room.client1->m_id == id && room.client1->isReady == true)
+		//	room.client1->isReady = false;
+		//else if (room.client2->m_id == id && room.client2->isReady == false) // 2P가 눌렀을때의 처리
+		//	room.client2->isReady = true;
+		//else if (room.client2->m_id == id && room.client2->isReady == true)
+		//	room.client2->isReady = false;
+
+		if (room.counts == 2) // 2명일때만 canStart 변수가 변할 수 있으므로
 		{
 			if (room.client1->isReady && room.client2->isReady)
 				room.canStart = true;
@@ -223,43 +309,85 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		sc_room_ready.size = sizeof(sc_room_ready);
 		sc_room_ready.type = SC_ROOM_READY;
 		sc_room_ready.canStart = room.canStart;
-		sc_room_ready.isReady1 = room.client1->isReady;
+		sc_room_ready.isReady1 = false;
 		sc_room_ready.isReady2 = false;
-		if(room.counts == 2)
+		if(room.client1 != NULL)
+			sc_room_ready.isReady1 = room.client1->isReady;
+		if(room.client2 != NULL)
 			sc_room_ready.isReady2 = room.client2->isReady;
 
+		// 1. 레디를 누른 사람한테 보내준다.
 		SendPacket(id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+
+		// 2. 상대방한테 보내준다.
+		if(other_id != -1)
+			SendPacket(other_id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+
 		break;
 	}
 	case CS_EXIT_CLICK:
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_READY_CLICK 진입")));
 		cs_packet_room_exit *room_exit = reinterpret_cast<cs_packet_room_exit*>(packet);
-		int myid = -1;
-		if (id == room.client1->m_id) // 1P가 나갔다면
+		int other_id = -1;
+
+		if (clients[id].playerNum == 1) // 1P가 나갔다면
 		{
+			clients[id].state = 1;
+			clients[id].isReady = false;
+			clients[id].playerNum = 0;
+			clients[id].roomNum = -1;
 			room.client1 = NULL;
+			if (room.client2 != NULL) // 2P가 있다면
+				room.state = 1;
+			else
+				room.state = 0;
+			room.canStart = false;
+			room.counts--;
 			if (room.client2 != NULL)
-				room.state = 1;
-			else
-				room.state = 0;
-			room.canStart = false;
-			room.counts--;
-			if(room.client2 != NULL)
-				myid = room.client2->m_id;
+				other_id = room.client2->m_id;
 		}
-		else if (id == room.client2->m_id) // 2P가 나갔다면
+		else if (clients[id].playerNum == 2) // 2P가 나갔다면
 		{
+			clients[id].state = 1;
+			clients[id].isReady = false;
+			clients[id].playerNum = 0;
+			clients[id].roomNum = -1;
 			room.client2 = NULL;
-			if (room.client1 != NULL)
+			if (room.client1 != NULL) // 1P가 있다면
 				room.state = 1;
 			else
 				room.state = 0;
 			room.canStart = false;
 			room.counts--;
-			if(room.client1 != NULL)
-				myid = room.client1->m_id;
+			if (room.client1 != NULL)
+				other_id = room.client1->m_id;
 		}
+
+		//if (id == room.client1->m_id) // 1P가 나갔다면
+		//{
+		//	room.client1 = NULL;
+		//	if (room.client2 != NULL)
+		//		room.state = 1;
+		//	else
+		//		room.state = 0;
+		//	room.canStart = false;
+		//	room.counts--;
+		//	if(room.client2 != NULL)
+		//		other_id = room.client2->m_id;
+		//}
+		//else if (id == room.client2->m_id) // 2P가 나갔다면
+		//{
+		//	room.client2 = NULL;
+		//	if (room.client1 != NULL)
+		//		room.state = 1;
+		//	else
+		//		room.state = 0;
+		//	room.canStart = false;
+		//	room.counts--;
+		//	if(room.client1 != NULL)
+		//		other_id = room.client1->m_id;
+		//}
 		
 		// 1. 나간 애한테는 전체 방 정보를 보내줘야 한다.
 		sc_packet_room_show room_show;
@@ -270,7 +398,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		room_show.roomNum = room.roomNum;
 		SendPacket(id, reinterpret_cast<unsigned char*>(&room_show));
 
-		// 상대방한테는 현재 방 정보를 갱신해줘야 한다.
+		// 2. 상대방한테는 현재 방 정보를 갱신해줘야 한다.
 		if (room.counts == 1) // 상대방이 남아있다면
 		{
 			sc_packet_room_info room_info;
@@ -278,15 +406,28 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 			room_info.type = SC_ROOM_INFO;
 			room_info.canStart = false;
 			room_info.counts = room.counts;
-			if(room.client1 != NULL)
+			if (room.client1 != NULL) // 나간애가 2P고 1P가 남아있다면
+			{
 				room_info.isReady1 = room.client1->isReady;
-			else room_info.isReady1 = false;
-			if (room.client2 != NULL)
+				room_info.isReady2 = false;
+			}
+			else if (room.client2 != NULL)
+			{
+				room_info.isReady1 = false;
 				room_info.isReady2 = room.client2->isReady;
-			else room_info.isReady2 = false;
+			}
 			//room_info.name1
 			//room_info.name2
-			//room_info.playerNum
+			SendPacket(other_id, reinterpret_cast<unsigned char*>(&room_info));
+		}
+
+		// 3. 로비에 있는 사람들한테도 갱신해줘야 한다.
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			if (clients[i].is_connected == true && clients[i].state == 1) // 연결이 되어있고, 로비에 있다면
+			{
+				SendPacket(i, reinterpret_cast<unsigned char*>(&room_show));
+			}
 		}
 
 		
@@ -497,6 +638,12 @@ void AnwtestGameModeBase::acceptthread()
 		clients[new_id].m_recv_overlap.operation = OP_RECV;
 		clients[new_id].m_recv_overlap.packet_size = 0;
 		clients[new_id].previous_data = 0;
+		clients[new_id].isReady = false;
+		clients[new_id].state = 1;
+		clients[new_id].playerNum = 0;
+		clients[new_id].name = "temp";
+		clients[new_id].roomNum = -1;
+
 		ZeroMemory(&clients[new_id].m_recv_overlap, sizeof(OVERLAPPED));
 		/*room.clients[new_id].m_s = new_client;
 		room.clients[new_id].is_connected = true;
@@ -508,7 +655,6 @@ void AnwtestGameModeBase::acceptthread()
 		// 방 정보 전송
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Send Room Show")));
 		sc_packet_room_show room_show;
-		//room_show.canStart = room.canStart;
 		room_show.counts = room.counts;
 		room_show.roomNum = room.roomNum;
 		room_show.size = sizeof(room_show);
