@@ -122,6 +122,7 @@ ALOTPlayer::ALOTPlayer()
 
 	isNotAI = true;
 	bIsShoot = false;
+	
 }
 
 void ALOTPlayer::BeginPlay()
@@ -449,14 +450,16 @@ void ALOTPlayer::ChangeTurn() {
 }
 
 void ALOTPlayer::ShootAI() {
-	bIsShoot = true;
-	CurShootingPower += 500;
-	FireEnd();
-}
-
-void ALOTPlayer::Think() {
 	if (myTurn && !isNotAI && !bIsShoot) {
 		bIsFireMode = true;
-		ShootAI();
+		bIsShoot = true;
+		CurShootingPower += 500;
+		FireEnd();
 	}
+}
+
+
+void ALOTPlayer::TurnAI() {
+	MoveRight(1);
+	MoveForward(1);
 }

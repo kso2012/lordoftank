@@ -14,10 +14,13 @@
 #define CS_FORWARD 1
 #define CS_RIGHT 2
 #define CS_ROOM_CLICK 3
+#define CS_READY_CLICK 4
+#define CS_EXIT_CLICK 5
 
 #define SC_ROOM_SHOW 1
 #define SC_ROOM_INFO 2
-#define SC_MOVE_PLAYER 3
+#define SC_ROOM_READY 3
+#define SC_MOVE_PLAYER 4
 
 #pragma pack (push, 1)
 struct cs_packet_room_click
@@ -25,6 +28,18 @@ struct cs_packet_room_click
 	BYTE size;
 	BYTE type;
 	int roomNum;
+};
+
+struct cs_packet_room_ready
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct cs_packet_room_exit
+{
+	BYTE size;
+	BYTE type;
 };
 
 struct cs_packet_info
@@ -78,6 +93,15 @@ struct sc_packet_room_info
 	int counts;
 	FString name1;
 	FString name2;
+};
+
+struct sc_packet_room_ready
+{
+	BYTE size;
+	BYTE type;
+	bool canStart;
+	bool isReady1;
+	bool isReady2;
 };
 
 struct sc_packet_tank_move
