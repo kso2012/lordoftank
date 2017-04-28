@@ -10,6 +10,7 @@ ULOTGameInstance::ULOTGameInstance()
 {
 
 	bIsTryConnecting = false;
+	PlayerNum = 0;
 }
 
 void ULOTGameInstance::ClickMultiBT()
@@ -85,14 +86,24 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("¹æÀÎ¿ø : %d"), my_packet->counts));
 		break;
 	}
+	case SC_PLAYER_NUM:
+	{
+		sc_packet_player_num *my_packet = reinterpret_cast<sc_packet_player_num*>(ptr);
+		PlayerNum = my_packet->playerNum;
+		break;
+	}
 	case SC_ROOM_INFO:
 	{
+
 		sc_packet_room_info *my_packet = reinterpret_cast<sc_packet_room_info*>(ptr);
 		LobbyInfo.canStart = my_packet->canStart;
 		LobbyInfo.counts = my_packet->counts;
 		LobbyInfo.isReady1 = my_packet->isReady1;
 		LobbyInfo.isReady2 = my_packet->isReady2;
-		LobbyInfo.playerNum = my_packet->playerNum;
+		//LobbyInfo.playerNum = my_packet->playerNum;
+		//LobbyInfo.name1 = my_packet->name1;
+	    //LobbyInfo.name2 = my_packet->name2;
+		
 		break;
 	}
 

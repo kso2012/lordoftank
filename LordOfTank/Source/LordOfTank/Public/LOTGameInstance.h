@@ -43,15 +43,12 @@ struct FShowRoom
 		int counts;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		int state;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
-		bool canStart;
 
 	FShowRoom()
 	{
 		roomNum = 0;
 		counts = 0;
 		state = 0;
-		canStart = false;
 	}
 
 };
@@ -67,8 +64,6 @@ struct FShowLobby
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	bool isReady2;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
-	int playerNum;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	int counts;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	FString name1;
@@ -76,13 +71,12 @@ struct FShowLobby
 	FString name2;
 
 	FShowLobby() {
-		bool canStart = false;
-		bool isReady1 = false;
-		bool isReady2 = false;
-		int playerNum = 0;
-		int counts = 0;
-		FString name1 = "none";
-		FString name2 = "none";
+		canStart = false;
+		isReady1 = false;
+		isReady2 = false;
+		counts = 0;
+		name1 = "none";
+		name2 = "none";
 	}
 
 	
@@ -117,13 +111,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "lobby")
 		FShowLobby LobbyInfo;
-
+	//TArray<FShowLobby> LobbyInfo
 	UPROPERTY()
 		FStreamableManager AssetLoader;
 
 	UFUNCTION(BlueprintCallable, Category = "RoomClick")
 		bool ClickRoomBT(int roomnum);
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "lobby")
+	int PlayerNum;
 
 	char send_buffer[4000];
 	WSADATA wsa;

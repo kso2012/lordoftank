@@ -31,6 +31,8 @@ ALOTPlayer::ALOTPlayer()
 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/LOTAssets/TankAssets/LOTPlaytankAnimBP"));
 	GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
 	GetMesh()->OnComponentHit.AddDynamic(this, &ALOTPlayer::OnHit);
+	//GetMesh()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::OnOverlapBegin);
 	
 	//터렛컴포넌트에 메쉬 적용.

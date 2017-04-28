@@ -4,16 +4,11 @@
 
 #include "Engine.h"
 
-
-
 /** when you modify this, please note that this information can be saved with instances
 * also DefaultEngine.ini [/Script/Engine.CollisionProfile] should match with this list **/
-//#define COLLISION_WEAPON		ECC_GameTraceChannel1
-#define COLLISION_PROJECTILE	ECC_GameTraceChannel1
-#define COLLISION_PICKUP		ECC_GameTraceChannel2
-
-
-
+//#define COLLISION_WEAPON      ECC_GameTraceChannel1
+#define COLLISION_PROJECTILE   ECC_GameTraceChannel1
+#define COLLISION_PICKUP      ECC_GameTraceChannel2
 
 #define OP_RECV 1
 #define OP_SEND 2
@@ -22,16 +17,18 @@
 #define SERVER_PORT 4000
 #define MAX_BUF_SIZE 4000
 
-#define CS_FORWARD 1
-#define CS_RIGHT 2
-#define CS_ROOM_CLICK 3
-#define CS_READY_CLICK 4
-#define CS_EXIT_CLICK 5
+
+#define CS_ROOM_CLICK 1
+#define CS_READY_CLICK 2
+#define CS_EXIT_CLICK 3
+#define CS_FORWARD 4
+#define CS_RIGHT 5
 
 #define SC_ROOM_SHOW 1
-#define SC_ROOM_INFO 2
-#define SC_ROOM_READY 3
-#define SC_MOVE_PLAYER 4
+#define SC_PLAYER_NUM 2
+#define SC_ROOM_INFO 3
+#define SC_ROOM_READY 4
+#define SC_MOVE_PLAYER 5
 
 #pragma pack (push, 1)
 struct cs_packet_room_click
@@ -93,6 +90,13 @@ struct sc_packet_room_show
 	int state;
 };
 
+struct sc_packet_player_num
+{
+	BYTE size;
+	BYTE type;
+	int playerNum;
+};
+
 struct sc_packet_room_info
 {
 	BYTE size;
@@ -100,7 +104,6 @@ struct sc_packet_room_info
 	bool canStart;
 	bool isReady1;
 	bool isReady2;
-	int playerNum;
 	int counts;
 	FString name1;
 	FString name2;
