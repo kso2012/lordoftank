@@ -98,13 +98,25 @@ public:
 	virtual void FinishDestroy() override;
 
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
-		void ClickMultiBT();
+		bool ClickIpEntBT();
+
+	UFUNCTION(BlueprintCallable, Category = "MenuClick")
+		void ClickNameEntBT();
 
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickReadyBT();
 
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickBackRoomBT();
+
+	UFUNCTION(BlueprintCallable, Category = "RoomClick")
+		bool ClickRoomBT(int roomnum);
+
+	UFUNCTION(BlueprintCallable, Category = "MenuClick")
+		void ClickStartBT();
+
+	UFUNCTION(BlueprintCallable, Category = "test")
+		void testfunc();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
 		FShowRoom RoomInfo;
@@ -115,12 +127,18 @@ public:
 	UPROPERTY()
 		FStreamableManager AssetLoader;
 
-	UFUNCTION(BlueprintCallable, Category = "RoomClick")
-		bool ClickRoomBT(int roomnum);
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "lobby")
-	int PlayerNum;
+		int PlayerNum;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "keypad")
+		FString IPaddr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "keypad")
+		FString Nickname;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "keypad")
+		bool bIsConnected;
+
 
 	char send_buffer[4000];
 	WSADATA wsa;

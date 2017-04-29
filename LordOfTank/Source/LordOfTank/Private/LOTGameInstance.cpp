@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "LordOfTank.h"
+#include "StartGameMode.h"
 #include "LOTGameInstance.h"
 
 
@@ -8,12 +9,12 @@
 
 ULOTGameInstance::ULOTGameInstance()
 {
-
+	bIsConnected = false;
 	bIsTryConnecting = false;
 	PlayerNum = 0;
 }
 
-void ULOTGameInstance::ClickMultiBT()
+bool ULOTGameInstance::ClickIpEntBT()
 {
 	int retval;
 
@@ -21,11 +22,10 @@ void ULOTGameInstance::ClickMultiBT()
 	send_wsabuf.len = 4000;
 
 	// 윈속 초기화
-
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		UE_LOG(LogTemp, Warning, TEXT("윈속 초기화 실패"))
 
-		// socket()
+	// socket()
 		sock = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (sock == INVALID_SOCKET)
 		UE_LOG(LogTemp, Warning, TEXT("소켓 생성 실패"));
@@ -35,21 +35,32 @@ void ULOTGameInstance::ClickMultiBT()
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
 	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	InitEvent(sock);
-	WSAEventSelect(app.sarr[app.now], app.hEarr[app.now], FD_CONNECT);
 	retval = connect(sock, (SOCKADDR *)&serveraddr, sizeof(serveraddr));
-	app.now++;
-	if (retval != SOCKET_ERROR)
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 성공"));
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 실패"));
 	int error_code = WSAGetLastError();
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), error_code));
-	// 스레드 생성
-	event_thread = new thread{ &ToCalleventThread, this };
-	bIsTryConnecting = true;
+	if (retval == 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 성공"));
+		WSAEventSelect(app.sarr[app.now], app.hEarr[app.now], FD_CONNECT);
+		app.now++;
+		// 스레드 생성
+		event_thread = new thread{ &ToCalleventThread, this };
+		bIsTryConnecting = true;
+		return true;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 실패"));
+		bIsTryConnecting = false;
+		bIsConnected = false;
+		closesocket(sock);
+		WSACleanup();
+		return false;
+	}
 }
 
 void ULOTGameInstance::SendPos(FVector pos)
@@ -70,6 +81,20 @@ void ULOTGameInstance::SendPos(FVector pos)
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Send Error"));
 	}*/
 	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("센드 성공"));
+}
+
+void ULOTGameInstance::ClickNameEntBT()
+{
+	cs_packet_player_name *player_name = reinterpret_cast<cs_packet_player_name *>(send_buffer);
+	player_name->name = TCHAR_TO_UTF8(*Nickname);
+	player_name->type = CS_PLAYER_NAME;
+	player_name->size = sizeof(cs_packet_player_name);
+	send_wsabuf.len = sizeof(cs_packet_player_name);
+	DWORD iobyte;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, Nickname);
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+
+
 }
 
 void ULOTGameInstance::ProcessPacket(char *ptr)
@@ -100,9 +125,8 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		LobbyInfo.counts = my_packet->counts;
 		LobbyInfo.isReady1 = my_packet->isReady1;
 		LobbyInfo.isReady2 = my_packet->isReady2;
-		//LobbyInfo.playerNum = my_packet->playerNum;
-		//LobbyInfo.name1 = my_packet->name1;
-	    //LobbyInfo.name2 = my_packet->name2;
+		LobbyInfo.name1 = my_packet->name1.c_str();
+	    LobbyInfo.name2 = my_packet->name2.c_str();
 		
 		break;
 	}
@@ -113,6 +137,18 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		LobbyInfo.canStart = my_packet->canStart;
 		LobbyInfo.isReady1 = my_packet->isReady1;
 		LobbyInfo.isReady2 = my_packet->isReady2;
+		break;
+	}
+
+	case SC_GAME_START:
+	{
+		sc_packet_room_ready *my_packet = reinterpret_cast<sc_packet_room_ready*>(ptr);
+
+		//UKismetSystemLibrary::Delay(UObject* WorldContextObject, float Duration, struct FLatentActionInfo LatentInfo);
+		AStartGameMode* const Testa = Cast<AStartGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		Testa->StartGame();
+		
+
 		break;
 	}
 	case SC_MOVE_PLAYER:
@@ -310,6 +346,17 @@ void ULOTGameInstance::ClickBackRoomBT()
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
 
+void ULOTGameInstance::ClickStartBT()
+{
+	//static void	Delay(UObject* WorldContextObject, float Duration, struct FLatentActionInfo LatentInfo);
+	cs_packet_game_start *game_start = reinterpret_cast<cs_packet_game_start *>(send_buffer);
+	game_start->type = CS_GAME_START;
+	game_start->size = sizeof(cs_packet_game_start);
+	send_wsabuf.len = sizeof(cs_packet_game_start);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
 
 
 void ULOTGameInstance::FinishDestroy()
@@ -324,4 +371,11 @@ void ULOTGameInstance::FinishDestroy()
 		WSACleanup();
 	}
 
+}
+
+void ULOTGameInstance::testfunc()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("게임 스타트")));
+	AStartGameMode* const Testa = Cast<AStartGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	Testa->StartGame();
 }

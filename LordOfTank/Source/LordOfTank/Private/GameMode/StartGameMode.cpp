@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "LordOfTank.h"
+#include "LOTPlayer.h"
 #include "LOTGameInstance.h"
 #include "StartGameMode.h"
 
@@ -24,6 +25,18 @@ AStartGameMode::AStartGameMode()
 void AStartGameMode::test()
 {
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Test BT WORK!!")));
+}
+
+void AStartGameMode::StartGame()
+{
+	UGameplayStatics::OpenLevel(GetWorld(),"NetworkTest");
+	//UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", AdvancedDisplay = "2"), Category = "Game")
+		//static void OpenLevel(const UObject* WorldContextObject, FName LevelName, bool bAbsolute = true, FString Options = FString(TEXT("")));
+
+	//UWorld* const World = GetWorld();
+	//AActor* LoadingScreen = NewObject<AActor>(this);
+	//LoadingScreen = LoadObject<AActor>(nullptr, TEXT("Blueprint'/Game/Blueprints/Main_Blueprints/LoadingScreen.LoadingScreen'"));
+	//World->SpawnActor<AActor>(LoadingScreen->GetClass(), FVector(-48255.328125, 31466.636719, 776.058350), FRotator(0.f, 0.f, 0.f));
 }
 
 //void EndPlay(const EEndPlayReason::Type EndPlayReason)

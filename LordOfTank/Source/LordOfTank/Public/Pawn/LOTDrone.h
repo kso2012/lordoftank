@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Pawn.h"
+#include "Components/BoxComponent.h"
 #include "LOTDrone.generated.h"
 
 
@@ -186,11 +187,28 @@ private:
 
 	bool isNotAI;
 
+	UBoxComponent* ViewBox;
+
+	void SetViewBoxLocation();
+
+	int PawnNum;
+
 
 public:
 
 	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
 	bool GetisAI() { return !isNotAI; }
+
+	int GetPawnNum() { return PawnNum; }
+
+	int DecideCollisionState;
+
+	AActor * CollisionActor;
 	
 	
+	UFUNCTION()
+		void DroneFindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

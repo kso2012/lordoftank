@@ -24,6 +24,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Damage")
 		void test();
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+	void StartGame();
 
 
 

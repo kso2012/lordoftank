@@ -3,8 +3,8 @@
 #pragma once
 
 #include "GameFramework/GameModeBase.h"
-#include "Pawn/LOTPlayer.h"
-#include "Pawn/LOTDrone.h"
+#include "Pawn/LOTMultiPlayer.h"
+#include "Pawn/LOTMultiDrone.h"
 #include "MultiGameMode.generated.h"
 
 /**
@@ -12,8 +12,8 @@
  */
 struct PlayerInfomation
 {
-	ALOTPlayer* Tank;
-	ALOTDrone* Drone;
+	ALOTMultiPlayer* Tank;
+	ALOTMultiDrone* Drone;
 	AActor* TargetActor;
 	float AP;
 	float HP;
