@@ -14,15 +14,11 @@ AnwtestGameModeBase::AnwtestGameModeBase()
 	tesking = 0;
 	PrimaryActorTick.bCanEverTick = true;
 	threadkey = false;
-
 }
 
 void AnwtestGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-
-	//-
 
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
@@ -33,15 +29,9 @@ void AnwtestGameModeBase::BeginPlay()
 		worker_threads.push_back(new thread{ &ToCallworkerthread, this });
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("beforetocallaccept"));
 
-
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("소켓생성전"));
 	accept_threads = new thread{ &ToCallacceptthread, this };
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("소켓 생성 성공"));
-
-
-
-
-
 }
 
 void AnwtestGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -67,8 +57,7 @@ void AnwtestGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AnwtestGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("tesking= %f"), tesking));
-
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("tesking= %f"), tesking));
 }
 
 //void AnwtestGameModeBase::error_display(char *msg, int err_no)
@@ -111,8 +100,8 @@ void AnwtestGameModeBase::Initialize_Server()
 	room.canStart = false;
 	room.client1 = nullptr;
 	room.client2 = nullptr;
-	
 }
+
 void AnwtestGameModeBase::SendPacket(int id, unsigned char *packet)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("SendPacket 진입")));
@@ -138,10 +127,28 @@ void AnwtestGameModeBase::SendPacket(int id, unsigned char *packet)
 void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ProcessPacket 진입")));
-	
 	unsigned char packet_type = packet[1];
 	switch (packet_type)
 	{
+	case CS_PLAYER_NAME:
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_PLAYER_NAME 진입")));
+		cs_packet_player_name *player_name = reinterpret_cast<cs_packet_player_name*>(packet);
+		
+		clients[id].name = player_name->name;
+
+		// 방 정보 전송
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Send Room Show")));
+		sc_packet_room_show room_show;
+		room_show.counts = room.counts;
+		room_show.roomNum = room.roomNum;
+		room_show.size = sizeof(room_show);
+		room_show.state = room.state;
+		room_show.type = SC_ROOM_SHOW;
+		SendPacket(id, reinterpret_cast<unsigned char*>(&room_show));
+		break;
+	}
+
 	case CS_ROOM_CLICK:
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_ROOM_CLICK 진입")));
@@ -227,10 +234,15 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		else room_info.canStart = false;
 
 		room_info.counts = room.counts;
-		//room_info.name1 = room.client1->name;
-		//room_info.name2 = room.client2->name;
-		room_info.name1 = "temp1";
-		room_info.name2 = "temp2";
+
+		if (room.client1 != NULL)
+			room_info.name1 = room.client1->name;
+		else
+			room_info.name1 = "";
+		if (room.client2 != NULL)
+			room_info.name2 = room.client2->name;
+		else
+			room_info.name2 = "";
 
 		SendPacket(id, reinterpret_cast<unsigned char*>(&room_info)); 
 
@@ -256,6 +268,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_ROOM_CLICK 끝")));
 		break;
 	}
+
 	case CS_READY_CLICK:
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_READY_CLICK 진입")));
@@ -287,16 +300,6 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 				other_id = room.client1->m_id;
 		}
 
-		// 이 코드는 참조할때 에러가 날 수도 있어서 위에껄로 수정.
-		//if (room.client1->m_id == id && room.client1->isReady == false) // 1P가 눌렀을때의 처리
-		//	room.client1->isReady = true;
-		//else if (room.client1->m_id == id && room.client1->isReady == true)
-		//	room.client1->isReady = false;
-		//else if (room.client2->m_id == id && room.client2->isReady == false) // 2P가 눌렀을때의 처리
-		//	room.client2->isReady = true;
-		//else if (room.client2->m_id == id && room.client2->isReady == true)
-		//	room.client2->isReady = false;
-
 		if (room.counts == 2) // 2명일때만 canStart 변수가 변할 수 있으므로
 		{
 			if (room.client1->isReady && room.client2->isReady)
@@ -305,26 +308,32 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 				room.canStart = false;
 		}
 
-		sc_packet_room_ready sc_room_ready;
-		sc_room_ready.size = sizeof(sc_room_ready);
-		sc_room_ready.type = SC_ROOM_READY;
-		sc_room_ready.canStart = room.canStart;
-		sc_room_ready.isReady1 = false;
-		sc_room_ready.isReady2 = false;
-		if(room.client1 != NULL)
-			sc_room_ready.isReady1 = room.client1->isReady;
-		if(room.client2 != NULL)
-			sc_room_ready.isReady2 = room.client2->isReady;
+		//sc_packet_room_ready sc_room_ready;
+		//sc_room_ready.size = sizeof(sc_room_ready);
+		//sc_room_ready.type = SC_ROOM_READY;
+		//sc_room_ready.canStart = room.canStart;
+		//sc_room_ready.isReady1 = false;
+		//sc_room_ready.isReady2 = false;
+		//if(room.client1 != NULL)
+		//	sc_room_ready.isReady1 = room.client1->isReady;
+		//if(room.client2 != NULL)
+		//	sc_room_ready.isReady2 = room.client2->isReady;
 
-		// 1. 레디를 누른 사람한테 보내준다.
-		SendPacket(id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+		//// 1. 레디를 누른 사람한테 보내준다.
+		//SendPacket(id, reinterpret_cast<unsigned char*>(&sc_room_ready));
 
-		// 2. 상대방한테 보내준다.
-		if(other_id != -1)
-			SendPacket(other_id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+		//// 2. 상대방한테 보내준다.
+		//if(other_id != -1)
+		//	SendPacket(other_id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+		//break;
+		sc_packet_game_start game_start;
+		game_start.size = sizeof(game_start);
+		game_start.type = SC_GAME_START;
 
-		break;
+		// 1. 게임을 시작하라고 보내준다.
+		SendPacket(id, reinterpret_cast<unsigned char*>(&game_start));
 	}
+
 	case CS_EXIT_CLICK:
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_READY_CLICK 진입")));
@@ -364,31 +373,6 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 				other_id = room.client1->m_id;
 		}
 
-		//if (id == room.client1->m_id) // 1P가 나갔다면
-		//{
-		//	room.client1 = NULL;
-		//	if (room.client2 != NULL)
-		//		room.state = 1;
-		//	else
-		//		room.state = 0;
-		//	room.canStart = false;
-		//	room.counts--;
-		//	if(room.client2 != NULL)
-		//		other_id = room.client2->m_id;
-		//}
-		//else if (id == room.client2->m_id) // 2P가 나갔다면
-		//{
-		//	room.client2 = NULL;
-		//	if (room.client1 != NULL)
-		//		room.state = 1;
-		//	else
-		//		room.state = 0;
-		//	room.canStart = false;
-		//	room.counts--;
-		//	if(room.client1 != NULL)
-		//		other_id = room.client1->m_id;
-		//}
-		
 		// 1. 나간 애한테는 전체 방 정보를 보내줘야 한다.
 		sc_packet_room_show room_show;
 		room_show.counts = room.counts;
@@ -416,8 +400,14 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 				room_info.isReady1 = false;
 				room_info.isReady2 = room.client2->isReady;
 			}
-			//room_info.name1
-			//room_info.name2
+			if (room.client1 != NULL)
+				room_info.name1 = room.client1->name;
+			else
+				room_info.name1 = "";
+			if (room.client2 != NULL)
+				room_info.name2 = room.client2->name;
+			else
+				room_info.name2 = "";
 			SendPacket(other_id, reinterpret_cast<unsigned char*>(&room_info));
 		}
 
@@ -429,8 +419,22 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 				SendPacket(i, reinterpret_cast<unsigned char*>(&room_show));
 			}
 		}
+		break;
+	}
 
-		
+	case CS_GAME_START:
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_GAME_START 진입")));
+		//cs_packet_game_start *game_start = reinterpret_cast<cs_packet_game_start*>(packet);
+		int other_id = room.client2->m_id;
+
+		sc_packet_game_start game_start;
+		game_start.size = sizeof(game_start);
+		game_start.type = SC_GAME_START;
+
+		// 1. 게임을 시작하라고 보내준다.
+		SendPacket(id, reinterpret_cast<unsigned char*>(&game_start));
+		SendPacket(other_id, reinterpret_cast<unsigned char*>(&game_start));
 		break;
 	}
 	case CS_FORWARD:
@@ -442,7 +446,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("알수없는 패킷")));
 		//cs_packet_room_click *error = reinterpret_cast<cs_packet_room_click*>(packet);
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" TYPE : %d"),error->type ));
-		//break;
+		break;
 	}
 	}
 
@@ -491,9 +495,95 @@ void AnwtestGameModeBase::workerthread()
 		if (io_size == 0) // 클라이언트가 closesocket()으로 정상종료한 경우
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("WorkerThread - io_size == 0")));
-			/*closesocket(room.clients[key].m_s);
-			room.clients[key].is_connected = false;*/
 			closesocket(clients[key].m_s);
+			int other_id = -1;
+
+			if (clients[key].playerNum == 1) // 1P가 나갔다면
+			{
+				clients[key].state = 0;
+				clients[key].isReady = false;
+				clients[key].playerNum = 0;
+				clients[key].roomNum = -1;
+				room.client1 = NULL;
+				if (room.client2 != NULL) // 2P가 있다면
+					room.state = 1;
+				else
+					room.state = 0;
+				room.canStart = false;
+				room.counts--;
+				if (room.client2 != NULL)
+					other_id = room.client2->m_id;
+			}
+			else if (clients[key].playerNum == 2) // 2P가 나갔다면
+			{
+				clients[key].state = 0;
+				clients[key].isReady = false;
+				clients[key].playerNum = 0;
+				clients[key].roomNum = -1;
+				room.client2 = NULL;
+				if (room.client1 != NULL) // 1P가 있다면
+					room.state = 1;
+				else
+					room.state = 0;
+				room.canStart = false;
+				room.counts--;
+				if (room.client1 != NULL)
+					other_id = room.client1->m_id;
+			}
+
+			//// 1. 나간 애한테는 전체 방 정보를 보내줘야 한다.
+			//sc_packet_room_show room_show;
+			//room_show.counts = room.counts;
+			//room_show.size = sizeof(room_show);
+			//room_show.type = SC_ROOM_SHOW;
+			//room_show.state = room.state;
+			//room_show.roomNum = room.roomNum;
+			//SendPacket(key, reinterpret_cast<unsigned char*>(&room_show));
+
+			// 2. 상대방한테는 현재 방 정보를 갱신해줘야 한다.
+			if (room.counts == 1) // 상대방이 남아있다면
+			{
+				sc_packet_room_info room_info;
+				room_info.size = sizeof(room_info);
+				room_info.type = SC_ROOM_INFO;
+				room_info.canStart = false;
+				room_info.counts = room.counts;
+				if (room.client1 != NULL) // 나간애가 2P고 1P가 남아있다면
+				{
+					room_info.isReady1 = room.client1->isReady;
+					room_info.isReady2 = false;
+				}
+				else if (room.client2 != NULL)
+				{
+					room_info.isReady1 = false;
+					room_info.isReady2 = room.client2->isReady;
+				}
+				if (room.client1 != NULL)
+					room_info.name1 = room.client1->name;
+				else
+					room_info.name1 = "";
+				if (room.client2 != NULL)
+					room_info.name2 = room.client2->name;
+				else
+					room_info.name2 = "";
+				SendPacket(other_id, reinterpret_cast<unsigned char*>(&room_info));
+			}
+
+			// 3. 로비에 있는 사람들한테도 갱신해줘야 한다.
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				if (clients[i].is_connected == true && clients[i].state == 1) // 연결이 되어있고, 로비에 있다면
+				{
+					sc_packet_room_show room_show;
+					room_show.counts = room.counts;
+					room_show.size = sizeof(room_show);
+					room_show.type = SC_ROOM_SHOW;
+					room_show.state = room.state;
+					room_show.roomNum = room.roomNum;
+					SendPacket(i, reinterpret_cast<unsigned char*>(&room_show));
+				}
+			}
+			
 			clients[key].is_connected = false;
 			continue;
 		}
@@ -652,15 +742,15 @@ void AnwtestGameModeBase::acceptthread()
 		room.clients[new_id].m_recv_overlap.packet_size = 0;
 		room.clients[new_id].previous_data = 0;*/
 
-		// 방 정보 전송
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Send Room Show")));
-		sc_packet_room_show room_show;
-		room_show.counts = room.counts;
-		room_show.roomNum = room.roomNum;
-		room_show.size = sizeof(room_show);
-		room_show.state = room.state;
-		room_show.type = SC_ROOM_SHOW;
-		SendPacket(new_id, reinterpret_cast<unsigned char*>(&room_show));
+		//// 방 정보 전송
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Send Room Show")));
+		//sc_packet_room_show room_show;
+		//room_show.counts = room.counts;
+		//room_show.roomNum = room.roomNum;
+		//room_show.size = sizeof(room_show);
+		//room_show.state = room.state;
+		//room_show.type = SC_ROOM_SHOW;
+		//SendPacket(new_id, reinterpret_cast<unsigned char*>(&room_show));
 
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Accept - Recv")));
 		DWORD flags = 0;

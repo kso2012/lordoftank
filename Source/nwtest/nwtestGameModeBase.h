@@ -9,6 +9,7 @@
 #include <thread>
 #include <mutex>
 #include <vector>
+#include "Tank.h"
 #include <set>
 #include "HideWindowsPlatformTypes.h"
 #include "nwtestGameModeBase.generated.h"
@@ -25,8 +26,7 @@ struct OverlapEx
 };
 
 struct Player {
-	FVector pos;
-	class UWheeledVehicleMovementComponent*  VehicleMovement;
+	ATank* Tank;
 };
 
 struct Client {
@@ -35,7 +35,7 @@ struct Client {
 	SOCKET m_s;
 	Player m_player;
 	int roomNum;
-	FString name;
+	string name;
 	bool isReady;
 	int playerNum;
 	int state; // 클라이언트의 상태 1이면 로비, 2이면 대기방, 3이면 게임시작

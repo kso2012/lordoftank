@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Engine.h"
+#include <string>
 
 #define OP_RECV 1
 #define OP_SEND 2
@@ -11,20 +12,29 @@
 #define SERVER_PORT 4000
 #define MAX_BUF_SIZE 4000
 
-
-#define CS_ROOM_CLICK 1
-#define CS_READY_CLICK 2
-#define CS_EXIT_CLICK 3
-#define CS_FORWARD 4
-#define CS_RIGHT 5
+#define CS_PLAYER_NAME 1
+#define CS_ROOM_CLICK 2
+#define CS_READY_CLICK 3
+#define CS_EXIT_CLICK 4
+#define CS_GAME_START 5
+#define CS_FORWARD 6
+#define CS_RIGHT 7
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
 #define SC_ROOM_INFO 3
 #define SC_ROOM_READY 4
-#define SC_MOVE_PLAYER 5
+#define SC_GAME_START 5
+#define SC_MOVE_PLAYER 6
 
 #pragma pack (push, 1)
+struct cs_packet_player_name
+{
+	BYTE size;
+	BYTE type;
+	std::string name;
+};
+
 struct cs_packet_room_click
 {
 	BYTE size;
@@ -44,11 +54,17 @@ struct cs_packet_room_exit
 	BYTE type;
 };
 
+struct cs_packet_game_start
+{
+	BYTE size;
+	BYTE type;
+};
+
 struct cs_packet_info
 {
 	BYTE size;
 	BYTE type;
-	FString name;
+	std::string name;
 };
 
 struct cs_packet_tank_move
@@ -99,8 +115,8 @@ struct sc_packet_room_info
 	bool isReady1;
 	bool isReady2;
 	int counts;
-	FString name1;
-	FString name2;
+	std::string name1;
+	std::string name2;
 };
 
 struct sc_packet_room_ready
@@ -110,6 +126,12 @@ struct sc_packet_room_ready
 	bool canStart;
 	bool isReady1;
 	bool isReady2;
+};
+
+struct sc_packet_game_start
+{
+	BYTE size;
+	BYTE type;
 };
 
 struct sc_packet_tank_move
