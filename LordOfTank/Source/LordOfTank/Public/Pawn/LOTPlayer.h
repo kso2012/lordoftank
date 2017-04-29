@@ -195,9 +195,15 @@ private:
 
 	int PawnNum;
 
+	FVector EnemyLocation;
 
 
 public:
+
+	int TurretAim;
+
+	AActor * CollisionActor;
+
 	void CommandShoot() { ShootAI(); }
 	void CommandTurn() { TurnAI(); }
 	
@@ -213,4 +219,10 @@ public:
 
 	UFUNCTION()
 		void LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void SetEnemyLocation(FVector location) { EnemyLocation = location; }
+
+	void RotateTurret();
+
+	void ScaleViewBox();
 };

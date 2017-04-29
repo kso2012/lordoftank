@@ -70,14 +70,6 @@ public:
 
 	float DroneSpawningHeight;
 
-	UFUNCTION(BlueprintCallable)
-	void ChangePawn();
-
-	//플레이어와 AI를 생성시키고 초기화하는 함수
-	void InitPlayer();
-	void InitAI();
-
-	void IsLookEnemyTank();
 
 private:
 
@@ -86,6 +78,21 @@ private:
 	APlayerController* Control;
 	APlayerController* AI;
 
+	UFUNCTION(BlueprintCallable)
+		void ChangePawn();
+
+	//플레이어와 AI를 생성시키고 초기화하는 함수
+	void InitPlayer();
+	void InitAI();
+
+	void IsLookEnemyTank();
+
+	bool IsEnemyFound;
+
 
 	void Think();
+
+	void TraceEnemyLocation();
+
+	void AimTurret();
 };

@@ -194,6 +194,7 @@ private:
 	int PawnNum;
 
 
+
 public:
 
 	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }

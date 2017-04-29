@@ -18,6 +18,10 @@
 #define PawnTank 1
 #define PawnDrone 2
 
+#define None 0
+#define CorrectAim 1
+#define InCorrectAim 2
+
 
 
 ALOTPlayer::ALOTPlayer()
@@ -124,6 +128,8 @@ ALOTPlayer::ALOTPlayer()
 	SetViewBoxLocation();
 	
 	//PawnNum = PawnTank;
+
+	TurretAim = None;
 }
 
 void ALOTPlayer::BeginPlay()
@@ -246,23 +252,25 @@ void ALOTPlayer::FireEnd()
 void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 {
 	
-	if (bIsFireMode == true)
-	{
-		MoveModeCamera->Deactivate();
-		FireModeCamera->Activate();
-		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
-		TurretMesh->SetVisibility(false, false);
-		GetMesh()->SetVisibility(false, false);
-		BarrelMesh->SetVisibility(false, false);
-	}
-	else if (bIsFireMode == false)
-	{
-		MoveModeCamera->Activate();
-		FireModeCamera->Deactivate();
-		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
-		TurretMesh->SetVisibility(true, false);
-		GetMesh()->SetVisibility(true, false);
-		BarrelMesh->SetVisibility(true, false);
+	if (isNotAI) {
+		if (bIsFireMode == true)
+		{
+			MoveModeCamera->Deactivate();
+			FireModeCamera->Activate();
+			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
+			TurretMesh->SetVisibility(false, false);
+			GetMesh()->SetVisibility(false, false);
+			BarrelMesh->SetVisibility(false, false);
+		}
+		else if (bIsFireMode == false)
+		{
+			MoveModeCamera->Activate();
+			FireModeCamera->Deactivate();
+			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
+			TurretMesh->SetVisibility(true, false);
+			GetMesh()->SetVisibility(true, false);
+			BarrelMesh->SetVisibility(true, false);
+		}
 	}
 }
 
@@ -468,11 +476,11 @@ void ALOTPlayer::TurnAI() {
 void ALOTPlayer::SetViewBoxLocation() {
 	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
 
-	ViewBox->SetupAttachment(MoveModeCamera);
+	ViewBox->SetupAttachment(MuzzleLocation);
 
-	ViewBox->SetBoxExtent(FVector(1000, 1000, 1000));
+	ViewBox->SetBoxExtent(FVector(15000, 10, 10));
 
-	//ViewBox->SetRelativeLocation((MoveModeCamera->GetForwardVector() * 15000));
+	ViewBox->SetRelativeLocation(MuzzleLocation->GetComponentLocation() + (MuzzleLocation->GetForwardVector() * 15000));
 
 	ViewBox->SetVisibility(true, true);
 
@@ -484,10 +492,24 @@ void ALOTPlayer::SetViewBoxLocation() {
 }
 
 void ALOTPlayer::FindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
+	
+	TurretAim = CorrectAim;
+	CollisionActor = OtherActor;
 }
 
 void ALOTPlayer::LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
+	TurretAim = InCorrectAim;
+	CollisionActor = OtherActor;
+}
+
+void ALOTPlayer::RotateTurret() {
+	if (TurretAim == None) {
+		TurretMesh->AddLocalRotation(FRotator(0, 1, 0));
+	}
+}
+
+void ALOTPlayer::ScaleViewBox() {
+	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(15000, 10, 10000));
+	else ViewBox->SetBoxExtent(FVector(15000, 10, 10));
 }

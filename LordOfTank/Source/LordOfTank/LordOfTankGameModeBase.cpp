@@ -14,6 +14,10 @@
 #define Lost 2
 
 
+#define CorrectAim 1
+#define InCorrectAim 2
+
+
 
 PlayerInfo Info = PlayerInfo::PlayerInfo();
 
@@ -65,6 +69,8 @@ void ALordOfTankGameModeBase::InitAI() {
 	EnemyPlayer.Tank->SetTurn(false);
 	EnemyPlayer.ControlledPawn = PawnTank;
 	EnemyPlayer.Tank->SetisNotAI(false);
+
+	IsEnemyFound = false;
 
 	//AI->Possess(EnemyPlayer.Tank);
 }
@@ -127,59 +133,59 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 		if (!MyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 2;
 			EnemyPlayer.Tank->SetTurn(true);
+			MyPlayer.Tank->DisableInput(Control);
 		}
-		IsLookEnemyTank();
+		//IsLookEnemyTank();
 	}
 	else if (PlayerTurn == 2) {
 		if (!EnemyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 1;
 			MyPlayer.Tank->SetTurn(true);
+			MyPlayer.Tank->EnableInput(Control);
 		}
-		Think();
 	}
 	ChangePawn();
+	Think();
 }
 
 
-void ALordOfTankGameModeBase::Think() {/*
-	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
-	//비히클타입만 체크하도록 한다.
-	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
-	//현재 월드를 가져온다.
-	UWorld* const World = GetWorld();
-	//벡터의 시작점
-	FVector StartTrace = EnemyPlayer.Tank->ReturnCamera()->K2_GetComponentLocation() + EnemyPlayer.Tank->ReturnCamera()->GetForwardVector() * 500;
-	//벡터의 끝점
-	FVector EndTrace = StartTrace + EnemyPlayer.Tank->ReturnCamera()->GetForwardVector() * 500000;
-	//결과를 담을 구조체변수
-	TArray<FHitResult> OutHit;
-	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
-	if (UKismetSystemLibrary::BoxTraceMultiForObjects(GetWorld(), StartTrace, EndTrace, FVector(30000, 30000, 30000), FRotator(0, 0, 0), TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, OutHit, true, FLinearColor::Blue, FLinearColor::Red,0.1f)) {
-		//HomingTarget = OutHit.GetActor();
-		//HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
-		
-		if (OutHit[0].GetActor() != EnemyPlayer.Tank) {
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
-			EnemyPlayer.Tank->CommandShoot();
-		}
-		else {
-			EnemyPlayer.Tank->CommandTurn();
-		}
-	}*/
+void ALordOfTankGameModeBase::Think() {
+	if (!IsEnemyFound)
+		IsLookEnemyTank();
+	if (IsEnemyFound && PlayerTurn == 2) {
+		TraceEnemyLocation();
+		AimTurret();
+		EnemyPlayer.Tank->RotateTurret();
+	}
 }
 
 
 void ALordOfTankGameModeBase::IsLookEnemyTank() {
-	if (MyPlayer.Drone->DecideCollisionState == Find) {
-		if (MyPlayer.Drone->CollisionActor == EnemyPlayer.Tank) {
+	if (EnemyPlayer.Drone->DecideCollisionState == Find) {
+		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
+			IsEnemyFound = true;
 		}
-		MyPlayer.Drone->DecideCollisionState = None;
+		EnemyPlayer.Drone->DecideCollisionState = None;
 	}
-	else if (MyPlayer.Drone->DecideCollisionState == Lost) {
-		if (MyPlayer.Drone->CollisionActor == EnemyPlayer.Tank) {
+	else if (EnemyPlayer.Drone->DecideCollisionState == Lost) {
+		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
+			IsEnemyFound = false;
 		}
-		MyPlayer.Drone->DecideCollisionState = None;
+		EnemyPlayer.Drone->DecideCollisionState = None;
+	}
+}
+
+void ALordOfTankGameModeBase::TraceEnemyLocation() {
+	EnemyPlayer.Tank->SetEnemyLocation(MyPlayer.Tank->GetActorLocation());
+}
+
+void ALordOfTankGameModeBase::AimTurret() {
+	if (EnemyPlayer.Tank->CollisionActor == MyPlayer.Tank) {
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Aim Correctly");
+	}
+	else {
+		EnemyPlayer.Tank->TurretAim = None;
 	}
 }
