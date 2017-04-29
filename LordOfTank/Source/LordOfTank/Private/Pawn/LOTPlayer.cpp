@@ -31,8 +31,6 @@ ALOTPlayer::ALOTPlayer()
 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/LOTAssets/TankAssets/LOTPlaytankAnimBP"));
 	GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
 	GetMesh()->OnComponentHit.AddDynamic(this, &ALOTPlayer::OnHit);
-	//GetMesh()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::OnOverlapBegin);
 	
 	//터렛컴포넌트에 메쉬 적용.
@@ -122,7 +120,10 @@ ALOTPlayer::ALOTPlayer()
 
 	isNotAI = true;
 	bIsShoot = false;
+
+	SetViewBoxLocation();
 	
+	//PawnNum = PawnTank;
 }
 
 void ALOTPlayer::BeginPlay()
@@ -462,4 +463,31 @@ void ALOTPlayer::ShootAI() {
 void ALOTPlayer::TurnAI() {
 	MoveRight(1);
 	MoveForward(1);
+}
+
+void ALOTPlayer::SetViewBoxLocation() {
+	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
+
+	ViewBox->SetupAttachment(MoveModeCamera);
+
+	ViewBox->SetBoxExtent(FVector(1000, 1000, 1000));
+
+	//ViewBox->SetRelativeLocation((MoveModeCamera->GetForwardVector() * 15000));
+
+	ViewBox->SetVisibility(true, true);
+
+
+	ViewBox->bGenerateOverlapEvents = true;
+	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::FindEnemy);
+	ViewBox->OnComponentEndOverlap.AddDynamic(this, &ALOTPlayer::LostEnemy);
+
+}
+
+void ALOTPlayer::FindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
+}
+
+void ALOTPlayer::LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
 }
