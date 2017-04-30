@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "nwtest.h"
+#include "Tank.h"
 #include "nwtestGameModeBase.h"
 
 
@@ -154,6 +155,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_ROOM_CLICK 진입")));
 		cs_packet_room_click *room_click = reinterpret_cast<cs_packet_room_click*>(packet);
 		room.roomNum = room_click->roomNum;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%d"), room.roomNum));
 		int playerNum = 0;
 		int other_id = -1;
 		
@@ -325,13 +327,15 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		//// 2. 상대방한테 보내준다.
 		//if(other_id != -1)
 		//	SendPacket(other_id, reinterpret_cast<unsigned char*>(&sc_room_ready));
-		//break;
+
+		// 임시용
 		sc_packet_game_start game_start;
 		game_start.size = sizeof(game_start);
 		game_start.type = SC_GAME_START;
-
-		// 1. 게임을 시작하라고 보내준다.
 		SendPacket(id, reinterpret_cast<unsigned char*>(&game_start));
+	
+
+		break;
 	}
 
 	case CS_EXIT_CLICK:
@@ -435,12 +439,21 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		// 1. 게임을 시작하라고 보내준다.
 		SendPacket(id, reinterpret_cast<unsigned char*>(&game_start));
 		SendPacket(other_id, reinterpret_cast<unsigned char*>(&game_start));
+
+		
+
 		break;
 	}
-	case CS_FORWARD:
+	case CS_TANK_FORWARD:
+	{
+		
 		break;
-	case CS_RIGHT:
+	}
+	case CS_TANK_RIGHT:
+	{
+
 		break;
+	}
 	default:
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("알수없는 패킷")));
@@ -690,6 +703,7 @@ void AnwtestGameModeBase::acceptthread()
 
 	while (threadkey == false)
 	{
+		//SpawnPlayer(3);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Accept"));
 		struct sockaddr_in client_addr;
 		int addr_size = sizeof(client_addr);
@@ -715,7 +729,7 @@ void AnwtestGameModeBase::acceptthread()
 
 		if (-1 == new_id) {
 			closesocket(new_client);
-			tesking += 1;
+			//tesking += 1;
 			continue;
 		}
 
@@ -778,4 +792,28 @@ void AnwtestGameModeBase::ToCallacceptthread(LPVOID p)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ToCallaccept진입"));
 	((AnwtestGameModeBase*)p)->acceptthread();
+}
+
+void AnwtestGameModeBase::SpawnPlayer(int id)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("SpawnPlayer"));
+
+	APlayerController*  Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	AActor* PlayerStart1 = Cast<AActor>(FindPlayerStart(Test, "1"));
+	AActor*  PlayerStart2 = Cast<AActor>(FindPlayerStart(Test, "2"));
+
+	UWorld*  World = GetWorld();
+
+	clients[id].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
+
+	//MyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart1->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart1->GetActorRotation());
+
+	//EnemyPlayer.Tank = World->SpawnActor<ALOTMultiPlayer>(ALOTMultiPlayer::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
+	//EnemyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticCl
+}
+
+void AnwtestGameModeBase::test()
+{
+
 }
