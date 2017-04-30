@@ -125,11 +125,8 @@ ALOTPlayer::ALOTPlayer()
 	isNotAI = true;
 	bIsShoot = false;
 
+	TurretAim = None; 
 	SetViewBoxLocation();
-	
-	//PawnNum = PawnTank;
-
-	TurretAim = None;
 }
 
 void ALOTPlayer::BeginPlay()
@@ -210,6 +207,7 @@ void ALOTPlayer::FireStart()
 	{
 		bIsPushFire = true;
 		CurShootingPower = MinShootingPower;
+		bIsShoot = true;
 	}
 }
 
@@ -475,6 +473,7 @@ void ALOTPlayer::TurnAI() {
 
 void ALOTPlayer::SetViewBoxLocation() {
 	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
+	ViewBox->SetCollisionObjectType(ECC_Vehicle);
 
 	ViewBox->SetupAttachment(MuzzleLocation);
 
@@ -482,13 +481,18 @@ void ALOTPlayer::SetViewBoxLocation() {
 
 	ViewBox->SetRelativeLocation(MuzzleLocation->GetComponentLocation() + (MuzzleLocation->GetForwardVector() * 15000));
 
-	ViewBox->SetVisibility(true, true);
+	ViewBox->SetVisibility(false, false);
 
 
 	ViewBox->bGenerateOverlapEvents = true;
 	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::FindEnemy);
 	ViewBox->OnComponentEndOverlap.AddDynamic(this, &ALOTPlayer::LostEnemy);
 
+
+	//ViewBox->Activate();
+
+
+	OffViewBox();
 }
 
 void ALOTPlayer::FindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -507,9 +511,11 @@ void ALOTPlayer::RotateTurret() {
 	if (TurretAim == None) {
 		TurretMesh->AddLocalRotation(FRotator(0, 1, 0));
 	}
+	ScaleViewBox();
 }
 
 void ALOTPlayer::ScaleViewBox() {
 	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(15000, 10, 10000));
 	else ViewBox->SetBoxExtent(FVector(15000, 10, 10));
 }
+

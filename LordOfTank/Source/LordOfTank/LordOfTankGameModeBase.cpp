@@ -53,6 +53,8 @@ void ALordOfTankGameModeBase::InitPlayer() {
 	MyPlayer.ControlledPawn = PawnTank;
 	MyPlayer.Tank->SetisNotAI(true);
 
+	MyPlayer.Tank->OffViewBox();
+	MyPlayer.Drone->OffViewBox();
 	Control->Possess(MyPlayer.Tank);
 }
 
@@ -70,6 +72,8 @@ void ALordOfTankGameModeBase::InitAI() {
 	EnemyPlayer.ControlledPawn = PawnTank;
 	EnemyPlayer.Tank->SetisNotAI(false);
 
+	EnemyPlayer.Tank->OnViewBox();
+	EnemyPlayer.Drone->OnViewBox();
 	IsEnemyFound = false;
 
 	//AI->Possess(EnemyPlayer.Tank);
@@ -133,7 +137,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 		if (!MyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 2;
 			EnemyPlayer.Tank->SetTurn(true);
-			MyPlayer.Tank->DisableInput(Control);
+			//MyPlayer.Tank->DisableInput(Control);
 		}
 		//IsLookEnemyTank();
 	}
@@ -141,7 +145,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 		if (!EnemyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 1;
 			MyPlayer.Tank->SetTurn(true);
-			MyPlayer.Tank->EnableInput(Control);
+			//MyPlayer.Tank->EnableInput(Control);
 		}
 	}
 	ChangePawn();
@@ -150,12 +154,24 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 
 
 void ALordOfTankGameModeBase::Think() {
-	if (!IsEnemyFound)
+	if (MyPlayer.Tank->GetbIsShoot() || EnemyPlayer.Tank->GetbIsShoot()) {
+		EnemyPlayer.Tank->OffViewBox();
+		EnemyPlayer.Drone->OffViewBox();
+		MyPlayer.Tank->OffViewBox();
+		MyPlayer.Drone->OffViewBox();
+	}
+	else {
 		IsLookEnemyTank();
-	if (IsEnemyFound && PlayerTurn == 2) {
-		TraceEnemyLocation();
-		AimTurret();
-		EnemyPlayer.Tank->RotateTurret();
+		if (IsEnemyFound && PlayerTurn == 2) {
+			TraceEnemyLocation();
+			AimTurret();
+			EnemyPlayer.Tank->RotateTurret();
+		}
+
+	}
+	if (!(MyPlayer.Tank->GetbIsShoot() && EnemyPlayer.Tank->GetbIsShoot())) {
+		EnemyPlayer.Tank->OnViewBox();
+		EnemyPlayer.Drone->OnViewBox();
 	}
 }
 

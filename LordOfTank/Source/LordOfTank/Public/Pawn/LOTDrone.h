@@ -189,11 +189,10 @@ private:
 
 	UBoxComponent* ViewBox;
 
-	void SetViewBoxLocation();
-
 	int PawnNum;
 
 
+	void SetViewBoxLocation();
 
 public:
 
@@ -212,4 +211,20 @@ public:
 
 	UFUNCTION()
 		void DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
+
+	void OnViewBox() {
+		ViewBox->Activate();
+		ViewBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		ViewBox->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Overlap);
+		
+	}
+
+	void OffViewBox() {
+		ViewBox->Deactivate();
+		ViewBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ViewBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+
 };

@@ -191,12 +191,12 @@ private:
 
 	UBoxComponent* ViewBox;
 
-	void SetViewBoxLocation();
 
 	int PawnNum;
 
 	FVector EnemyLocation;
 
+	void SetViewBoxLocation();
 
 public:
 
@@ -220,9 +220,28 @@ public:
 	UFUNCTION()
 		void LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+
 	void SetEnemyLocation(FVector location) { EnemyLocation = location; }
 
 	void RotateTurret();
 
 	void ScaleViewBox();
+
+
+	void OnViewBox() {
+		ViewBox->Activate();
+		ViewBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		ViewBox->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Overlap);
+
+	}
+
+	void OffViewBox() {
+		ViewBox->Deactivate();
+		ViewBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ViewBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
+
+	bool GetbIsShoot() { return bIsShoot; }
+
+	UBoxComponent* GetViewBox() { return ViewBox; }
 };

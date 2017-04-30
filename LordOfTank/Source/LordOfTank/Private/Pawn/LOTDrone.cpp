@@ -214,7 +214,6 @@ ALOTDrone::ALOTDrone()
 	//PawnNum = PawnDrone;
 
 	DecideCollisionState = None;
-	
 	SetViewBoxLocation();
 }
 
@@ -308,6 +307,44 @@ void ALOTDrone::MoveForwardInput(float Val)
 	if (bHasInputForward)
 	{
 		CurrentAcc = Val * Acceleration;
+		bAcceleratedForward = (Val > 0) ? true : false;
+		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+	}
+	//정지상태가 아니라면
+	else if (CurrentForwardSpeed != 0.f)
+	{
+		//전방으로 가속하고 있었다면 
+		if (bAcceleratedForward)
+		{
+			CurrentAcc = -1.f * Acceleration;
+		}
+		//후방으로 가속하고 있었다면
+		else
+		{
+			CurrentAcc =  Acceleration;
+		}
+		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+		float TempClamp = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+		CurrentForwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 500.f) ? 0.f : TempClamp;
+	}
+	
+
+
+}
+
+void ALOTDrone::MoveUpwardInput(float Val)
+{
+
+
+	bHasInputUpward = !FMath::IsNearlyEqual(Val, 0.f);
+	float CurrentAcc=0.f;
+
+
+	//키 입력을 했다면
+	if (bHasInputForward)
+	{
+		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 	}
@@ -337,7 +374,7 @@ void ALOTDrone::MoveUpwardInput(float Val)
 
 
 	bHasInputUpward = !FMath::IsNearlyEqual(Val, 0.f);
-	float CurrentAcc=0.f;
+	float CurrentAcc = 0.f;
 
 
 	if (bHasInputUpward)
@@ -365,10 +402,11 @@ void ALOTDrone::MoveUpwardInput(float Val)
 
 	}
 
-	
+
 
 
 }
+
 
 void ALOTDrone::DrawBeam(FVector StartLocation, FVector EndLocation)
 {
@@ -452,6 +490,7 @@ void ALOTDrone::ChangePawn()
 
 void ALOTDrone::SetViewBoxLocation() {
 	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
+	ViewBox->SetCollisionObjectType(ECC_Vehicle);
 
 	ViewBox->SetupAttachment(Camera);
 
@@ -459,13 +498,16 @@ void ALOTDrone::SetViewBoxLocation() {
 	
 	ViewBox->SetRelativeLocation((Camera->GetForwardVector() * 15000));
 
-	ViewBox->SetVisibility(true, true);
+	ViewBox->SetVisibility(false, false);
 
 	ViewBox->bGenerateOverlapEvents = true;
 	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTDrone::DroneFindEnemy);
 	ViewBox->OnComponentEndOverlap.AddDynamic(this, &ALOTDrone::DroneLostEnemy);
 
 
+	//ViewBox->Activate();
+
+	OffViewBox();
 }
 
 void ALOTDrone::DroneFindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
