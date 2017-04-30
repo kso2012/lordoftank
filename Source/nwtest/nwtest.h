@@ -17,8 +17,8 @@
 #define CS_READY_CLICK 3
 #define CS_EXIT_CLICK 4
 #define CS_GAME_START 5
-#define CS_FORWARD 6
-#define CS_RIGHT 7
+#define CS_TANK_FORWARD 6
+#define CS_TANK_RIGHT 7
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
@@ -71,6 +71,7 @@ struct cs_packet_tank_move
 {
 	BYTE size;
 	BYTE type;
+	float val;
 };
 
 struct cs_packet_tank_shot
@@ -137,7 +138,8 @@ struct sc_packet_game_start
 struct sc_packet_tank_move
 {
 	BYTE size;
-	int num;
-	WORD id;
+	BYTE type;
+	FVector velocity;
+	FVector angle;
 };
 #pragma pack (pop)

@@ -70,6 +70,9 @@ public:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void SpawnPlayer(int id);
+	void test();
+
 	HANDLE g_hIocp;
 	Client clients[MAX_USER];
 	Room room;
