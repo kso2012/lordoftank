@@ -199,8 +199,6 @@ ALOTMultiDrone::ALOTMultiDrone()
 	MinSpeed = -4000.f;
 	CurrentForwardSpeed = 0.f;
 	CurrentUpwardSpeed = 0.f;
-	bAcceleratedUpward = false;
-	bAcceleratedForward = false;
 	bHasInputUpward = false;
 	bHasInputForward = false;
 	bIsDetectMode = false;
@@ -239,7 +237,7 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 
 	SetAnim();
 
-	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("위방향 속도= %f,앞방향 속도 = %f"), CurrentUpwardSpeed, CurrentForwardSpeed));
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("위방향 속도= %f,앞방향 속도 = %f"), CurrentUpwardSpeed, CurrentForwardSpeed));
 }
 
 // Called to bind functionality to input
@@ -289,6 +287,7 @@ void ALOTMultiDrone::SetTarget()
 
 void ALOTMultiDrone::MoveForwardInput(float Val)
 {
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("val값= %ff"), Val));
 	//Val이 0.f와 근사치에 가깝다면 true,아니면 false를 반환.
 	bHasInputForward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
@@ -297,23 +296,21 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	if (bHasInputForward)
 	{
 		CurrentAcc = Val * Acceleration;
-		bAcceleratedForward = (Val > 0) ? true : false;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 	}
 	//정지상태가 아니라면
 	else if (CurrentForwardSpeed != 0.f)
 	{
-		//전방으로 가속하고 있었다면 
-		if (bAcceleratedForward)
+		if (CurrentForwardSpeed > 0)
 		{
 			CurrentAcc = -1.f * Acceleration;
 		}
-		//후방으로 가속하고 있었다면
-		else
+		else if (CurrentForwardSpeed < 0)
 		{
 			CurrentAcc = Acceleration;
 		}
+		
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		float TempClamp = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 		CurrentForwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 500.f) ? 0.f : TempClamp;
@@ -333,31 +330,21 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 
 	if (bHasInputUpward)
 	{
-
-
 		CurrentAcc = Val * Acceleration;
-		bAcceleratedUpward = (Val > 0) ? true : false;
-
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
-		//GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Blue, FString::Printf(TEXT("%f"), NewUpwardSpeed));
-
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
 
 	}
 
 	else if (CurrentUpwardSpeed != 0.f)
 	{
-
-		if (bAcceleratedUpward)
+		if (CurrentUpwardSpeed > 0)
 		{
 			CurrentAcc = -1.f * Acceleration;
-
 		}
-		else
+		else if (CurrentUpwardSpeed < 0)
 		{
-
 			CurrentAcc = Acceleration;
-
 		}
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		float TempClamp = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);

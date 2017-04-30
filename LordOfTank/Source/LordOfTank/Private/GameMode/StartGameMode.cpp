@@ -22,14 +22,14 @@ AStartGameMode::AStartGameMode()
 
 }
 
-void AStartGameMode::test()
-{
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Test BT WORK!!")));
-}
+//void AStartGameMode::test()
+//{
+//	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Test BT WORK!!")));
+//}
 
-void AStartGameMode::StartGame()
+void AStartGameMode::StartMultiGame_Implementation()
 {
-	UGameplayStatics::OpenLevel(GetWorld(),"NetworkTest");
+	//UGameplayStatics::OpenLevel(GetWorld(),"NetworkTest");
 	//UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", AdvancedDisplay = "2"), Category = "Game")
 		//static void OpenLevel(const UObject* WorldContextObject, FName LevelName, bool bAbsolute = true, FString Options = FString(TEXT("")));
 
@@ -38,7 +38,10 @@ void AStartGameMode::StartGame()
 	//LoadingScreen = LoadObject<AActor>(nullptr, TEXT("Blueprint'/Game/Blueprints/Main_Blueprints/LoadingScreen.LoadingScreen'"));
 	//World->SpawnActor<AActor>(LoadingScreen->GetClass(), FVector(-48255.328125, 31466.636719, 776.058350), FRotator(0.f, 0.f, 0.f));
 }
-
+void AStartGameMode::StartPlay()
+{
+	Super::StartPlay();
+}
 //void EndPlay(const EEndPlayReason::Type EndPlayReason)
 //{
 //	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("³¡!!")));

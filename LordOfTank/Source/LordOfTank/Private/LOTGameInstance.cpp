@@ -10,6 +10,7 @@
 ULOTGameInstance::ULOTGameInstance()
 {
 	bIsConnected = false;
+	bIsStart = false;
 	bIsTryConnecting = false;
 	PlayerNum = 0;
 }
@@ -108,18 +109,18 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		RoomInfo.roomNum = my_packet->roomNum;
 		RoomInfo.counts = my_packet->counts;
 		RoomInfo.state = my_packet->state;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("방인원 : %d"), my_packet->counts));
 		break;
 	}
 	case SC_PLAYER_NUM:
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("플레이어넘버받음")));
 		sc_packet_player_num *my_packet = reinterpret_cast<sc_packet_player_num*>(ptr);
 		PlayerNum = my_packet->playerNum;
 		break;
 	}
 	case SC_ROOM_INFO:
 	{
-
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("로비정보받음")));
 		sc_packet_room_info *my_packet = reinterpret_cast<sc_packet_room_info*>(ptr);
 		LobbyInfo.canStart = my_packet->canStart;
 		LobbyInfo.counts = my_packet->counts;
@@ -127,12 +128,12 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		LobbyInfo.isReady2 = my_packet->isReady2;
 		LobbyInfo.name1 = my_packet->name1.c_str();
 	    LobbyInfo.name2 = my_packet->name2.c_str();
-		
 		break;
 	}
 
 	case SC_ROOM_READY:
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("레디정보받음")));
 		sc_packet_room_ready *my_packet = reinterpret_cast<sc_packet_room_ready*>(ptr);
 		LobbyInfo.canStart = my_packet->canStart;
 		LobbyInfo.isReady1 = my_packet->isReady1;
@@ -142,13 +143,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 
 	case SC_GAME_START:
 	{
-		sc_packet_room_ready *my_packet = reinterpret_cast<sc_packet_room_ready*>(ptr);
-
-		//UKismetSystemLibrary::Delay(UObject* WorldContextObject, float Duration, struct FLatentActionInfo LatentInfo);
-		AStartGameMode* const Testa = Cast<AStartGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		Testa->StartGame();
-		
-
+		bIsStart = true;
 		break;
 	}
 	case SC_MOVE_PLAYER:
@@ -377,5 +372,6 @@ void ULOTGameInstance::testfunc()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("게임 스타트")));
 	AStartGameMode* const Testa = Cast<AStartGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	Testa->StartGame();
+	Testa->StartMultiGame();
 }
+

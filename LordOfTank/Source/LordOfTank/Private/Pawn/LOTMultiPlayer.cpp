@@ -39,8 +39,8 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> TurretStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Turret_SM"));
 	TurretMesh->SetStaticMesh(TurretStaticMesh.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterial> TurretMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
-	TurretMesh->SetMaterial(0, TurretMaterial.Object);
+	//static ConstructorHelpers::FObjectFinder<UMaterial> TurretMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
+	//TurretMesh->SetMaterial(0, TurretMaterial.Object);
 	TurretMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
 	TurretMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -48,8 +48,8 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BarrelStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Barrel_SM"));
 	BarrelMesh->SetStaticMesh(BarrelStaticMesh.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterial> BarrelMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
-	BarrelMesh->SetMaterial(0, BarrelMaterial.Object);
+	//static ConstructorHelpers::FObjectFinder<UMaterial> BarrelMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
+	//BarrelMesh->SetMaterial(0, BarrelMaterial.Object);
 	BarrelMesh->AttachToComponent(TurretMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Turret_BR"));
 	BarrelMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//ÃÑ±¸¿¡ ¾ÀÄÄÆ÷³ÍÆ® ºÎÂø.
@@ -274,12 +274,11 @@ void ALOTMultiPlayer::MoveForward(float Val)
 {
 	//SetVehicleMovement();
 	if (!bIsFireMode) {
-		GetVehicleMovementComponent()->SetThrottleInput(Val);
+		//GetVehicleMovementComponent()->SetThrottleInput(Val);
 
-		ULOTGameInstance* const Test = Cast<ULOTGameInstance>(GetGameInstance());
-		//GetVehicleMovementComponent()->set
-		//Test->SendPos(GetActorLocation(),GetVehicleMovementComponent());
-		//ALOTMultiPlayer* const Test = Cast<ALOTMultiPlayer>(InsideActor)
+		//ULOTGameInstance* const Test = Cast<ULOTGameInstance>(GetGameInstance());
+		////GetVehicleMovementComponent()->set
+
 	}
 }
 

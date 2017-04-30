@@ -118,6 +118,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "test")
 		void testfunc();
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
 		FShowRoom RoomInfo;
 
@@ -138,6 +139,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "keypad")
 		bool bIsConnected;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "keypad")
+		bool bIsStart;
 
 
 	char send_buffer[4000];

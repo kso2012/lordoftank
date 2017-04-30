@@ -21,11 +21,12 @@ class LORDOFTANK_API AStartGameMode : public AGameModeBase
 public:
 
 	AStartGameMode();
+	virtual void StartPlay() override;
+	UFUNCTION(BlueprintNativeEvent, Category = "NetFuntion")
+		void StartMultiGame();
+		void StartMultiGame_Implementation();
+		
 	
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-		void test();
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	void StartGame();
 
 
 
