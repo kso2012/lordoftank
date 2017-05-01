@@ -125,11 +125,8 @@ ALOTPlayer::ALOTPlayer()
 	isNotAI = true;
 	bIsShoot = false;
 
+	TurretAim = None; 
 	SetViewBoxLocation();
-	
-	//PawnNum = PawnTank;
-
-	TurretAim = None;
 }
 
 void ALOTPlayer::BeginPlay()
@@ -210,6 +207,7 @@ void ALOTPlayer::FireStart()
 	{
 		bIsPushFire = true;
 		CurShootingPower = MinShootingPower;
+		bIsShoot = true;
 	}
 }
 
@@ -239,8 +237,10 @@ void ALOTPlayer::FireEnd()
 			//APickup* const SpawnedPickup = World->SpawnActor<APickup>(WhatToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
 			//World->SpawnActor<ALOTDrone>(ALOTDrone::StaticClass(), SpawnLocation+FVector(0.0f,0.0f,1000.f), SpawnRotation);
 			
-			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
-			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor,0.25f,VTBlend_Linear,0.0f,true);
+			if (isNotAI) {
+				UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
+				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.25f, VTBlend_Linear, 0.0f, true);
+			}
 			TempActor->GetTank(this);
 		}
 	}
@@ -458,11 +458,11 @@ void ALOTPlayer::ChangeTurn() {
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Trun Changed")));
 }
 
-void ALOTPlayer::ShootAI() {
+void ALOTPlayer::ShootAI(float power) {
 	if (myTurn && !isNotAI && !bIsShoot) {
 		bIsFireMode = true;
 		bIsShoot = true;
-		CurShootingPower += 500;
+		CurShootingPower = power;
 		FireEnd();
 	}
 }
@@ -475,12 +475,13 @@ void ALOTPlayer::TurnAI() {
 
 void ALOTPlayer::SetViewBoxLocation() {
 	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
+	ViewBox->SetCollisionObjectType(ECC_Vehicle);
 
 	ViewBox->SetupAttachment(MuzzleLocation);
 
-	ViewBox->SetBoxExtent(FVector(15000, 10, 10));
+	ViewBox->SetBoxExtent(FVector(50000, 10, 10));
 
-	ViewBox->SetRelativeLocation(MuzzleLocation->GetComponentLocation() + (MuzzleLocation->GetForwardVector() * 15000));
+	ViewBox->SetRelativeLocation(MuzzleLocation->GetComponentLocation() + (MuzzleLocation->GetForwardVector() * 50000) - FVector(0, 0, 100));
 
 	ViewBox->SetVisibility(true, true);
 
@@ -489,6 +490,11 @@ void ALOTPlayer::SetViewBoxLocation() {
 	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::FindEnemy);
 	ViewBox->OnComponentEndOverlap.AddDynamic(this, &ALOTPlayer::LostEnemy);
 
+
+	//ViewBox->Activate();
+
+
+	OffViewBox();
 }
 
 void ALOTPlayer::FindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -503,13 +509,15 @@ void ALOTPlayer::LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherAct
 	CollisionActor = OtherActor;
 }
 
-void ALOTPlayer::RotateTurret() {
+void ALOTPlayer::RotateTurret(float RotateDirection) {
 	if (TurretAim == None) {
-		TurretMesh->AddLocalRotation(FRotator(0, 1, 0));
+		TurretMesh->AddLocalRotation(FRotator(0, RotateDirection, 0));
 	}
+	ScaleViewBox();
 }
 
 void ALOTPlayer::ScaleViewBox() {
-	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(15000, 10, 10000));
-	else ViewBox->SetBoxExtent(FVector(15000, 10, 10));
+	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(50000, 10, 10000));
+	else ViewBox->SetBoxExtent(FVector(50000, 10, 10));
 }
+
