@@ -369,43 +369,6 @@ void ALOTDrone::MoveUpwardInput(float Val)
 
 }
 
-void ALOTDrone::MoveUpwardInput(float Val)
-{
-
-
-	bHasInputUpward = !FMath::IsNearlyEqual(Val, 0.f);
-	float CurrentAcc = 0.f;
-
-
-	if (bHasInputUpward)
-	{
-		CurrentAcc = Val * Acceleration;
-		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
-		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
-
-	}
-
-	else if (CurrentUpwardSpeed != 0.f)
-	{
-		if (CurrentUpwardSpeed > 0)
-		{
-			CurrentAcc = -1.f * Acceleration;
-		}
-		else if (CurrentUpwardSpeed < 0)
-		{
-			CurrentAcc = Acceleration;
-		}
-		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
-		float TempClamp = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
-		CurrentUpwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 500.f) ? 0.f : TempClamp;
-
-
-	}
-
-
-
-
-}
 
 
 void ALOTDrone::DrawBeam(FVector StartLocation, FVector EndLocation)

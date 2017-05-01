@@ -89,10 +89,17 @@ private:
 
 	bool IsEnemyFound;
 
+	int TurretRotateDirection;
+
+	float distance;
 
 	void Think();
 
 	void TraceEnemyLocation();
 
 	void AimTurret();
+
+	void CalcTurretRotator();
+
+	void SetPower();
 };

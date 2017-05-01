@@ -185,7 +185,7 @@ private:
 
 	bool isNotAI;
 
-	void ShootAI();
+	void ShootAI(float);
 
 	void TurnAI();
 
@@ -204,7 +204,7 @@ public:
 
 	AActor * CollisionActor;
 
-	void CommandShoot() { ShootAI(); }
+	void CommandShoot(float power) { ShootAI(power); }
 	void CommandTurn() { TurnAI(); }
 	
 	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
@@ -223,7 +223,7 @@ public:
 
 	void SetEnemyLocation(FVector location) { EnemyLocation = location; }
 
-	void RotateTurret();
+	void RotateTurret(float);
 
 	void ScaleViewBox();
 
@@ -244,4 +244,8 @@ public:
 	bool GetbIsShoot() { return bIsShoot; }
 
 	UBoxComponent* GetViewBox() { return ViewBox; }
+
+
+	FVector ReturnMeshForwardVector() { return GetMesh()->GetForwardVector(); }
+	FVector ReturnTurretForwardVector() { return TurretMesh->GetForwardVector(); }
 };

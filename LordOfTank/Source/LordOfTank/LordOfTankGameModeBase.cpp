@@ -3,6 +3,7 @@
 #include "LordOfTank.h"
 #include "PlayerInfo.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "LordOfTankGameModeBase.h"
 
 #define PawnTank 1
@@ -17,6 +18,9 @@
 #define CorrectAim 1
 #define InCorrectAim 2
 
+#define Right 1
+#define Left -1
+
 
 
 PlayerInfo Info = PlayerInfo::PlayerInfo();
@@ -29,6 +33,8 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 	PlayerCount = 1;
 	PlayerTurn = 1;
 	PrimaryActorTick.bCanEverTick = true;
+	TurretRotateDirection = None;
+	distance = 0.f;
 }
 
 void ALordOfTankGameModeBase::StartPlay()
@@ -137,7 +143,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 		if (!MyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 2;
 			EnemyPlayer.Tank->SetTurn(true);
-			//MyPlayer.Tank->DisableInput(Control);
+			MyPlayer.Tank->DisableInput(Control);
 		}
 		//IsLookEnemyTank();
 	}
@@ -145,7 +151,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 		if (!EnemyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 1;
 			MyPlayer.Tank->SetTurn(true);
-			//MyPlayer.Tank->EnableInput(Control);
+			MyPlayer.Tank->EnableInput(Control);
 		}
 	}
 	ChangePawn();
@@ -165,7 +171,17 @@ void ALordOfTankGameModeBase::Think() {
 		if (IsEnemyFound && PlayerTurn == 2) {
 			TraceEnemyLocation();
 			AimTurret();
-			EnemyPlayer.Tank->RotateTurret();
+			if (EnemyPlayer.Tank->TurretAim != CorrectAim) {
+				CalcTurretRotator();
+				if (TurretRotateDirection != None) {
+					EnemyPlayer.Tank->RotateTurret(TurretRotateDirection);
+				}
+			}
+			else {
+				if (distance != 0.f)
+					SetPower();
+				EnemyPlayer.Tank->CommandShoot(distance);
+			}
 		}
 
 	}
@@ -198,10 +214,25 @@ void ALordOfTankGameModeBase::TraceEnemyLocation() {
 }
 
 void ALordOfTankGameModeBase::AimTurret() {
-	if (EnemyPlayer.Tank->CollisionActor == MyPlayer.Tank) {
+	if (EnemyPlayer.Tank->CollisionActor == MyPlayer.Tank && EnemyPlayer.Tank->TurretAim == CorrectAim) {
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Aim Correctly");
+		TurretRotateDirection = None;
+		distance = 0.f;
 	}
 	else {
 		EnemyPlayer.Tank->TurretAim = None;
 	}
+}
+
+void ALordOfTankGameModeBase::CalcTurretRotator() {
+	if (TurretRotateDirection == None) {
+		if (UKismetMathLibrary::Dot_VectorVector(MyPlayer.Tank->ReturnMeshForwardVector(), EnemyPlayer.Tank->ReturnTurretForwardVector()) < 0.f)
+			TurretRotateDirection = Right;
+		else
+			TurretRotateDirection = Left;
+	}
+}
+
+void ALordOfTankGameModeBase::SetPower() {
+	distance = EnemyPlayer.Tank->GetDistanceTo(MyPlayer.Tank) * 1000000.f;
 }
