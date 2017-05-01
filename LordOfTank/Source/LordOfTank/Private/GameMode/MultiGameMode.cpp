@@ -29,7 +29,7 @@ void AMultiGameMode::StartPlay()
 	EnemyPlayer.Tank = World->SpawnActor<ALOTMultiPlayer>(ALOTMultiPlayer::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
 	EnemyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart2->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart2->GetActorRotation());
 
-	Test->Possess(MyPlayer.Tank);
+	//Test->Possess(MyPlayer.Tank);
 
 }
 
