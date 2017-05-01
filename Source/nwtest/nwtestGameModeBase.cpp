@@ -12,7 +12,12 @@ using namespace std;
 AnwtestGameModeBase::AnwtestGameModeBase()
 {
 	g_isshutdown = false;
-	tesking = 0;
+	tesking = 0; 
+	static ConstructorHelpers::FClassFinder<APawn> GameModeBP(TEXT("Blueprint'/Game/GameMode.GameMode_C'"));
+	if (GameModeBP.Class != NULL)
+	{
+		DefaultPawnClass = GameModeBP.Class;
+	}
 	PrimaryActorTick.bCanEverTick = true;
 	threadkey = false;
 }
@@ -20,7 +25,6 @@ AnwtestGameModeBase::AnwtestGameModeBase()
 void AnwtestGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 
@@ -58,7 +62,18 @@ void AnwtestGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AnwtestGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("tesking= %f"), tesking));
+	if (SpawnActor == true && SpawnID != -1) // 탱크 스폰
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("액터 스폰 진입")));
+		APlayerController*  Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		AActor* PlayerStart1 = Cast<AActor>(FindPlayerStart(Test, "1"));
+		//AActor*  PlayerStart2 = Cast<AActor>(FindPlayerStart(Test, TEXT("2")));
+		UWorld*  World = GetWorld();
+		clients[SpawnID].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
+		SpawnActor = false;
+		SpawnID = -1;
+	}
+	
 }
 
 //void AnwtestGameModeBase::error_display(char *msg, int err_no)
@@ -333,7 +348,8 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		game_start.size = sizeof(game_start);
 		game_start.type = SC_GAME_START;
 		SendPacket(id, reinterpret_cast<unsigned char*>(&game_start));
-	
+		SpawnActor = true;
+		SpawnID = id;
 
 		break;
 	}
@@ -703,6 +719,8 @@ void AnwtestGameModeBase::acceptthread()
 
 	while (threadkey == false)
 	{
+		SpawnActor = true;
+		SpawnID = 0;
 		//SpawnPlayer(3);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Accept"));
 		struct sockaddr_in client_addr;
@@ -805,7 +823,7 @@ void AnwtestGameModeBase::SpawnPlayer(int id)
 
 	UWorld*  World = GetWorld();
 
-	clients[id].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
+	clients[0].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
 
 	//MyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart1->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart1->GetActorRotation());
 
@@ -816,4 +834,9 @@ void AnwtestGameModeBase::SpawnPlayer(int id)
 void AnwtestGameModeBase::test()
 {
 
+}
+
+int AnwtestGameModeBase::GetID()
+{
+	return 0;
 }

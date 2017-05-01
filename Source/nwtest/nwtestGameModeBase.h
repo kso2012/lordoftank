@@ -77,6 +77,9 @@ public:
 	Client clients[MAX_USER];
 	Room room;
 	bool g_isshutdown;
+	bool SpawnActor = false;
+	int SpawnID = -1;
+	HANDLE hThread;
 
 	//void error_display(char *msg, int err_no);
 
@@ -94,5 +97,6 @@ public:
 	float tesking;
 	void ProcessPacket(int id, unsigned char *packet);
 	void SendPacket(int id, unsigned char *packet);
+	int GetID();
 
 };
