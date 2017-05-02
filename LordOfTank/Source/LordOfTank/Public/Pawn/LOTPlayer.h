@@ -183,51 +183,69 @@ private:
 	// AI관련 
 private:
 
+	// 플레이어인지 AI인지 판단하는 bool, true면 플레이어
 	bool isNotAI;
 
+	// AI가 포를 쏘기 위한 함수, 파워값을 받아서 FireEnd() 함수로 보냄
 	void ShootAI(float);
+
 
 	void TurnAI();
 
+	// AI의 포신방향으로 나가는 collision box, 터렛을 회전시킬 때 사용
 	UBoxComponent* ViewBox;
 
 
 	int PawnNum;
 
+	// AI가 플레이어의 위치를 추적하기 위한 변수
 	FVector EnemyLocation;
 
+	// collision box 초기화 함수
 	void SetViewBoxLocation();
 
 public:
 
+	// AI가 포신을 회전시킬 때 ViewBox에 충돌이 되었는지 확인하는 변수
 	int TurretAim;
 
+	// ViewBox에 충돌된 Actor를 저장하는 변수
 	AActor * CollisionActor;
 
+	// 게임모드에서 ShootAI를 호출하기 위한 함수, 게임모드에서 탱크에게 파워값을 보내줌
 	void CommandShoot(float power) { ShootAI(power); }
 	void CommandTurn() { TurnAI(); }
 	
+	// 게임모드에서 이 탱크가 AI인지 아닌지를 설정해주는 함수
 	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
+
+	// !IsNotAI를 반환, true이면 AI
 	bool GetisAI() { return !isNotAI; }
 
+	
 	int GetPawnNum() { return PawnNum; }
 
+	// Camera를 외부에서 사용하기 위해 반환
 	UCameraComponent* ReturnCamera() { return MoveModeCamera; }
 
+	// ViewBox에 충돌되었을 때 호출되는 함수
 	UFUNCTION()
 		void FindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	// ViewBox에서 벗어났을 때 호출되는 함수
 	UFUNCTION()
 		void LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-
+	// 플레이어의 위치를 적 AI가 추적하기 위해 위치를 받아 저장시키는 함수
 	void SetEnemyLocation(FVector location) { EnemyLocation = location; }
 
+	// 입력된 값을 이용해 터렛을 회전
 	void RotateTurret(float);
 
+	// ViewBox의 크기를 늘이거나 줄이는 함수
 	void ScaleViewBox();
 
-
+	// ViewBox를 Activate
 	void OnViewBox() {
 		ViewBox->Activate();
 		ViewBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -235,17 +253,20 @@ public:
 
 	}
 
+	// ViewBox를 Deactivate
 	void OffViewBox() {
 		ViewBox->Deactivate();
 		ViewBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		ViewBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
 
+	// 현재 발사중인지 아닌지를 게임모드에서 확인하기 위해 값을 리턴
 	bool GetbIsShoot() { return bIsShoot; }
+
 
 	UBoxComponent* GetViewBox() { return ViewBox; }
 
-
-	FVector ReturnMeshForwardVector() { return GetMesh()->GetForwardVector(); }
+	// AI가 어느 방향으로 회전해야할지 계산하기 위해 메쉬의 위치와 포신의 forwardVector를 리턴
+	FVector ReturnMeshLocation() { return GetMesh()->GetComponentLocation(); }
 	FVector ReturnTurretForwardVector() { return TurretMesh->GetForwardVector(); }
 };

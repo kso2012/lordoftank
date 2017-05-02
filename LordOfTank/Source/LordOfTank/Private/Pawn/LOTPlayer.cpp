@@ -216,9 +216,13 @@ void ALOTPlayer::FireEnd()
 {
 	bIsPushFire = false;
 	ClearBeam();
-	if (CurrentProjectile != NULL && bIsFireMode)
+	if (CurrentProjectile != NULL && bIsFireMode )
 	{
-		const FRotator SpawnRotation = GetActorRotation()+ FireModeCamera->RelativeRotation;//
+		FRotator SpawnRotation = GetActorRotation()+ FireModeCamera->RelativeRotation;//
+
+		if (!isNotAI) {
+			SpawnRotation = MuzzleLocation->GetComponentRotation();
+		}
 		
 		const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation()) ;
 
@@ -227,6 +231,7 @@ void ALOTPlayer::FireEnd()
 		{
 			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
 				FRotator(0.f,0.f,0.f), FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
+
 
 			AProjectile* TempActor = World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation);
 			TempActor->SetInitialVelocity(InitialVelocity);
@@ -244,7 +249,7 @@ void ALOTPlayer::FireEnd()
 			TempActor->GetTank(this);
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
 	FireMode();
 
 }
@@ -453,10 +458,11 @@ void ALOTPlayer::ChangeTurn() {
 			myTurn = false;
 		else
 			myTurn = true;
-
+		// 발사중일 땐 bIsShoot = true인데 포탄이 폭발할 때 턴을 넘기도록 함. 이 함수는 Projectile에서 호출됨
 		bIsShoot = false; 
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Trun Changed")));
 }
+
 
 void ALOTPlayer::ShootAI(float power) {
 	if (myTurn && !isNotAI && !bIsShoot) {

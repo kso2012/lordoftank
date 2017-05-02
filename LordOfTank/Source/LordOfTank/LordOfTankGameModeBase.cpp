@@ -143,6 +143,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 		if (!MyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 2;
 			EnemyPlayer.Tank->SetTurn(true);
+			// AI에게 턴이 넘어갈 때 조작을 금지시킴
 			MyPlayer.Tank->DisableInput(Control);
 		}
 		//IsLookEnemyTank();
@@ -151,6 +152,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 		if (!EnemyPlayer.Tank->GetTurn()) {
 			PlayerTurn = 1;
 			MyPlayer.Tank->SetTurn(true);
+			// 플레이어에게 턴이 넘어올 때 조작을 가능하게 함
 			MyPlayer.Tank->EnableInput(Control);
 		}
 	}
@@ -160,6 +162,8 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 
 
 void ALordOfTankGameModeBase::Think() {
+	// 플레이어나 AI가 포를 발사하고 있을 땐 탱크와 드론의 ViewBox를 사용하지 않음
+	// 남겨둘 경우 포탄이 어딘가에 충돌된 것으로 판단하여 바로 터지게 됌
 	if (MyPlayer.Tank->GetbIsShoot() || EnemyPlayer.Tank->GetbIsShoot()) {
 		EnemyPlayer.Tank->OffViewBox();
 		EnemyPlayer.Drone->OffViewBox();
@@ -171,20 +175,23 @@ void ALordOfTankGameModeBase::Think() {
 		if (IsEnemyFound && PlayerTurn == 2) {
 			TraceEnemyLocation();
 			AimTurret();
+			// AI 포신이 플레이어 탱크를 제대로 조준하지 않았을 경우 포신을 회전
 			if (EnemyPlayer.Tank->TurretAim != CorrectAim) {
 				CalcTurretRotator();
 				if (TurretRotateDirection != None) {
 					EnemyPlayer.Tank->RotateTurret(TurretRotateDirection);
 				}
 			}
+			// AI 포신이 제대로 조준이 되었을 경우 파워 조절 후 발사
 			else {
-				if (distance != 0.f)
+				if (distance == 0.f)
 					SetPower();
 				EnemyPlayer.Tank->CommandShoot(distance);
 			}
 		}
 
 	}
+	// 플레이어나 AI가 포를 발사하고 있지 않은 경우에는 ViewBox를 사용하는 상태로 둠
 	if (!(MyPlayer.Tank->GetbIsShoot() && EnemyPlayer.Tank->GetbIsShoot())) {
 		EnemyPlayer.Tank->OnViewBox();
 		EnemyPlayer.Drone->OnViewBox();
@@ -225,8 +232,12 @@ void ALordOfTankGameModeBase::AimTurret() {
 }
 
 void ALordOfTankGameModeBase::CalcTurretRotator() {
+	FVector TurretLookVector = EnemyPlayer.Tank->ReturnTurretForwardVector();
+
+	FVector CrossVector = UKismetMathLibrary::Cross_VectorVector(EnemyPlayer.Tank->ReturnMeshLocation() - MyPlayer.Tank->ReturnMeshLocation(), TurretLookVector);
+
 	if (TurretRotateDirection == None) {
-		if (UKismetMathLibrary::Dot_VectorVector(MyPlayer.Tank->ReturnMeshForwardVector(), EnemyPlayer.Tank->ReturnTurretForwardVector()) < 0.f)
+		if (UKismetMathLibrary::Dot_VectorVector(CrossVector, FVector(0,0,1)) > 0)
 			TurretRotateDirection = Right;
 		else
 			TurretRotateDirection = Left;
@@ -234,5 +245,5 @@ void ALordOfTankGameModeBase::CalcTurretRotator() {
 }
 
 void ALordOfTankGameModeBase::SetPower() {
-	distance = EnemyPlayer.Tank->GetDistanceTo(MyPlayer.Tank) * 1000000.f;
+	distance = EnemyPlayer.Tank->GetDistanceTo(MyPlayer.Tank);
 }

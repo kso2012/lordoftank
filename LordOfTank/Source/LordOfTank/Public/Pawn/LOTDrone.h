@@ -185,35 +185,43 @@ public:
 
 private:
 
+	// 플레이어인지 AI인지 판단하는 bool, true면 플레이어
 	bool isNotAI;
 
+	// 드론이 바라보는 인지 범위로 사용할 collision box
 	UBoxComponent* ViewBox;
 
 	int PawnNum;
 
-
+	// collision box 초기화 함수
 	void SetViewBoxLocation();
 
 public:
 
+	// 게임모드에서 이 탱크가 AI인지 아닌지를 설정해주는 함수
 	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
+
+	// !IsNotAI를 반환, true이면 AI
 	bool GetisAI() { return !isNotAI; }
 
 	int GetPawnNum() { return PawnNum; }
 
+	// Drone의 인지 범위 내에 탱크가 들어왔는지 판단하는 변수
 	int DecideCollisionState;
 
+	// ViewBox에 충돌된 Actor를 저장하는 변수
 	AActor * CollisionActor;
 	
-	
+	// ViewBox에 충돌되었을 때 호출되는 함수
 	UFUNCTION()
 		void DroneFindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	// ViewBox에서 벗어났을 때 호출되는 함수
 	UFUNCTION()
 		void DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
-
+	// ViewBox를 Activate
 	void OnViewBox() {
 		ViewBox->Activate();
 		ViewBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -221,6 +229,7 @@ public:
 		
 	}
 
+	// ViewBox를 Deactivate
 	void OffViewBox() {
 		ViewBox->Deactivate();
 		ViewBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
