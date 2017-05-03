@@ -18,8 +18,8 @@
 #define CorrectAim 1
 #define InCorrectAim 2
 
-#define Right 1
-#define Left -1
+#define Right 1.f
+#define Left -1.f
 
 
 
@@ -35,6 +35,11 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 	PrimaryActorTick.bCanEverTick = true;
 	TurretRotateDirection = None;
 	distance = 0.f;
+	bIsPreFound = false;
+	DroneDirection = FVector(0, 0, 0);
+	DroneRotateDirection = None;
+	bIsRightDirection = false;
+	LostLocation = FVector(0, 0, 0);
 }
 
 void ALordOfTankGameModeBase::StartPlay()
@@ -112,20 +117,6 @@ void ALordOfTankGameModeBase::ChangePawn() {
 			MyPlayer.Tank->PossessTank = true;
 		}
 	}
-	else {
-		if (EnemyPlayer.ControlledPawn == PawnTank && !EnemyPlayer.Tank->PossessTank && !EnemyPlayer.Drone->PossessDrone) {
-			EnemyPlayer.ControlledPawn = PawnDrone;
-			Control->UnPossess();
-			Control->Possess(EnemyPlayer.Drone);
-			EnemyPlayer.Drone->PossessDrone = true;
-		}
-		else if (EnemyPlayer.ControlledPawn == PawnDrone && !EnemyPlayer.Tank->PossessTank && !EnemyPlayer.Drone->PossessDrone) {
-			EnemyPlayer.ControlledPawn = PawnTank;
-			Control->UnPossess();
-			Control->Possess(EnemyPlayer.Tank);
-			EnemyPlayer.Tank->PossessTank = true;
-		}
-	}
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), PlayerTurn));
 }
 
@@ -172,7 +163,36 @@ void ALordOfTankGameModeBase::Think() {
 	}
 	else {
 		IsLookEnemyTank();
-		if (IsEnemyFound && PlayerTurn == 2) {
+		if ((!IsEnemyFound && PlayerTurn == 2) || (EnemyPlayer.Drone->ReturnDroneSpeed() != 0.f && PlayerTurn == 2)) {
+			if (!bIsRightDirection) {
+				SetDroneDirection();
+				if (DroneRotateDirection != None){
+					//EnemyPlayer.Drone->RotateDrone(DroneRotateDirection);
+					FVector DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Drone->GetActorForwardVector(), DroneDirection, 0.01f);
+					EnemyPlayer.Drone->SetActorRotation(DVector.Rotation());
+					
+					if (((DroneDirection.X - 0.02f) < EnemyPlayer.Drone->GetActorForwardVector().X && EnemyPlayer.Drone->GetActorForwardVector().X  < (DroneDirection.X + 0.02f)) 
+						 && ((DroneDirection.Y - 0.02f) < EnemyPlayer.Drone->GetActorForwardVector().Y && EnemyPlayer.Drone->GetActorForwardVector().Y < (DroneDirection.Y + 0.02f))
+						 && ((DroneDirection.Z - 0.02f) < EnemyPlayer.Drone->GetActorForwardVector().Z && EnemyPlayer.Drone->GetActorForwardVector().Z < (DroneDirection.Z + 0.02f))) {
+						bIsRightDirection = true;
+						DroneRotateDirection = None;
+						DroneDirection = FVector(0, 0, 0);
+
+						GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Drone Rotate Done");
+					}
+				}
+			}
+			else {
+				if(!IsEnemyFound)
+					EnemyPlayer.Drone->CommandMoveForward(1.f);
+				else {
+					EnemyPlayer.Drone->CommandMoveForward(-1.f);
+					if (EnemyPlayer.Drone->ReturnDroneSpeed() < 10.f)
+						EnemyPlayer.Drone->SetDroneSpeed();
+				}
+			}
+		}
+		else if (IsEnemyFound && PlayerTurn == 2) {
 			TraceEnemyLocation();
 			AimTurret();
 			// AI 포신이 플레이어 탱크를 제대로 조준하지 않았을 경우 포신을 회전
@@ -204,6 +224,10 @@ void ALordOfTankGameModeBase::IsLookEnemyTank() {
 		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
 			IsEnemyFound = true;
+			bIsPreFound = true;
+			bIsRightDirection = true;
+			LostLocation = FVector(0, 0, 0);
+			//DroneDirection = MyPlayer.Tank->GetActorLocation() - EnemyPlayer.Drone->GetActorLocation();
 		}
 		EnemyPlayer.Drone->DecideCollisionState = None;
 	}
@@ -211,6 +235,8 @@ void ALordOfTankGameModeBase::IsLookEnemyTank() {
 		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
 			IsEnemyFound = false;
+			LostLocation = MyPlayer.Tank->GetActorLocation();
+			bIsRightDirection = false;
 		}
 		EnemyPlayer.Drone->DecideCollisionState = None;
 	}
@@ -246,4 +272,28 @@ void ALordOfTankGameModeBase::CalcTurretRotator() {
 
 void ALordOfTankGameModeBase::SetPower() {
 	distance = EnemyPlayer.Tank->GetDistanceTo(MyPlayer.Tank);
+}
+
+void ALordOfTankGameModeBase::SetDroneDirection() {
+	FVector DroneLocation = EnemyPlayer.Drone->GetActorLocation();
+	FVector DroneForwardVector = EnemyPlayer.Drone->GetActorForwardVector();
+	if (DroneRotateDirection == None && !bIsRightDirection) {
+
+		if (!bIsPreFound) {
+			AActor* const PlayerStart = Cast<AActor>(FindPlayerStart(Control, "1"));
+			DroneDirection = PlayerStart->GetActorLocation() - DroneLocation;
+		}
+		else if (bIsPreFound && LostLocation != FVector(0, 0, 0)) {
+			DroneDirection = LostLocation - DroneLocation;
+		}
+
+		DroneDirection.Z = 0.f;
+		DroneDirection.Normalize();
+		FVector CrossVector = UKismetMathLibrary::Cross_VectorVector(DroneDirection, DroneForwardVector);
+		if (UKismetMathLibrary::Dot_VectorVector(CrossVector, FVector(0, 0, 1)) > 0)
+			DroneRotateDirection = Right;
+		else
+			DroneRotateDirection = Left;
+
+	}
 }

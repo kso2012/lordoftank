@@ -485,9 +485,9 @@ void ALOTPlayer::SetViewBoxLocation() {
 
 	ViewBox->SetupAttachment(MuzzleLocation);
 
-	ViewBox->SetBoxExtent(FVector(50000, 10, 10));
+	ViewBox->SetBoxExtent(FVector(80000, 10, 10));
 
-	ViewBox->SetRelativeLocation(MuzzleLocation->GetComponentLocation() + (MuzzleLocation->GetForwardVector() * 50000) - FVector(0, 0, 100));
+	ViewBox->SetRelativeLocation(MuzzleLocation->GetComponentLocation() + (MuzzleLocation->GetForwardVector() * 80000) - FVector(0, 0, 100));
 
 	ViewBox->SetVisibility(true, true);
 
@@ -523,7 +523,7 @@ void ALOTPlayer::RotateTurret(float RotateDirection) {
 }
 
 void ALOTPlayer::ScaleViewBox() {
-	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(50000, 10, 10000));
-	else ViewBox->SetBoxExtent(FVector(50000, 10, 10));
+	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(80000, 10, 10000));
+	else ViewBox->SetBoxExtent(FVector(80000, 10, 10));
 }
 

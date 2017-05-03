@@ -71,6 +71,7 @@ public:
 	float DroneSpawningHeight;
 
 
+
 private:
 
 	PlayerInfomations MyPlayer;
@@ -92,7 +93,7 @@ private:
 	bool IsEnemyFound;
 
 	//포신이 좌,우 돌아갈 방향
-	int TurretRotateDirection;
+	float TurretRotateDirection;
 
 	//플레이어와 AI 탱크의 거리
 	float distance;
@@ -111,4 +112,22 @@ private:
 
 	//거리로 파워를 정하는 함수
 	void SetPower();
+
+	void SetDroneDirection();
+
+
+
+
+
+	bool bIsPreFound;
+
+	bool bIsRightDirection;
+
+	FVector DroneDirection;
+
+	int DroneRotateDirection;
+
+	FVector LostLocation;
+
+
 };

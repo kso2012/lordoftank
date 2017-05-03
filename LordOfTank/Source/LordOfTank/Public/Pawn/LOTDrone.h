@@ -236,4 +236,12 @@ public:
 		ViewBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
 
+	// 입력된 값을 이용해 드론을 회전
+	void RotateDrone(float);
+
+	void CommandMoveForward(float val) { MoveForwardInput(val); }
+
+	float ReturnDroneSpeed() { return CurrentForwardSpeed; }
+
+	void SetDroneSpeed() { CurrentForwardSpeed = 0.f; }
 };
