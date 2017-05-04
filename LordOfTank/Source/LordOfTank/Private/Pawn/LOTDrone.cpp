@@ -455,13 +455,13 @@ void ALOTDrone::SetViewBoxLocation() {
 	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
 	ViewBox->SetCollisionObjectType(ECC_Vehicle);
 
-	ViewBox->SetupAttachment(Camera);
+	ViewBox->SetupAttachment(Root);
 
 	ViewBox->SetBoxExtent(FVector(30000, 30000, 30000));
 	
-	ViewBox->SetRelativeLocation((Camera->GetForwardVector() * 15000));
+	ViewBox->SetRelativeLocation(this->GetActorForwardVector() * 30000);
 
-	ViewBox->SetVisibility(false, false);
+	ViewBox->SetVisibility(true, true);
 
 	ViewBox->bGenerateOverlapEvents = true;
 	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTDrone::DroneFindEnemy);
@@ -491,4 +491,8 @@ void ALOTDrone::DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* Othe
 
 	DecideCollisionState = Lost;
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
+}
+
+void ALOTDrone::RotateDrone(float RotateDirection) {
+	Root->AddLocalRotation(FRotator(0, RotateDirection, 0));
 }
