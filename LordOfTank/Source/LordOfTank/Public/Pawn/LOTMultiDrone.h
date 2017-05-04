@@ -81,14 +81,7 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
 
-	//상하로 움직일 때 입력처리
-	void MoveUpwardInput(float Val);
 
-	//앞뒤로 움직일 때 입력처리
-	void MoveForwardInput(float val);
-
-	//좌우로 회전할 때 입력처리
-	void MoveRightInput(float Val);
 
 private:
 
@@ -146,6 +139,14 @@ public:
 
 
 	ALOTMultiDrone();
+	//상하로 움직일 때 입력처리
+	void MoveUpwardInput(float Val);
+
+	//앞뒤로 움직일 때 입력처리
+	void MoveForwardInput(float val);
+
+	//좌우로 회전할 때 입력처리
+	void MoveRightInput(float Val);
 
 	virtual void Tick(float DeltaTime) override;
 	//타겟설정

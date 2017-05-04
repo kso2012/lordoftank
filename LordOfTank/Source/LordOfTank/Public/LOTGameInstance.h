@@ -18,6 +18,8 @@ using namespace std;
 *
 */
 
+
+
 struct Packet
 {
 	BYTE size;
@@ -118,6 +120,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "test")
 		void testfunc();
 
+	void MoveForward(float val);
+
+	void MoveRight(float val);
+
+	FTransform Location;
+	FVector Velocity;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
 		FShowRoom RoomInfo;
@@ -170,6 +179,9 @@ public:
 	void connectProc(int index);
 	void DeleteSocket(int index);
 	void CloseProc(int index);
+
+	//FVector Velocity;
+	//FVector Angular;
 
 	
 };

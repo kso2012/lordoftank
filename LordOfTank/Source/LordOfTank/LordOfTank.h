@@ -30,7 +30,8 @@
 #define SC_ROOM_INFO 3
 #define SC_ROOM_READY 4
 #define SC_GAME_START 5
-#define SC_MOVE_PLAYER 6
+#define SC_TANK_MOVE 6
+
 
 #pragma pack (push, 1)
 struct cs_packet_player_name
@@ -144,9 +145,12 @@ struct sc_packet_tank_move
 {
 	BYTE size;
 	BYTE type;
+	FTransform loctaion;
 	FVector velocity;
-	FVector angle;
 };
+
+
+
 
 
 #pragma pack (pop)

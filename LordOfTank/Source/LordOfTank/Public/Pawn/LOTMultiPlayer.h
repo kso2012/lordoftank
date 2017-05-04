@@ -52,60 +52,60 @@ public:
 
 	void MoveRight(float Val);
 
-	void OnResetVR();
+	//void OnResetVR();
 
-	////void SetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
-	//UFUNCTION(BlueprintCallable, Category = "CustomFunc")
-	//	void ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
+	//////void SetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
+	////UFUNCTION(BlueprintCallable, Category = "CustomFunc")
+	////	void ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
 
 
-	UFUNCTION()
-		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	//UFUNCTION()
+	//	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	//UFUNCTION(BlueprintCallable, Category = "Animation")
-	//		UWheeledVehicleMovementComponent* 
+	////UFUNCTION(BlueprintCallable, Category = "Animation")
+	////		UWheeledVehicleMovementComponent* 
 
 
 	//사격버튼 눌렀을 때
-	void FireStart();
-	//사격버튼 떼었을 때
-	void FireEnd();
-	//시점변경시 visible설정
-	void FireMode();
-	//인벤토리생성
-	void SetDefaultInvetory();
-	//탱크에게 데미지를 전달.
-	UFUNCTION()
-		void ApplyDamage(float damage);
+	//void FireStart();
+	////사격버튼 떼었을 때
+	//void FireEnd();
+	////시점변경시 visible설정
+	//void FireMode();
+	////인벤토리생성
+	//void SetDefaultInvetory();
+	////탱크에게 데미지를 전달.
+	//UFUNCTION()
+	//	void ApplyDamage(float damage);
 
 private:
 
 
-	//현재 탄환을 가리키는 포인터,TSubclassOf를 사용하는 이유는 <타입>을 상속하는 클래스만 할당하게 하기 위함.
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-		TSubclassOf<class AProjectile> CurrentProjectile;
-	TArray<UParticleSystemComponent*> BeamArray;
+	////현재 탄환을 가리키는 포인터,TSubclassOf를 사용하는 이유는 <타입>을 상속하는 클래스만 할당하게 하기 위함.
+	//UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	//	TSubclassOf<class AProjectile> CurrentProjectile;
+	//TArray<UParticleSystemComponent*> BeamArray;
 
-	//빔을 담고있는 배열
-	//탄환을 넣을 인벤토리
-	UPROPERTY(EditDefaultsOnly, Category = Inventory)
-		TArray<TSubclassOf<class AProjectile>> ProjectileInventory;
-	//사격모드일 때 Barrel과 Gun 메쉬 변환.
+	////빔을 담고있는 배열
+	////탄환을 넣을 인벤토리
+	//UPROPERTY(EditDefaultsOnly, Category = Inventory)
+	//	TArray<TSubclassOf<class AProjectile>> ProjectileInventory;
+	////사격모드일 때 Barrel과 Gun 메쉬 변환.
 	void ChangeFiremodeBody();
 
-	FVector GetSegmentatTime(FVector StartLocation, FVector InitialVelocity, FVector Gravity, float time);
+	//FVector GetSegmentatTime(FVector StartLocation, FVector InitialVelocity, FVector Gravity, float time);
 
-	void DrawTrajectory();
+	//void DrawTrajectory();
 
-	void ClearBeam();
+	//void ClearBeam();
 
-	void RaisePower();
+	//void RaisePower();
 
-	//버튼 클릭 시 시점변경
-	void ChangeCamera(bool bIsFireMode);
+	////버튼 클릭 시 시점변경
+	//void ChangeCamera(bool bIsFireMode);
 
-	//빔을 그리는 함수
-	void DrawBeam(FVector StartLocation, FVector EndLocation);
+	////빔을 그리는 함수
+	//void DrawBeam(FVector StartLocation, FVector EndLocation);
 
 	//유도미사일에게 넘겨줄 유도타겟
 	class AActor* HomingTarget;

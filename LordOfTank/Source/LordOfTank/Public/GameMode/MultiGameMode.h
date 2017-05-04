@@ -15,6 +15,8 @@ struct PlayerInfomation
 	ALOTMultiPlayer* Tank;
 	ALOTMultiDrone* Drone;
 	AActor* TargetActor;
+	FVector Velocity;
+	FVector Angular;
 	float AP;
 	float HP;
 	float PlayerNum;
@@ -31,11 +33,14 @@ public:
 	float i;
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	
 
-	float DroneSpawningHeight;
-
-private:
 	PlayerInfomation MyPlayer;
 	PlayerInfomation EnemyPlayer;
+
+private:
 	
+	float DroneSpawningHeight;
+
 };

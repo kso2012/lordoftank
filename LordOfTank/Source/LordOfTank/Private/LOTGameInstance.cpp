@@ -2,6 +2,7 @@
 
 #include "LordOfTank.h"
 #include "StartGameMode.h"
+#include "GameMode/MultiGameMode.h"
 #include "LOTGameInstance.h"
 
 
@@ -13,6 +14,8 @@ ULOTGameInstance::ULOTGameInstance()
 	bIsStart = false;
 	bIsTryConnecting = false;
 	PlayerNum = 0;
+	//Velocity = FVector(0.f,0.f,0.f);
+	//Angular = FVector(0.f,0.f,0.f);
 }
 
 bool ULOTGameInstance::ClickIpEntBT()
@@ -35,7 +38,7 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
@@ -62,6 +65,9 @@ bool ULOTGameInstance::ClickIpEntBT()
 		WSACleanup();
 		return false;
 	}
+
+	
+
 }
 
 void ULOTGameInstance::SendPos(FVector pos)
@@ -146,13 +152,23 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		bIsStart = true;
 		break;
 	}
-	case SC_MOVE_PLAYER:
+	case SC_TANK_MOVE:
 	{
+		
+		sc_packet_tank_move *my_packet = reinterpret_cast<sc_packet_tank_move*>(ptr);
+		
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f,%f,%f"), my_packet->velocity.X, my_packet->velocity.Y, my_packet->velocity.Z));
+		
+		Location = my_packet->loctaion;
+		Velocity = my_packet->velocity;
 
+		
 		break;
 	}
+
 	default:
 	{
+		auto a =ptr[1];
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("이상한 데이터 받음")));
 		break;
 	}
@@ -161,7 +177,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 
 void ULOTGameInstance::ReadPacket(int index)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Read Packet 진입")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Read Packet 진입")));
 	SOCKET sock = app.sarr[index];
 	DWORD iobyte, ioflag = 0;
 	wsaEvent = WSACreateEvent();
@@ -180,7 +196,7 @@ void ULOTGameInstance::ReadPacket(int index)
 	BYTE *ptr = reinterpret_cast<BYTE *>(recv_buffer);
 
 	while (0 != iobyte) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 확실히 받음")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 확실히 받음")));
 		if (0 == in_packet_size) in_packet_size = ptr[0];
 		if (iobyte + saved_packet_size >= in_packet_size) {
 			memcpy(packet_buffer + saved_packet_size, ptr, in_packet_size - saved_packet_size);
@@ -221,7 +237,7 @@ void ULOTGameInstance::eventThread()
 		{
 			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
 			//ReadPacket(index);
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Read Packet 진입")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Read Packet 진입")));
 			SOCKET sock = app.sarr[index];
 			DWORD iobyte, ioflag = 0;
 			wsaEvent = WSACreateEvent();
@@ -240,7 +256,7 @@ void ULOTGameInstance::eventThread()
 			BYTE *ptr = reinterpret_cast<BYTE *>(recv_buffer);
 
 			while (0 != iobyte) {
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 확실히 받음")));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 확실히 받음")));
 				if (0 == in_packet_size) in_packet_size = ptr[0];
 				if (iobyte + saved_packet_size >= in_packet_size) {
 					memcpy(packet_buffer + saved_packet_size, ptr, in_packet_size - saved_packet_size);
@@ -373,5 +389,29 @@ void ULOTGameInstance::testfunc()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("게임 스타트")));
 	AStartGameMode* const Testa = Cast<AStartGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	Testa->StartMultiGame();
+}
+
+void ULOTGameInstance::MoveForward(float val)
+{
+	cs_packet_tank_move *tank_move = reinterpret_cast<cs_packet_tank_move *>(send_buffer);
+	
+	tank_move->val = val;
+	tank_move->type = CS_TANK_FORWARD;
+	tank_move->size = sizeof(cs_packet_tank_move);
+	send_wsabuf.len = sizeof(cs_packet_tank_move);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::MoveRight(float val)
+{
+	cs_packet_tank_move *tank_move = reinterpret_cast<cs_packet_tank_move *>(send_buffer);
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("오른쪽 send%f"), val));
+	tank_move->val = val;
+	tank_move->type = CS_TANK_RIGHT;
+	tank_move->size = sizeof(cs_packet_tank_move);
+	send_wsabuf.len = sizeof(cs_packet_tank_move);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
 
