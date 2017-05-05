@@ -26,18 +26,21 @@ ATank::ATank()
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> TurretStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Turret_SM"));
 	TurretMesh->SetStaticMesh(TurretStaticMesh.Object);
-	TurretMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
+	//TurretMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
+	TurretMesh->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	TurretMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BarrelStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Barrel_SM"));
 	BarrelMesh->SetStaticMesh(BarrelStaticMesh.Object);
-	BarrelMesh->AttachToComponent(TurretMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Turret_BR"));
+	//BarrelMesh->AttachToComponent(TurretMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Turret_BR"));
+	BarrelMesh->SetupAttachment(TurretMesh, TEXT("Turret_BR"));
 	BarrelMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//ÃÑ±¸¿¡ ¾ÀÄÄÆ÷³ÍÆ® ºÎÂø.
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
-	MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
+	//MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
+	MuzzleLocation->SetupAttachment(BarrelMesh, TEXT("Muzzle"));
 
 
 
@@ -85,7 +88,8 @@ ATank::ATank()
 	FireModeCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
 	FireModeCamera->bUsePawnControlRotation = false;
 	FireModeCamera->FieldOfView = 90.f;
-	FireModeCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
+	//FireModeCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
+	FireModeCamera->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	FireModeCamera->Deactivate();
 
 
@@ -107,8 +111,8 @@ void ATank::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	Super::SetupPlayerInputComponent(InputComponent);
 
 	check(InputComponent);
-	InputComponent->BindAxis("Forward", this, &ATank::MoveForward);
-	InputComponent->BindAxis("Right", this, &ATank::MoveRight);
+	//InputComponent->BindAxis("Forward", this, &ATank::MoveForward);
+	//InputComponent->BindAxis("Right", this, &ATank::MoveRight);
 
 
 }
@@ -118,25 +122,23 @@ void ATank::SetupPlayerInputComponent(UInputComponent* InputComponent)
 void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
-
 }
 
 
 
-void ATank::MoveForward(float Val)
+FTransform ATank::MoveForward(float Val)
 {
 	
 	GetVehicleMovementComponent()->SetThrottleInput(Val);
+	return GetActorTransform();
 	
 }
 
 
-void ATank::MoveRight(float Val)
+FTransform ATank::MoveRight(float Val)
 {
 	GetVehicleMovementComponent()->SetSteeringInput(Val);
-
+	return GetActorTransform();
 }
 
 

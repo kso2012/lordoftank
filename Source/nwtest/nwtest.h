@@ -25,7 +25,9 @@
 #define SC_ROOM_INFO 3
 #define SC_ROOM_READY 4
 #define SC_GAME_START 5
-#define SC_MOVE_PLAYER 6
+#define SC_TANK_MOVE 6
+#define SC_TURN 7
+#define SC_TIMER 8
 
 #pragma pack (push, 1)
 struct cs_packet_player_name
@@ -133,13 +135,23 @@ struct sc_packet_game_start
 {
 	BYTE size;
 	BYTE type;
+	bool turn;
+};
+
+struct sc_packet_turn
+{
+	BYTE size;
+	BYTE type;
+	bool turn;
 };
 
 struct sc_packet_tank_move
 {
 	BYTE size;
 	BYTE type;
-	FVector velocity;
-	FVector angle;
+	FTransform location;
+	FTransform location2;
+	float velocity;
 };
+
 #pragma pack (pop)

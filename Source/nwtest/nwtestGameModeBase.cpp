@@ -16,15 +16,21 @@ AnwtestGameModeBase::AnwtestGameModeBase()
 	static ConstructorHelpers::FClassFinder<APawn> GameModeBP(TEXT("Blueprint'/Game/GameMode.GameMode_C'"));
 	if (GameModeBP.Class != NULL)
 	{
-		DefaultPawnClass = GameModeBP.Class;
+		//DefaultPawnClass = GameModeBP.Class;
+		DefaultPawnClass = NULL;
 	}
 	PrimaryActorTick.bCanEverTick = true;
 	threadkey = false;
+
+	SpawnClient = false;
+	MyID = -1;
+	OtherID = -1;
 }
 
 void AnwtestGameModeBase::BeginPlay()
-{
+{	
 	Super::BeginPlay();
+
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 
@@ -32,11 +38,22 @@ void AnwtestGameModeBase::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("beforetocallworker"));
 	for (auto i = 0; i < (int)si.dwNumberOfProcessors * 2; ++i)
 		worker_threads.push_back(new thread{ &ToCallworkerthread, this });
+	for (auto th : worker_threads)
+		th->detach();
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("beforetocallaccept"));
 
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("소켓생성전"));
 	accept_threads = new thread{ &ToCallacceptthread, this };
+	accept_threads->detach();
 	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("소켓 생성 성공"));
+
+	//APlayerController*  Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//AActor* PlayerStart1 = Cast<AActor>(FindPlayerStart(Test, "1"));
+	////	//AActor*  PlayerStart2 = Cast<AActor>(FindPlayerStart(Test, TEXT("2")));
+	//UWorld*  World = GetWorld();
+
+	//testtank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
+	//Test->Possess(testtank);
 }
 
 void AnwtestGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -50,10 +67,10 @@ void AnwtestGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	closesocket(accept_socket);
 	for (auto th : worker_threads)
 	{
-		th->detach();
+		//th->detach();
 		delete th;
 	}
-	accept_threads->detach();
+	//accept_threads->detach();
 	delete accept_threads;
 
 	WSACleanup();
@@ -62,18 +79,77 @@ void AnwtestGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AnwtestGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (SpawnActor == true && SpawnID != -1) // 탱크 스폰
+	if (PlayTick == true)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("액터 스폰 진입")));
-		APlayerController*  Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		AActor* PlayerStart1 = Cast<AActor>(FindPlayerStart(Test, "1"));
-		//AActor*  PlayerStart2 = Cast<AActor>(FindPlayerStart(Test, TEXT("2")));
-		UWorld*  World = GetWorld();
-		clients[SpawnID].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
-		SpawnActor = false;
-		SpawnID = -1;
+		room.client1->turn = client1_turn;
+		room.client2->turn = client2_turn;
+		
+		if (SpawnClient == true) // 탱크 스폰
+		{
+			GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &AnwtestGameModeBase::TimerFunction, 1, true); // 타이머 설정
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("액터 스폰 진입")));
+			Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+			AActor* PlayerStart1 = Cast<AActor>(FindPlayerStart(Test, "1"));
+			AActor*  PlayerStart2 = Cast<AActor>(FindPlayerStart(Test, "2"));
+			UWorld*  World = GetWorld();
+			//clients[MyID].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
+			room.client1->m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
+			//clients[OtherID].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
+			room.client2->m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
+			SpawnClient = false;
+		}
+
+		if (TankForward == true) // 탱크 상하 이동
+		{
+			if (room.client1->turn == true)
+				whoTurn = room.client1->m_id;
+			else
+				whoTurn = room.client2->m_id;
+
+			Test->Possess(clients[whoTurn].m_player.Tank);
+			moveTf = clients[whoTurn].m_player.Tank->MoveForward(moveVal);
+
+			moveVal = 0;
+			TankForward = false;
+		}
+
+		if (TankRight == true) // 탱크 좌우 이동
+		{
+			if (room.client1->turn == true)
+				whoTurn = room.client1->m_id;
+			else
+				whoTurn = room.client2->m_id;
+
+			Test->Possess(clients[whoTurn].m_player.Tank);
+			moveTf = clients[whoTurn].m_player.Tank->MoveRight(moveVal2);
+
+			Tank_Move.size = sizeof(Tank_Move);
+			Tank_Move.type = SC_TANK_MOVE;
+
+			if (room.client1->turn == true)
+			{
+				Tank_Move.location = moveTf;
+				//Tank_Move.location2 = clients[OtherID].m_player.Tank->GetActorTransform();
+				Tank_Move.location2 = room.client2->m_player.Tank->GetActorTransform();
+			}
+			else
+			{
+				//Tank_Move.location = clients[OtherID].m_player.Tank->GetActorTransform();
+				Tank_Move.location = room.client1->m_player.Tank->GetActorTransform();
+				Tank_Move.location2 = moveTf;
+			}
+			
+			//tank_right.velocity = clients[MyID].m_player.Tank->GetVelocity();
+			SendPacket(MyID, reinterpret_cast<unsigned char*>(&Tank_Move));
+			SendPacket(OtherID, reinterpret_cast<unsigned char*>(&Tank_Move));
+			
+			moveVal2 = 0;
+			TankRight = false;
+
+		}
 	}
-	
+
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("tesking= %f"), tesking));
 }
 
 //void AnwtestGameModeBase::error_display(char *msg, int err_no)
@@ -120,7 +196,7 @@ void AnwtestGameModeBase::Initialize_Server()
 
 void AnwtestGameModeBase::SendPacket(int id, unsigned char *packet)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("SendPacket 진입")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("SendPacket 진입")));
 	OverlapEx *send_over = new OverlapEx;
 	memset(send_over, 0, sizeof(OverlapEx));
 	send_over->operation = OP_SEND;
@@ -142,7 +218,7 @@ void AnwtestGameModeBase::SendPacket(int id, unsigned char *packet)
 
 void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ProcessPacket 진입")));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("ProcessPacket 진입")));
 	unsigned char packet_type = packet[1];
 	switch (packet_type)
 	{
@@ -174,7 +250,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		int playerNum = 0;
 		int other_id = -1;
 		
-		if (room.counts == 0 && room.client1 == NULL) // 1P로 방에 들어왔을때
+		if (room.counts == 0 && room.client1 == nullptr) // 1P로 방에 들어왔을때
 		{
 			room.client1 = &clients[id];
 			room.client1->playerNum = 1;
@@ -182,7 +258,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 			room.state = 1;
 			playerNum = 1;
 		}
-		else if (room.counts == 1 && room.client1 != NULL) // 2P로 방에 들어왔을때
+		else if (room.counts == 1 && room.client1 != nullptr) // 2P로 방에 들어왔을때
 		{
 			room.client2 = &clients[id];
 			room.client2->playerNum = 2;
@@ -191,7 +267,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 			playerNum = 2;
 			other_id = room.client1->m_id;
 		}
-		else if (room.counts == 1 && room.client1 == NULL) // 2P가 현재 있는 상태에서 1P로 들어왔을때
+		else if (room.counts == 1 && room.client1 == nullptr) // 2P가 현재 있는 상태에서 1P로 들어왔을때
 		{
 			room.client1 = &clients[id];
 			room.client1->playerNum = 1;
@@ -221,7 +297,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 
 		if (playerNum == 1) // 들어온 사람이 1P이고
 		{
-			if (room.client2 != NULL) // 2P가 존재한다면
+			if (room.client2 != nullptr) // 2P가 존재한다면
 			{
 				room_info.isReady1 = false;
 				room_info.isReady2 = room.client2->isReady;
@@ -234,7 +310,7 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		}
 		if (playerNum == 2) // 들어온 사람이 2P이고
 		{
-			if (room.client1 != NULL) // 1P가 존재한다면
+			if (room.client1 != nullptr) // 1P가 존재한다면
 			{
 				room_info.isReady1 = room.client1->isReady;
 				room_info.isReady2 = false;
@@ -252,11 +328,11 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 
 		room_info.counts = room.counts;
 
-		if (room.client1 != NULL)
+		if (room.client1 != nullptr)
 			room_info.name1 = room.client1->name;
 		else
 			room_info.name1 = "";
-		if (room.client2 != NULL)
+		if (room.client2 != nullptr)
 			room_info.name2 = room.client2->name;
 		else
 			room_info.name2 = "";
@@ -295,25 +371,25 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		if (clients[id].playerNum == 1 && clients[id].isReady == false) // 1P가 눌렀을때의 처리
 		{
 			room.client1->isReady = true;
-			if(room.client2 != NULL)
+			if(room.client2 != nullptr)
 				other_id = room.client2->m_id;
 		}
 		else if (clients[id].playerNum == 1 && clients[id].isReady == true)
 		{
 			room.client1->isReady = false;
-			if (room.client2 != NULL)
+			if (room.client2 != nullptr)
 				other_id = room.client2->m_id;
 		}
 		else if (clients[id].playerNum == 2 && clients[id].isReady == false) // 2P가 눌렀을때의 처리
 		{
 			room.client2->isReady = true;
-			if (room.client1 != NULL)
+			if (room.client1 != nullptr)
 				other_id = room.client1->m_id;
 		}
 		else if (clients[id].playerNum == 2 && clients[id].isReady == true)
 		{
 			room.client2->isReady = false;
-			if (room.client1 != NULL)
+			if (room.client1 != nullptr)
 				other_id = room.client1->m_id;
 		}
 
@@ -325,31 +401,32 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 				room.canStart = false;
 		}
 
-		//sc_packet_room_ready sc_room_ready;
-		//sc_room_ready.size = sizeof(sc_room_ready);
-		//sc_room_ready.type = SC_ROOM_READY;
-		//sc_room_ready.canStart = room.canStart;
-		//sc_room_ready.isReady1 = false;
-		//sc_room_ready.isReady2 = false;
-		//if(room.client1 != NULL)
-		//	sc_room_ready.isReady1 = room.client1->isReady;
-		//if(room.client2 != NULL)
-		//	sc_room_ready.isReady2 = room.client2->isReady;
+		sc_packet_room_ready sc_room_ready;
+		sc_room_ready.size = sizeof(sc_room_ready);
+		sc_room_ready.type = SC_ROOM_READY;
+		sc_room_ready.canStart = room.canStart;
+		sc_room_ready.isReady1 = false;
+		sc_room_ready.isReady2 = false;
+		if(room.client1 != nullptr)
+			sc_room_ready.isReady1 = room.client1->isReady;
+		if(room.client2 != nullptr)
+			sc_room_ready.isReady2 = room.client2->isReady;
 
-		//// 1. 레디를 누른 사람한테 보내준다.
-		//SendPacket(id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+		// 2인용
+		// 1. 레디를 누른 사람한테 보내준다.
+		SendPacket(id, reinterpret_cast<unsigned char*>(&sc_room_ready));
 
-		//// 2. 상대방한테 보내준다.
-		//if(other_id != -1)
-		//	SendPacket(other_id, reinterpret_cast<unsigned char*>(&sc_room_ready));
+		// 2. 상대방한테 보내준다.
+		if(other_id != -1)
+			SendPacket(other_id, reinterpret_cast<unsigned char*>(&sc_room_ready));
 
 		// 임시용
-		sc_packet_game_start game_start;
+		/*sc_packet_game_start game_start;
 		game_start.size = sizeof(game_start);
 		game_start.type = SC_GAME_START;
 		SendPacket(id, reinterpret_cast<unsigned char*>(&game_start));
-		SpawnActor = true;
-		SpawnID = id;
+		SpawnClient = true;
+		MyID = id;*/
 
 		break;
 	}
@@ -366,14 +443,14 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 			clients[id].isReady = false;
 			clients[id].playerNum = 0;
 			clients[id].roomNum = -1;
-			room.client1 = NULL;
-			if (room.client2 != NULL) // 2P가 있다면
+			room.client1 = nullptr;
+			if (room.client2 != nullptr) // 2P가 있다면
 				room.state = 1;
 			else
 				room.state = 0;
 			room.canStart = false;
 			room.counts--;
-			if (room.client2 != NULL)
+			if (room.client2 != nullptr)
 				other_id = room.client2->m_id;
 		}
 		else if (clients[id].playerNum == 2) // 2P가 나갔다면
@@ -382,14 +459,14 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 			clients[id].isReady = false;
 			clients[id].playerNum = 0;
 			clients[id].roomNum = -1;
-			room.client2 = NULL;
-			if (room.client1 != NULL) // 1P가 있다면
+			room.client2 = nullptr;
+			if (room.client1 != nullptr) // 1P가 있다면
 				room.state = 1;
 			else
 				room.state = 0;
 			room.canStart = false;
 			room.counts--;
-			if (room.client1 != NULL)
+			if (room.client1 != nullptr)
 				other_id = room.client1->m_id;
 		}
 
@@ -410,21 +487,21 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 			room_info.type = SC_ROOM_INFO;
 			room_info.canStart = false;
 			room_info.counts = room.counts;
-			if (room.client1 != NULL) // 나간애가 2P고 1P가 남아있다면
+			if (room.client1 != nullptr) // 나간애가 2P고 1P가 남아있다면
 			{
 				room_info.isReady1 = room.client1->isReady;
 				room_info.isReady2 = false;
 			}
-			else if (room.client2 != NULL)
+			else if (room.client2 != nullptr)
 			{
 				room_info.isReady1 = false;
 				room_info.isReady2 = room.client2->isReady;
 			}
-			if (room.client1 != NULL)
+			if (room.client1 != nullptr)
 				room_info.name1 = room.client1->name;
 			else
 				room_info.name1 = "";
-			if (room.client2 != NULL)
+			if (room.client2 != nullptr)
 				room_info.name2 = room.client2->name;
 			else
 				room_info.name2 = "";
@@ -447,32 +524,78 @@ void AnwtestGameModeBase::ProcessPacket(int id, unsigned char *packet)
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_GAME_START 진입")));
 		//cs_packet_game_start *game_start = reinterpret_cast<cs_packet_game_start*>(packet);
 		int other_id = room.client2->m_id;
+		clients[id].turn = true;
+		clients[other_id].turn = false;
 
 		sc_packet_game_start game_start;
 		game_start.size = sizeof(game_start);
 		game_start.type = SC_GAME_START;
+		game_start.turn = true;
 
-		// 1. 게임을 시작하라고 보내준다.
+		// 1. 게임을 시작하라고 보내준다. ( 1P에게 턴을 먼저 보내준다.)
 		SendPacket(id, reinterpret_cast<unsigned char*>(&game_start));
+		game_start.turn = false;
 		SendPacket(other_id, reinterpret_cast<unsigned char*>(&game_start));
 
+		// 서버에서도 탱크를 스폰해준다. 
+		PlayTick = true;
+		SpawnClient = true;
+		MyID = id;
+		OtherID = other_id;
 		
-
 		break;
 	}
 	case CS_TANK_FORWARD:
 	{
-		
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_TANK_FORWARD 진입")));
+		cs_packet_tank_move *tank_move = reinterpret_cast<cs_packet_tank_move*>(packet);
+		int other_id = -1;
+		if (clients[id].playerNum == 1)
+		{
+			if(room.client2 != nullptr)
+				other_id = room.client2->m_id;
+		}
+		if (clients[id].playerNum == 2)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("2P한테 패킷옴")));
+			if(room.client1 != nullptr)
+				other_id = room.client1->m_id;
+		}
+
+		moveVal = tank_move->val;
+		TankForward = true;
+		MyID = id;
+		OtherID = other_id;
+				
 		break;
 	}
 	case CS_TANK_RIGHT:
 	{
+		cs_packet_tank_move *tank_move = reinterpret_cast<cs_packet_tank_move*>(packet);
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("CS_TANK_RIGHT 진입")));
+		int other_id = -1;
+		if (clients[id].playerNum == 1)
+		{
+			if(room.client2 != nullptr)
+				other_id = room.client2->m_id;
+		}
+		if (clients[id].playerNum == 2)
+		{
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("2P한테 패킷옴")));
+			if(room.client1 != nullptr)
+				other_id = room.client1->m_id;
+		}
+
+		moveVal2 = tank_move->val;
+		TankRight = true;
+		MyID = id;
+		OtherID = other_id;
 
 		break;
 	}
 	default:
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("알수없는 패킷")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("알수없는 패킷")));
 		//cs_packet_room_click *error = reinterpret_cast<cs_packet_room_click*>(packet);
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT(" TYPE : %d"),error->type ));
 		break;
@@ -525,6 +648,7 @@ void AnwtestGameModeBase::workerthread()
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("WorkerThread - io_size == 0")));
 			closesocket(clients[key].m_s);
+			clients[key].is_connected = false;
 			int other_id = -1;
 
 			if (clients[key].playerNum == 1) // 1P가 나갔다면
@@ -533,30 +657,32 @@ void AnwtestGameModeBase::workerthread()
 				clients[key].isReady = false;
 				clients[key].playerNum = 0;
 				clients[key].roomNum = -1;
-				room.client1 = NULL;
-				if (room.client2 != NULL) // 2P가 있다면
+				clients[key].m_player.Tank = nullptr; // 탱크 레퍼런스 없애준다.
+				room.client1 = nullptr;
+				if (room.client2 != nullptr) // 2P가 있다면
 					room.state = 1;
 				else
 					room.state = 0;
 				room.canStart = false;
 				room.counts--;
-				if (room.client2 != NULL)
+				if (room.client2 != nullptr)
 					other_id = room.client2->m_id;
 			}
-			else if (clients[key].playerNum == 2) // 2P가 나갔다면
+			if (clients[key].playerNum == 2) // 2P가 나갔다면
 			{
 				clients[key].state = 0;
 				clients[key].isReady = false;
 				clients[key].playerNum = 0;
 				clients[key].roomNum = -1;
-				room.client2 = NULL;
-				if (room.client1 != NULL) // 1P가 있다면
+				clients[key].m_player.Tank = nullptr; // 탱크 레퍼런스 없애준다.
+				room.client2 = nullptr;
+				if (room.client1 != nullptr) // 1P가 있다면
 					room.state = 1;
 				else
 					room.state = 0;
 				room.canStart = false;
 				room.counts--;
-				if (room.client1 != NULL)
+				if (room.client1 != nullptr)
 					other_id = room.client1->m_id;
 			}
 
@@ -570,6 +696,7 @@ void AnwtestGameModeBase::workerthread()
 			//SendPacket(key, reinterpret_cast<unsigned char*>(&room_show));
 
 			// 2. 상대방한테는 현재 방 정보를 갱신해줘야 한다.
+			// 게임중인 상태에서 상대방이 나가면 어떻게 해야할지 논의 해야 함.
 			if (room.counts == 1) // 상대방이 남아있다면
 			{
 				sc_packet_room_info room_info;
@@ -577,25 +704,27 @@ void AnwtestGameModeBase::workerthread()
 				room_info.type = SC_ROOM_INFO;
 				room_info.canStart = false;
 				room_info.counts = room.counts;
-				if (room.client1 != NULL) // 나간애가 2P고 1P가 남아있다면
+				if (room.client1 != nullptr) // 나간애가 2P고 1P가 남아있다면
 				{
 					room_info.isReady1 = room.client1->isReady;
 					room_info.isReady2 = false;
 				}
-				else if (room.client2 != NULL)
+				else if (room.client2 != nullptr)
 				{
 					room_info.isReady1 = false;
 					room_info.isReady2 = room.client2->isReady;
 				}
-				if (room.client1 != NULL)
+				if (room.client1 != nullptr)
 					room_info.name1 = room.client1->name;
 				else
 					room_info.name1 = "";
-				if (room.client2 != NULL)
+				if (room.client2 != nullptr)
 					room_info.name2 = room.client2->name;
 				else
 					room_info.name2 = "";
-				SendPacket(other_id, reinterpret_cast<unsigned char*>(&room_info));
+
+				if(clients[other_id].state == 2)
+					SendPacket(other_id, reinterpret_cast<unsigned char*>(&room_info));
 			}
 
 			// 3. 로비에 있는 사람들한테도 갱신해줘야 한다.
@@ -613,13 +742,13 @@ void AnwtestGameModeBase::workerthread()
 				}
 			}
 			
-			clients[key].is_connected = false;
+			//clients[key].is_connected = false;
 			continue;
 		}
 
 		if (overlap->operation == OP_RECV)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 받음")));
 			unsigned char *buf_ptr = overlap->socket_buf;
 			int remained = io_size;
 
@@ -687,7 +816,7 @@ void AnwtestGameModeBase::workerthread()
 		}
 		else if (overlap->operation == OP_SEND)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("WorkerThread - SEND")));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("WorkerThread - SEND")));
 			delete overlap;
 		}
 		else
@@ -719,9 +848,6 @@ void AnwtestGameModeBase::acceptthread()
 
 	while (threadkey == false)
 	{
-		SpawnActor = true;
-		SpawnID = 0;
-		//SpawnPlayer(3);
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Accept"));
 		struct sockaddr_in client_addr;
 		int addr_size = sizeof(client_addr);
@@ -765,6 +891,9 @@ void AnwtestGameModeBase::acceptthread()
 		clients[new_id].playerNum = 0;
 		clients[new_id].name = "temp";
 		clients[new_id].roomNum = -1;
+		clients[new_id].m_player.Tank = nullptr;
+		clients[new_id].turn = false;
+		
 
 		ZeroMemory(&clients[new_id].m_recv_overlap, sizeof(OVERLAPPED));
 		/*room.clients[new_id].m_s = new_client;
@@ -814,7 +943,7 @@ void AnwtestGameModeBase::ToCallacceptthread(LPVOID p)
 
 void AnwtestGameModeBase::SpawnPlayer(int id)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("SpawnPlayer"));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("SpawnPlayer"));
 
 	APlayerController*  Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
@@ -824,16 +953,59 @@ void AnwtestGameModeBase::SpawnPlayer(int id)
 	UWorld*  World = GetWorld();
 
 	clients[0].m_player.Tank = World->SpawnActor<ATank>(ATank::StaticClass(), PlayerStart1->GetActorLocation(), PlayerStart1->GetActorRotation());
-
+*/
 	//MyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart1->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart1->GetActorRotation());
 
 	//EnemyPlayer.Tank = World->SpawnActor<ALOTMultiPlayer>(ALOTMultiPlayer::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
 	//EnemyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticCl
 }
 
-void AnwtestGameModeBase::test()
+void AnwtestGameModeBase::TimerFunction()
 {
-
+	mytime++;
+	if (mytime > 5) {
+		if (timerTurn == 1) // 1P였다면 2P로 설정
+		{
+			if (room.client1 != nullptr)
+				client1_turn = false;
+				//room.client1->turn = false;
+			if (room.client2 != nullptr)
+				client2_turn = true;
+				//room.client2->turn = true;
+			timerTurn = 2;
+			// 턴이 바뀌었다고 알려줘야함.
+			sc_packet_turn packet_turn;
+			packet_turn.size = sizeof(packet_turn);
+			packet_turn.type = SC_TURN;
+			packet_turn.turn = false;
+			if(room.client1 != nullptr)
+				SendPacket(room.client1->m_id, reinterpret_cast<unsigned char*>(&packet_turn)); // 1P한테는 false를
+			packet_turn.turn = true;
+			if(room.client2 != nullptr)
+				SendPacket(room.client2->m_id, reinterpret_cast<unsigned char*>(&packet_turn)); // 2P한테는 true를
+		}
+		else // 2P였다면 1P로 설정
+		{
+			timerTurn = 1;
+			if (room.client1 != nullptr)
+				client1_turn = true;
+				//room.client1->turn = true;
+			if (room.client2 != nullptr)
+				client2_turn = false;
+				//room.client2->turn = false;
+			// 턴이 바뀌었다고 알려줘야함.
+			sc_packet_turn packet_turn;
+			packet_turn.size = sizeof(packet_turn);
+			packet_turn.type = SC_TURN;
+			packet_turn.turn = true;
+			if (room.client1 != nullptr)
+				SendPacket(room.client1->m_id, reinterpret_cast<unsigned char*>(&packet_turn)); // 1P한테는 true를
+			packet_turn.turn = false;
+			if (room.client2 != nullptr)
+				SendPacket(room.client2->m_id, reinterpret_cast<unsigned char*>(&packet_turn)); // 2P한테는 false를
+		}
+		mytime = 0;
+	}
 }
 
 int AnwtestGameModeBase::GetID()
