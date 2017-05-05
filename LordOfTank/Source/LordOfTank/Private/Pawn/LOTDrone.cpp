@@ -437,7 +437,8 @@ void ALOTDrone::DetectMode()
 		Camera->Deactivate();
 		DetectCamera->Activate();
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
-		BabylonMesh->SetVisibility(false, true);
+		BabylonMesh->SetVisibility(false, true); 
+		CrossHair->SetVisibility(true, true);
 
 	}
 	else
@@ -450,6 +451,7 @@ void ALOTDrone::DetectMode()
 
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(true, true);
+		CrossHair->SetVisibility(false, true);
 		
 
 	}
