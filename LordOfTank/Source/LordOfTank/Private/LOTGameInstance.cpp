@@ -14,6 +14,8 @@ ULOTGameInstance::ULOTGameInstance()
 	bIsStart = false;
 	bIsTryConnecting = false;
 	PlayerNum = 0;
+	LeftTime = 0;
+	GameStateEnum = EGameState::Mode_Main;
 	//Velocity = FVector(0.f,0.f,0.f);
 	//Angular = FVector(0.f,0.f,0.f);
 }
@@ -38,7 +40,7 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
 	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
@@ -149,7 +151,16 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 
 	case SC_GAME_START:
 	{
+		sc_packet_game_start *my_packet = reinterpret_cast<sc_packet_game_start*>(ptr);
+
 		bIsStart = true;
+		bIsmyTurn = my_packet->turn;
+		break;
+	}
+	case SC_TURN:
+	{
+		sc_packet_turn *my_packet = reinterpret_cast<sc_packet_turn*>(ptr);
+		bIsmyTurn = my_packet->turn;
 		break;
 	}
 	case SC_TANK_MOVE:
@@ -159,8 +170,9 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		
 		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f,%f,%f"), my_packet->velocity.X, my_packet->velocity.Y, my_packet->velocity.Z));
 		
-		Location = my_packet->loctaion;
-		Velocity = my_packet->velocity;
+		Location = my_packet->location;
+		Location2 = my_packet->location2;
+		//Velocity = my_packet->velocity;
 
 		
 		break;

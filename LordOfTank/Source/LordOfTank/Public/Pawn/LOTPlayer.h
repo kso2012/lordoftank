@@ -53,6 +53,13 @@ class LORDOFTANK_API ALOTPlayer : public AWheeledVehicle
 		UCameraComponent* FireModeCamera;
 
 
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UAudioComponent* EngineSoundComponent;
+
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* CrossHair;
+
+
 
 public:
 

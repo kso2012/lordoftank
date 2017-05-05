@@ -192,6 +192,17 @@ ALOTMultiDrone::ALOTMultiDrone()
 	DetectCamera->Deactivate();
 
 
+	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
+	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
+	if (CrossHairBP.Class != NULL)
+	{
+		CrossHair->SetChildActorClass(CrossHairBP.Class);
+		CrossHair->SetupAttachment(DetectCamera);
+		CrossHair->SetVisibility(false,true);
+		//CrossHair->CreateChildActor();
+	}
+
+
 
 	Acceleration = 500.f;
 	TurnSpeed = 50.f;
@@ -277,12 +288,16 @@ void ALOTMultiDrone::SetTarget()
 	//결과를 담을 구조체변수
 	FHitResult OutHit;
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
-	if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, OutHit, true)) {
+	if(UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
+	{
+		if(HomingTarget != NULL)
+			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
 		HomingTarget = OutHit.GetActor();
 		HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
 		//DrawBeam(StartTrace, EndTrace);
 	}
+
 }
 
 void ALOTMultiDrone::MoveForwardInput(float Val)
@@ -413,6 +428,7 @@ void ALOTMultiDrone::DetectMode()
 		DetectCamera->Activate();
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true);
+		CrossHair->SetVisibility(true, true);
 
 	}
 	else
@@ -424,6 +440,7 @@ void ALOTMultiDrone::DetectMode()
 
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(true, true);
+		CrossHair->SetVisibility(false, true);
 
 
 	}

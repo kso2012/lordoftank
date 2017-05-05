@@ -18,6 +18,18 @@ using namespace std;
 *
 */
 
+UENUM(BlueprintType)
+namespace EGameState
+{
+	enum Type
+	{
+		Mode_Main				UMETA(DisplayName = "MainScreen"),
+		Mode_SinglePlay			UMETA(DisplayName = "SinglePlay"),
+		Mode_Multiplay	UMETA(DisplayName = "Multiplay"),
+		Mode_tutorial			UMETA(DisplayName = "tutorial")
+	};
+}
+
 
 
 struct Packet
@@ -125,7 +137,9 @@ public:
 	void MoveRight(float val);
 
 	FTransform Location;
-	FVector Velocity;
+	FTransform Location2;
+	bool bIsmyTurn;
+	//FVector Velocity;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
@@ -136,6 +150,9 @@ public:
 	//TArray<FShowLobby> LobbyInfo
 	UPROPERTY()
 		FStreamableManager AssetLoader;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GameState)
+		TEnumAsByte<EGameState::Type> GameStateEnum;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "lobby")
 		int PlayerNum;
@@ -152,6 +169,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "keypad")
 		bool bIsStart;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+		int LeftTime;
 
 	char send_buffer[4000];
 	WSADATA wsa;

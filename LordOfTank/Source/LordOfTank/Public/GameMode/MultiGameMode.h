@@ -34,7 +34,7 @@ public:
 	virtual void StartPlay() override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-	
+	void ApplyMovement();
 
 	PlayerInfomation MyPlayer;
 	PlayerInfomation EnemyPlayer;

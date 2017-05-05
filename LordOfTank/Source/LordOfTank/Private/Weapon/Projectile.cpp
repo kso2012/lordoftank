@@ -30,10 +30,10 @@ AProjectile::AProjectile()
 	AmmoMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	TrailParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("TrailParticle"));
-	TrailParticle->AttachToComponent(AmmoMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Trail_RC"));
+	TrailParticle->SetupAttachment(AmmoMesh, TEXT("Trail_RC"));
 
 	FlareParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("FlareParticle"));
-	FlareParticle->AttachToComponent(AmmoMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Trail_RC"));
+	FlareParticle->SetupAttachment(AmmoMesh,TEXT("Trail_RC"));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(RootComponent);

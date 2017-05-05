@@ -82,6 +82,8 @@ class LORDOFTANK_API ALOTDrone : public APawn
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* DetectCamera;
 
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* CrossHair;
 
 protected:
 

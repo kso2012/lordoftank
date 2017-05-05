@@ -2,18 +2,21 @@
 
 #pragma once
 
-#include "WheeledVehicle.h"
+#include "GameFramework/Pawn.h"
 #include "LOTMultiPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LORDOFTANK_API ALOTMultiPlayer : public AWheeledVehicle
+class LORDOFTANK_API ALOTMultiPlayer : public APawn
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		class USkeletalMeshComponent* BodyMesh;
 		//탱크상체 메쉬
-		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		class UStaticMeshComponent* TurretMesh;
 
 	//탱크포신 메쉬
@@ -36,6 +39,16 @@ class LORDOFTANK_API ALOTMultiPlayer : public AWheeledVehicle
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FireModeCamera;
 
+	//탱크 엔진 사운드
+	//UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	UAudioComponent* EngineSoundComponent;
+
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* CrossHair;
+
+	/*UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* UI;*/
+
 
 
 public:
@@ -51,6 +64,8 @@ public:
 	void MoveForward(float Val);
 
 	void MoveRight(float Val);
+
+	bool bIsTurn;
 
 	//void OnResetVR();
 
@@ -70,8 +85,8 @@ public:
 	//void FireStart();
 	////사격버튼 떼었을 때
 	//void FireEnd();
-	////시점변경시 visible설정
-	//void FireMode();
+	//시점변경시 visible설정
+	void FireMode();
 	////인벤토리생성
 	//void SetDefaultInvetory();
 	////탱크에게 데미지를 전달.
@@ -102,7 +117,7 @@ private:
 	//void RaisePower();
 
 	////버튼 클릭 시 시점변경
-	//void ChangeCamera(bool bIsFireMode);
+	void ChangeCamera(bool bIsFireMode);
 
 	////빔을 그리는 함수
 	//void DrawBeam(FVector StartLocation, FVector EndLocation);
@@ -135,6 +150,7 @@ private:
 	bool bIsShoot;
 
 	bool bIsPushFire;
+
 
 
 

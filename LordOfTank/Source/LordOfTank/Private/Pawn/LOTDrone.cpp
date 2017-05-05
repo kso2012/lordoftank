@@ -196,6 +196,16 @@ ALOTDrone::ALOTDrone()
 	DetectCamera->SetupAttachment(RootComponent);
 	DetectCamera->Deactivate();
 
+	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
+	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
+	if (CrossHairBP.Class != NULL)
+	{
+		CrossHair->SetChildActorClass(CrossHairBP.Class);
+		CrossHair->SetupAttachment(DetectCamera);
+		CrossHair->SetVisibility(false, true);
+		//CrossHair->CreateChildActor();
+	}
+
 	
 										
 	Acceleration = 500.f;
@@ -283,13 +293,16 @@ void ALOTDrone::SetTarget()
 	//현재 월드를 가져온다.
 	UWorld* const World = GetWorld();
 	//벡터의 시작점
-	FVector StartTrace = DetectCamera->K2_GetComponentLocation()+ DetectCamera->GetForwardVector() *500;
+	FVector StartTrace = DetectCamera->K2_GetComponentLocation() + DetectCamera->GetForwardVector() * 500;
 	//벡터의 끝점
 	FVector EndTrace = StartTrace + DetectCamera->GetForwardVector() * 500000;
 	//결과를 담을 구조체변수
 	FHitResult OutHit;
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
-	if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, OutHit, true)) {
+	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
+	{
+		if (HomingTarget != NULL)
+			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
 		HomingTarget = OutHit.GetActor();
 		HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
@@ -338,35 +351,33 @@ void ALOTDrone::MoveUpwardInput(float Val)
 
 
 	bHasInputUpward = !FMath::IsNearlyEqual(Val, 0.f);
-	float CurrentAcc=0.f;
+	float CurrentAcc = 0.f;
 
 
-	//키 입력을 했다면
-	if (bHasInputForward)
+	if (bHasInputUpward)
 	{
 		CurrentAcc = Val * Acceleration;
-		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
-		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
+
 	}
-	//정지상태가 아니라면
-	else if (CurrentForwardSpeed != 0.f)
+
+	else if (CurrentUpwardSpeed != 0.f)
 	{
-		if (CurrentForwardSpeed > 0)
+		if (CurrentUpwardSpeed > 0)
 		{
 			CurrentAcc = -1.f * Acceleration;
 		}
-		else if (CurrentForwardSpeed < 0)
+		else if (CurrentUpwardSpeed < 0)
 		{
 			CurrentAcc = Acceleration;
 		}
+		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
+		float TempClamp = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
+		CurrentUpwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 500.f) ? 0.f : TempClamp;
 
-		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
-		float TempClamp = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		CurrentForwardSpeed = FMath::IsNearlyEqual(TempClamp, 0.f, 500.f) ? 0.f : TempClamp;
+
 	}
-
-
-
 }
 
 
@@ -426,7 +437,7 @@ void ALOTDrone::DetectMode()
 		DetectCamera->Activate();
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true);
-
+		CrossHair->SetVisibility(true, true);
 	}
 	else
 	{
@@ -437,7 +448,7 @@ void ALOTDrone::DetectMode()
 
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(true, true);
-		
+		CrossHair->SetVisibility(false, true);
 
 	}
 }

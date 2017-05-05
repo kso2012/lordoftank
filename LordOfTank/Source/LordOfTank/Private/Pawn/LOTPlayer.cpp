@@ -34,29 +34,35 @@ ALOTPlayer::ALOTPlayer()
 	//스켈레톤컴포넌트에 애니메이션 적용.
 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/LOTAssets/TankAssets/LOTPlaytankAnimBP"));
 	GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
-	GetMesh()->OnComponentHit.AddDynamic(this, &ALOTPlayer::OnHit);
-	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::OnOverlapBegin);
-	
+	//GetMesh()->OnComponentHit.AddDynamic(this, &ALOTMultiPlayer::OnHit);
+	//GetMesh()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &ALOTMultiPlayer::OnOverlapBegin);
+
 	//터렛컴포넌트에 메쉬 적용.
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> TurretStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Turret_SM"));
 	TurretMesh->SetStaticMesh(TurretStaticMesh.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterial> TurretMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
-	TurretMesh->SetMaterial(0,TurretMaterial.Object);
-	TurretMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
+	//static ConstructorHelpers::FObjectFinder<UMaterial> TurretMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
+	//TurretMesh->SetMaterial(0, TurretMaterial.Object);
+	//TurretMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
+	TurretMesh->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	TurretMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-	
+
+
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BarrelStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Barrel_SM"));
 	BarrelMesh->SetStaticMesh(BarrelStaticMesh.Object);
-	static ConstructorHelpers::FObjectFinder<UMaterial> BarrelMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
-	BarrelMesh->SetMaterial(0, BarrelMaterial.Object);
-	BarrelMesh->AttachToComponent(TurretMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Turret_BR"));
+	//static ConstructorHelpers::FObjectFinder<UMaterial> BarrelMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
+	//BarrelMesh->SetMaterial(0, BarrelMaterial.Object);
+	//BarrelMesh->AttachToComponent(TurretMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Turret_BR"));
+	BarrelMesh->SetupAttachment(TurretMesh, TEXT("Turret_BR"));
 	BarrelMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//총구에 씬컴포넌트 부착.
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
-	MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
+	//MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
+	MuzzleLocation->SetupAttachment(BarrelMesh, TEXT("Muzzle"));
+
 	
 
 	
@@ -104,8 +110,26 @@ ALOTPlayer::ALOTPlayer()
 	FireModeCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
 	FireModeCamera->bUsePawnControlRotation = false;
 	FireModeCamera->FieldOfView = 90.f;
-	FireModeCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
+	FireModeCamera->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	FireModeCamera->Deactivate();
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue(TEXT("/Game/LOTAssets/TankAssets/Audio/Engine_Loop_Cue.Engine_Loop_Cue"));
+	EngineSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSound"));
+	EngineSoundComponent->SetSound(SoundCue.Object);
+	EngineSoundComponent->SetupAttachment(GetMesh());
+
+	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
+	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
+	if (CrossHairBP.Class != NULL)
+	{
+		CrossHair->SetChildActorClass(CrossHairBP.Class);
+		CrossHair->SetupAttachment(GetMesh(), TEXT("Body_TR"));
+		CrossHair->SetVisibility(false,true);
+		//CrossHair->CreateChildActor();
+	}
+
+
+
 
 	bIsFireMode = false;
 	bIsPushFire = false;
@@ -173,6 +197,8 @@ void ALOTPlayer::Tick(float DeltaTime)
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재파워 %f"), CurShootingPower));
 	}
 
+	float RPMToAudioScale = 2500.0f / GetVehicleMovement()->GetEngineMaxRotationSpeed();
+	EngineSoundComponent->SetFloatParameter("RPM", GetVehicleMovement()->GetEngineRotationSpeed()*RPMToAudioScale);
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), myTurn));
 	
 	
@@ -182,6 +208,7 @@ void ALOTPlayer::ChangeFiremodeBody()
 {
 	TurretMesh->SetRelativeRotation(FRotator(0.0f, FireModeCamera->RelativeRotation.Yaw, 0.0f));
 	BarrelMesh->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, 0.0f, 0.0f));
+	CrossHair->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, FireModeCamera->RelativeRotation.Yaw , 0.0f));
 
 }
 
@@ -260,21 +287,27 @@ void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 	if (isNotAI) {
 		if (bIsFireMode == true)
 		{
+			
 			MoveModeCamera->Deactivate();
 			FireModeCamera->Activate();
 			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 			TurretMesh->SetVisibility(false, false);
 			GetMesh()->SetVisibility(false, false);
 			BarrelMesh->SetVisibility(false, false);
+			CrossHair->SetVisibility(true, true);
+			
 		}
 		else if (bIsFireMode == false)
 		{
+			
 			MoveModeCamera->Activate();
 			FireModeCamera->Deactivate();
 			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 			TurretMesh->SetVisibility(true, false);
 			GetMesh()->SetVisibility(true, false);
 			BarrelMesh->SetVisibility(true, false);
+			CrossHair->SetVisibility(false, true);
+			
 		}
 	}
 }
@@ -525,5 +558,6 @@ void ALOTPlayer::RotateTurret(float RotateDirection) {
 void ALOTPlayer::ScaleViewBox() {
 	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(80000, 10, 10000));
 	else ViewBox->SetBoxExtent(FVector(80000, 10, 10));
+
 }
 
