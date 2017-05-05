@@ -50,9 +50,9 @@ public:
 
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
-	void MoveForward(float Val);
+	FTransform MoveForward(float Val);
 
-	void MoveRight(float Val);
+	FTransform MoveRight(float Val);
 
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

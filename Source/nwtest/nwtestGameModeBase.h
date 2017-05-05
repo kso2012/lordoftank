@@ -37,9 +37,10 @@ struct Client {
 	int roomNum;
 	string name;
 	bool isReady;
+	bool turn;
 	int playerNum;
 	int state; // 클라이언트의 상태 1이면 로비, 2이면 대기방, 3이면 게임시작
-	mutex vl_lock;
+	mutex my_lock;
 	OverlapEx m_recv_overlap;
 	int previous_data;
 	unsigned char packet[MAX_PACKET_SIZE];
@@ -71,15 +72,34 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	void SpawnPlayer(int id);
-	void test();
+	void TimerFunction();
 
 	HANDLE g_hIocp;
 	Client clients[MAX_USER];
 	Room room;
 	bool g_isshutdown;
-	bool SpawnActor = false;
-	int SpawnID = -1;
-	HANDLE hThread;
+	bool PlayTick = false;
+	bool SpawnClient = false;
+	bool TankForward = false;
+	bool TankRight = false;
+	bool client1_turn = true;
+	bool client2_turn = false;
+	int MyID = -1;
+	int OtherID = -1;
+	int whoTurn = -1;
+	int timerTurn = 1;
+	float moveVal = 0;
+	float moveVal2 = 0;
+	float moveVal3 = 0;
+	float moveVal4 = 0;
+	FTransform moveTf;
+	FTransform moveTf2;
+	ATank* testtank;
+	sc_packet_tank_move Tank_Move;
+	APlayerController*  Test;
+	int mytime = 0;
+	FTimerHandle CountdownTimerHandle;
+	mutex mylock;
 
 	//void error_display(char *msg, int err_no);
 
