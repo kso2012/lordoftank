@@ -198,15 +198,12 @@ ALOTDrone::ALOTDrone()
 
 	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
 	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
-	if (CrossHairBP.Class != NULL)
-	{
+	if (CrossHairBP.Class != NULL){
 		CrossHair->SetChildActorClass(CrossHairBP.Class);
 		CrossHair->SetupAttachment(DetectCamera);
 		CrossHair->SetVisibility(false, true);
 		//CrossHair->CreateChildActor();
 	}
-
-	
 										
 	Acceleration = 500.f;
 	TurnSpeed = 50.f;
@@ -220,6 +217,7 @@ ALOTDrone::ALOTDrone()
 	bHasInputForward = false;
 	bIsDetectMode = false; 
 	PossessDrone = false;
+	bDetectMode = false;
 
 	//PawnNum = PawnDrone;
 
@@ -299,8 +297,7 @@ void ALOTDrone::SetTarget()
 	//결과를 담을 구조체변수
 	FHitResult OutHit;
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
-	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
-	{
+	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true)){
 		if (HomingTarget != NULL)
 			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
 		HomingTarget = OutHit.GetActor();
@@ -378,6 +375,9 @@ void ALOTDrone::MoveUpwardInput(float Val)
 
 
 	}
+
+
+
 }
 
 
@@ -432,23 +432,25 @@ void ALOTDrone::DetectMode()
 	if (bIsDetectMode == false)
 	{
 		bIsDetectMode = true;
+		bDetectMode = true;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("탐색모드!!!"));
 		Camera->Deactivate();
 		DetectCamera->Activate();
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true);
-		CrossHair->SetVisibility(true, true);
+
 	}
 	else
 	{
 		bIsDetectMode = false;
+		bDetectMode = false;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노탐색모드!!!"));
 		Camera->Activate();
 		DetectCamera->Deactivate();
 
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(true, true);
-		CrossHair->SetVisibility(false, true);
+		
 
 	}
 }
@@ -468,9 +470,9 @@ void ALOTDrone::SetViewBoxLocation() {
 
 	ViewBox->SetupAttachment(Root);
 
-	ViewBox->SetBoxExtent(FVector(30000, 30000, 30000));
+	ViewBox->SetBoxExtent(FVector(50000, 50000, 30000));
 	
-	ViewBox->SetRelativeLocation(this->GetActorForwardVector() * 30000);
+	ViewBox->SetRelativeLocation(this->GetActorForwardVector() * 50000);
 
 	ViewBox->SetVisibility(true, true);
 
@@ -504,6 +506,6 @@ void ALOTDrone::DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* Othe
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
 }
 
-void ALOTDrone::RotateDrone(float RotateDirection) {
-	Root->AddLocalRotation(FRotator(0, RotateDirection, 0));
+void ALOTDrone::RotateDrone(FRotator RotateDirection) {
+	Root->SetWorldRotation(RotateDirection);
 }

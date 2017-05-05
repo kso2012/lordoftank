@@ -34,22 +34,19 @@ ALOTPlayer::ALOTPlayer()
 	//스켈레톤컴포넌트에 애니메이션 적용.
 	static ConstructorHelpers::FClassFinder<UObject> AnimBPClass(TEXT("/Game/LOTAssets/TankAssets/LOTPlaytankAnimBP"));
 	GetMesh()->SetAnimInstanceClass(AnimBPClass.Class);
-	//GetMesh()->OnComponentHit.AddDynamic(this, &ALOTMultiPlayer::OnHit);
-	//GetMesh()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-	//GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &ALOTMultiPlayer::OnOverlapBegin);
-
+	//GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::OnOverlapBegin);
+	
 	//터렛컴포넌트에 메쉬 적용.
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TurretMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> TurretStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Turret_SM"));
 	TurretMesh->SetStaticMesh(TurretStaticMesh.Object);
 	//static ConstructorHelpers::FObjectFinder<UMaterial> TurretMaterial(TEXT("/Game/LOTAssets/TankAssets/Materials/LBXMY_MAT"));
-	//TurretMesh->SetMaterial(0, TurretMaterial.Object);
+	//TurretMesh->SetMaterial(0,TurretMaterial.Object);
 	//TurretMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
 	TurretMesh->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	TurretMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-
+	
+	
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BarrelStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Barrel_SM"));
 	BarrelMesh->SetStaticMesh(BarrelStaticMesh.Object);
@@ -62,8 +59,6 @@ ALOTPlayer::ALOTPlayer()
 	MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	//MuzzleLocation->AttachToComponent(BarrelMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Muzzle"));
 	MuzzleLocation->SetupAttachment(BarrelMesh, TEXT("Muzzle"));
-
-	
 
 	
 	// 바퀴에 휠 클래스 적용
@@ -110,6 +105,7 @@ ALOTPlayer::ALOTPlayer()
 	FireModeCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
 	FireModeCamera->bUsePawnControlRotation = false;
 	FireModeCamera->FieldOfView = 90.f;
+	//FireModeCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
 	FireModeCamera->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	FireModeCamera->Deactivate();
 
@@ -117,20 +113,19 @@ ALOTPlayer::ALOTPlayer()
 	EngineSoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSound"));
 	EngineSoundComponent->SetSound(SoundCue.Object);
 	EngineSoundComponent->SetupAttachment(GetMesh());
-
+	
 	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
 	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
-	if (CrossHairBP.Class != NULL)
-	{
+	if (CrossHairBP.Class != NULL){
 		CrossHair->SetChildActorClass(CrossHairBP.Class);
 		CrossHair->SetupAttachment(GetMesh(), TEXT("Body_TR"));
-		CrossHair->SetVisibility(false,true);
+		CrossHair->SetVisibility(false, true);
 		//CrossHair->CreateChildActor();
 	}
-
-
-
-
+	
+	
+	
+	
 	bIsFireMode = false;
 	bIsPushFire = false;
 	MaxHealth = 100.f;
@@ -150,7 +145,6 @@ ALOTPlayer::ALOTPlayer()
 	bIsShoot = false;
 
 	TurretAim = None; 
-	SetViewBoxLocation();
 }
 
 void ALOTPlayer::BeginPlay()
@@ -208,7 +202,7 @@ void ALOTPlayer::ChangeFiremodeBody()
 {
 	TurretMesh->SetRelativeRotation(FRotator(0.0f, FireModeCamera->RelativeRotation.Yaw, 0.0f));
 	BarrelMesh->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, 0.0f, 0.0f));
-	CrossHair->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, FireModeCamera->RelativeRotation.Yaw , 0.0f));
+	CrossHair->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, FireModeCamera->RelativeRotation.Yaw, 0.0f));
 
 }
 
@@ -287,7 +281,6 @@ void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 	if (isNotAI) {
 		if (bIsFireMode == true)
 		{
-			
 			MoveModeCamera->Deactivate();
 			FireModeCamera->Activate();
 			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
@@ -295,11 +288,9 @@ void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 			GetMesh()->SetVisibility(false, false);
 			BarrelMesh->SetVisibility(false, false);
 			CrossHair->SetVisibility(true, true);
-			
 		}
 		else if (bIsFireMode == false)
 		{
-			
 			MoveModeCamera->Activate();
 			FireModeCamera->Deactivate();
 			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
@@ -307,7 +298,6 @@ void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 			GetMesh()->SetVisibility(true, false);
 			BarrelMesh->SetVisibility(true, false);
 			CrossHair->SetVisibility(false, true);
-			
 		}
 	}
 }
@@ -512,52 +502,11 @@ void ALOTPlayer::TurnAI() {
 	MoveForward(1);
 }
 
-void ALOTPlayer::SetViewBoxLocation() {
-	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
-	ViewBox->SetCollisionObjectType(ECC_Vehicle);
-
-	ViewBox->SetupAttachment(MuzzleLocation);
-
-	ViewBox->SetBoxExtent(FVector(80000, 10, 10));
-
-	ViewBox->SetRelativeLocation(MuzzleLocation->GetComponentLocation() + (MuzzleLocation->GetForwardVector() * 80000) - FVector(0, 0, 100));
-
-	ViewBox->SetVisibility(true, true);
 
 
-	ViewBox->bGenerateOverlapEvents = true;
-	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTPlayer::FindEnemy);
-	ViewBox->OnComponentEndOverlap.AddDynamic(this, &ALOTPlayer::LostEnemy);
-
-
-	//ViewBox->Activate();
-
-
-	OffViewBox();
-}
-
-void ALOTPlayer::FindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	
-	TurretAim = CorrectAim;
-	CollisionActor = OtherActor;
-}
-
-void ALOTPlayer::LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-
-	TurretAim = InCorrectAim;
-	CollisionActor = OtherActor;
-}
-
-void ALOTPlayer::RotateTurret(float RotateDirection) {
+void ALOTPlayer::RotateTurret(FRotator RotateDirection) {
 	if (TurretAim == None) {
-		TurretMesh->AddLocalRotation(FRotator(0, RotateDirection, 0));
+		TurretMesh->SetWorldRotation(RotateDirection);
 	}
-	ScaleViewBox();
-}
-
-void ALOTPlayer::ScaleViewBox() {
-	if (TurretAim == CorrectAim) ViewBox->SetBoxExtent(FVector(80000, 10, 10000));
-	else ViewBox->SetBoxExtent(FVector(80000, 10, 10));
-
 }
 

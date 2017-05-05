@@ -104,9 +104,6 @@ private:
 	//플레이어의 위치를 추적하는 함수
 	void TraceEnemyLocation();
 
-	//AI의 포신이 플레이어의 위치를 제대로 포착했는지 판단하는 함수
-	void AimTurret();
-
 	//AI의 포신을 어느 방향으로 회전시켜야 하는지 계산하는 함수, LOTPlayer의 RotateTurret을 호출
 	void CalcTurretRotator();
 
@@ -115,11 +112,13 @@ private:
 
 	void SetDroneDirection();
 
+	FVector TurretDirection;
+
+	bool bIsTurretRightDirection;
 
 
 
-
-	bool bIsPreFound;
+	bool bIsInRange;
 
 	bool bIsRightDirection;
 
@@ -127,7 +126,6 @@ private:
 
 	int DroneRotateDirection;
 
-	FVector LostLocation;
 
 
 };

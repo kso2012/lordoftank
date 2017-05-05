@@ -85,6 +85,7 @@ class LORDOFTANK_API ALOTDrone : public APawn
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* CrossHair;
 
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -160,6 +161,7 @@ private:
 
 	void ChangePawn();
 
+
 public:
 
 
@@ -180,6 +182,8 @@ public:
 	void DetectMode();
 
 	bool PossessDrone;
+
+	bool bDetectMode;
 
 	
 	/////////////////////////////
@@ -239,11 +243,15 @@ public:
 	}
 
 	// 입력된 값을 이용해 드론을 회전
-	void RotateDrone(float);
+	void RotateDrone(FRotator);
 
 	void CommandMoveForward(float val) { MoveForwardInput(val); }
 
 	float ReturnDroneSpeed() { return CurrentForwardSpeed; }
 
 	void SetDroneSpeed() { CurrentForwardSpeed = 0.f; }
+
+
+	FVector ReturnMeshLocation() { return Root->GetComponentLocation(); }
+	FVector ReturnForwardVector() { return Root->GetForwardVector(); }
 };

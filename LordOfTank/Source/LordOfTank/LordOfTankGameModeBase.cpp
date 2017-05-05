@@ -35,11 +35,11 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 	PrimaryActorTick.bCanEverTick = true;
 	TurretRotateDirection = None;
 	distance = 0.f;
-	bIsPreFound = false;
+	bIsInRange = false;
 	DroneDirection = FVector(0, 0, 0);
 	DroneRotateDirection = None;
 	bIsRightDirection = false;
-	LostLocation = FVector(0, 0, 0);
+	bIsTurretRightDirection = false;
 }
 
 void ALordOfTankGameModeBase::StartPlay()
@@ -64,7 +64,6 @@ void ALordOfTankGameModeBase::InitPlayer() {
 	MyPlayer.ControlledPawn = PawnTank;
 	MyPlayer.Tank->SetisNotAI(true);
 
-	MyPlayer.Tank->OffViewBox();
 	MyPlayer.Drone->OffViewBox();
 	Control->Possess(MyPlayer.Tank);
 }
@@ -83,7 +82,6 @@ void ALordOfTankGameModeBase::InitAI() {
 	EnemyPlayer.ControlledPawn = PawnTank;
 	EnemyPlayer.Tank->SetisNotAI(false);
 
-	EnemyPlayer.Tank->OnViewBox();
 	EnemyPlayer.Drone->OnViewBox();
 	IsEnemyFound = false;
 
@@ -155,51 +153,85 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 void ALordOfTankGameModeBase::Think() {
 	// 플레이어나 AI가 포를 발사하고 있을 땐 탱크와 드론의 ViewBox를 사용하지 않음
 	// 남겨둘 경우 포탄이 어딘가에 충돌된 것으로 판단하여 바로 터지게 됌
-	if (MyPlayer.Tank->GetbIsShoot() || EnemyPlayer.Tank->GetbIsShoot()) {
-		EnemyPlayer.Tank->OffViewBox();
+	if (MyPlayer.Tank->GetbIsShoot() || EnemyPlayer.Tank->GetbIsShoot() || MyPlayer.Drone->bDetectMode) {
 		EnemyPlayer.Drone->OffViewBox();
-		MyPlayer.Tank->OffViewBox();
 		MyPlayer.Drone->OffViewBox();
 	}
 	else {
 		IsLookEnemyTank();
-		if ((!IsEnemyFound && PlayerTurn == 2) || (EnemyPlayer.Drone->ReturnDroneSpeed() != 0.f && PlayerTurn == 2)) {
+		if (PlayerTurn == 2 && !bIsInRange) {
 			if (!bIsRightDirection) {
-				SetDroneDirection();
+				SetDroneDirection(); 
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Start Drone Rotate");
 				if (DroneRotateDirection != None){
-					//EnemyPlayer.Drone->RotateDrone(DroneRotateDirection);
-					FVector DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Drone->GetActorForwardVector(), DroneDirection, 0.01f);
-					EnemyPlayer.Drone->SetActorRotation(DVector.Rotation());
-					
-					if (((DroneDirection.X - 0.02f) < EnemyPlayer.Drone->GetActorForwardVector().X && EnemyPlayer.Drone->GetActorForwardVector().X  < (DroneDirection.X + 0.02f)) 
-						 && ((DroneDirection.Y - 0.02f) < EnemyPlayer.Drone->GetActorForwardVector().Y && EnemyPlayer.Drone->GetActorForwardVector().Y < (DroneDirection.Y + 0.02f))
-						 && ((DroneDirection.Z - 0.02f) < EnemyPlayer.Drone->GetActorForwardVector().Z && EnemyPlayer.Drone->GetActorForwardVector().Z < (DroneDirection.Z + 0.02f))) {
+					FVector DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Drone->ReturnForwardVector(), DroneDirection, 0.01f);
+					EnemyPlayer.Drone->RotateDrone(DVector.Rotation());
+
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Drone Rotation");
+					if (((DroneDirection.X - 0.1f) < EnemyPlayer.Drone->ReturnForwardVector().X && EnemyPlayer.Drone->ReturnForwardVector().X  < (DroneDirection.X + 0.1f))
+						 && ((DroneDirection.Y - 0.1f) < EnemyPlayer.Drone->ReturnForwardVector().Y && EnemyPlayer.Drone->ReturnForwardVector().Y < (DroneDirection.Y + 0.1f))) {
+
+						DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Drone->ReturnForwardVector(), DroneDirection, 1.f);
+						EnemyPlayer.Drone->RotateDrone(DVector.Rotation());
+
 						bIsRightDirection = true;
 						DroneRotateDirection = None;
 						DroneDirection = FVector(0, 0, 0);
 
-						GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Drone Rotate Done");
 					}
 				}
 			}
+		}
+		if(PlayerTurn == 2 && bIsRightDirection && !bIsInRange) {
+			EnemyPlayer.Drone->CommandMoveForward(1.f);
+			FVector tempLocation = EnemyPlayer.Drone->GetActorLocation();
+			tempLocation.Z = MyPlayer.Tank->ReturnMeshLocation().Z;
+			float Drone_Tank_Distance = (MyPlayer.Tank->GetActorLocation() - tempLocation).Size();
+
+			if (Drone_Tank_Distance >= 25000.f && Drone_Tank_Distance <= 35000.f) {
+				bIsInRange = true;
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "in Range");
+			}
+			else if (Drone_Tank_Distance < 25000.f) {
+				EnemyPlayer.Drone->CommandMoveForward(-2.f);
+			}
+
+		}
+		else if(PlayerTurn == 2 && EnemyPlayer.Drone->ReturnDroneSpeed() != 0.f && bIsInRange) {
+			if (EnemyPlayer.Drone->ReturnDroneSpeed() < -50.f) {
+				EnemyPlayer.Drone->CommandMoveForward(10.f);
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("%f FSpeed"), EnemyPlayer.Drone->ReturnDroneSpeed()));
+			}
+			else if (EnemyPlayer.Drone->ReturnDroneSpeed() < 50.f) {
+				EnemyPlayer.Drone->SetDroneSpeed();
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Stop");
+			}
 			else {
-				if(!IsEnemyFound)
-					EnemyPlayer.Drone->CommandMoveForward(1.f);
-				else {
-					EnemyPlayer.Drone->CommandMoveForward(-1.f);
-					if (EnemyPlayer.Drone->ReturnDroneSpeed() < 10.f)
-						EnemyPlayer.Drone->SetDroneSpeed();
-				}
+				EnemyPlayer.Drone->CommandMoveForward(-10.f);
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("%f BSpeed"), EnemyPlayer.Drone->ReturnDroneSpeed()));
 			}
 		}
-		else if (IsEnemyFound && PlayerTurn == 2) {
+
+
+		if (PlayerTurn == 2 && bIsInRange && EnemyPlayer.Drone->ReturnDroneSpeed() == 0.f) {
 			TraceEnemyLocation();
-			AimTurret();
 			// AI 포신이 플레이어 탱크를 제대로 조준하지 않았을 경우 포신을 회전
 			if (EnemyPlayer.Tank->TurretAim != CorrectAim) {
 				CalcTurretRotator();
-				if (TurretRotateDirection != None) {
-					EnemyPlayer.Tank->RotateTurret(TurretRotateDirection);
+				FVector DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Tank->ReturnTurretForwardVector(), TurretDirection, 0.01f);
+				EnemyPlayer.Tank->RotateTurret(DVector.Rotation());
+				if (((TurretDirection.X - 0.1f) < EnemyPlayer.Tank->ReturnTurretForwardVector().X && EnemyPlayer.Tank->ReturnTurretForwardVector().X  < (TurretDirection.X + 0.1f))
+					&& ((TurretDirection.Y - 0.1f) < EnemyPlayer.Tank->ReturnTurretForwardVector().Y && EnemyPlayer.Tank->ReturnTurretForwardVector().Y < (TurretDirection.Y + 0.1f))) {
+					DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Tank->ReturnTurretForwardVector(), TurretDirection, 1.f);
+					EnemyPlayer.Tank->RotateTurret(DVector.Rotation());
+					
+					bIsTurretRightDirection = true;
+					TurretRotateDirection = None;
+					TurretDirection = FVector(0, 0, 0);
+
+					EnemyPlayer.Tank->TurretAim = CorrectAim;
+
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Aim Done");
 				}
 			}
 			// AI 포신이 제대로 조준이 되었을 경우 파워 조절 후 발사
@@ -207,13 +239,15 @@ void ALordOfTankGameModeBase::Think() {
 				if (distance == 0.f)
 					SetPower();
 				EnemyPlayer.Tank->CommandShoot(distance);
+				bIsTurretRightDirection = false;
+				EnemyPlayer.Tank->TurretAim = None;
+				distance = 0.f;
 			}
 		}
 
 	}
 	// 플레이어나 AI가 포를 발사하고 있지 않은 경우에는 ViewBox를 사용하는 상태로 둠
-	if (!(MyPlayer.Tank->GetbIsShoot() && EnemyPlayer.Tank->GetbIsShoot())) {
-		EnemyPlayer.Tank->OnViewBox();
+	if (!(MyPlayer.Tank->GetbIsShoot() && EnemyPlayer.Tank->GetbIsShoot() && MyPlayer.Drone->bDetectMode)) {
 		EnemyPlayer.Drone->OnViewBox();
 	}
 }
@@ -224,9 +258,6 @@ void ALordOfTankGameModeBase::IsLookEnemyTank() {
 		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
 			IsEnemyFound = true;
-			bIsPreFound = true;
-			bIsRightDirection = true;
-			LostLocation = FVector(0, 0, 0);
 			//DroneDirection = MyPlayer.Tank->GetActorLocation() - EnemyPlayer.Drone->GetActorLocation();
 		}
 		EnemyPlayer.Drone->DecideCollisionState = None;
@@ -235,39 +266,32 @@ void ALordOfTankGameModeBase::IsLookEnemyTank() {
 		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
 			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
 			IsEnemyFound = false;
-			LostLocation = MyPlayer.Tank->GetActorLocation();
 			bIsRightDirection = false;
+			bIsInRange = false;
 		}
 		EnemyPlayer.Drone->DecideCollisionState = None;
 	}
 }
 
 void ALordOfTankGameModeBase::TraceEnemyLocation() {
-	EnemyPlayer.Tank->SetEnemyLocation(MyPlayer.Tank->GetActorLocation());
+	EnemyPlayer.Tank->SetEnemyLocation(MyPlayer.Tank->ReturnMeshLocation());
 }
 
-void ALordOfTankGameModeBase::AimTurret() {
-	if (EnemyPlayer.Tank->CollisionActor == MyPlayer.Tank && EnemyPlayer.Tank->TurretAim == CorrectAim) {
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Aim Correctly");
-		TurretRotateDirection = None;
-		distance = 0.f;
-	}
-	else {
-		EnemyPlayer.Tank->TurretAim = None;
-	}
-}
 
 void ALordOfTankGameModeBase::CalcTurretRotator() {
 	FVector TurretLookVector = EnemyPlayer.Tank->ReturnTurretForwardVector();
+	FVector TankLocation = EnemyPlayer.Tank->ReturnMeshLocation();
 
-	FVector CrossVector = UKismetMathLibrary::Cross_VectorVector(EnemyPlayer.Tank->ReturnMeshLocation() - MyPlayer.Tank->ReturnMeshLocation(), TurretLookVector);
+	TurretDirection = MyPlayer.Tank->ReturnMeshLocation() - TankLocation;
+	TurretDirection.Z = 0.f;
+	TurretDirection.Normalize();
 
-	if (TurretRotateDirection == None) {
-		if (UKismetMathLibrary::Dot_VectorVector(CrossVector, FVector(0,0,1)) > 0)
-			TurretRotateDirection = Right;
-		else
-			TurretRotateDirection = Left;
-	}
+	FVector CrossVector = UKismetMathLibrary::Cross_VectorVector(TurretDirection, TurretLookVector);
+
+	if (UKismetMathLibrary::Dot_VectorVector(CrossVector, FVector(0,0,1)) > 0)
+		TurretRotateDirection = Right;
+	else
+		TurretRotateDirection = Left;
 }
 
 void ALordOfTankGameModeBase::SetPower() {
@@ -275,17 +299,13 @@ void ALordOfTankGameModeBase::SetPower() {
 }
 
 void ALordOfTankGameModeBase::SetDroneDirection() {
-	FVector DroneLocation = EnemyPlayer.Drone->GetActorLocation();
-	FVector DroneForwardVector = EnemyPlayer.Drone->GetActorForwardVector();
+	FVector DroneLocation = EnemyPlayer.Drone->ReturnMeshLocation();
+	FVector DroneForwardVector = EnemyPlayer.Drone->ReturnForwardVector();
 	if (DroneRotateDirection == None && !bIsRightDirection) {
 
-		if (!bIsPreFound) {
-			AActor* const PlayerStart = Cast<AActor>(FindPlayerStart(Control, "1"));
-			DroneDirection = PlayerStart->GetActorLocation() - DroneLocation;
-		}
-		else if (bIsPreFound && LostLocation != FVector(0, 0, 0)) {
-			DroneDirection = LostLocation - DroneLocation;
-		}
+		
+		DroneDirection = MyPlayer.Tank->ReturnMeshLocation() - DroneLocation;
+		
 
 		DroneDirection.Z = 0.f;
 		DroneDirection.Normalize();
@@ -294,6 +314,9 @@ void ALordOfTankGameModeBase::SetDroneDirection() {
 			DroneRotateDirection = Right;
 		else
 			DroneRotateDirection = Left;
+
+
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Set Drone Direction()");
 
 	}
 }
