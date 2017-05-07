@@ -60,7 +60,6 @@ class LORDOFTANK_API ALOTPlayer : public AWheeledVehicle
 		UChildActorComponent* CrossHair;
 
 
-
 public:
 
 	ALOTPlayer();
@@ -199,8 +198,6 @@ private:
 
 	void TurnAI();
 
-	// AI의 포신방향으로 나가는 collision box, 터렛을 회전시킬 때 사용
-	UBoxComponent* ViewBox;
 
 
 	int PawnNum;
@@ -208,8 +205,6 @@ private:
 	// AI가 플레이어의 위치를 추적하기 위한 변수
 	FVector EnemyLocation;
 
-	// collision box 초기화 함수
-	void SetViewBoxLocation();
 
 public:
 
@@ -235,45 +230,23 @@ public:
 	// Camera를 외부에서 사용하기 위해 반환
 	UCameraComponent* ReturnCamera() { return MoveModeCamera; }
 
-	// ViewBox에 충돌되었을 때 호출되는 함수
-	UFUNCTION()
-		void FindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	// ViewBox에서 벗어났을 때 호출되는 함수
-	UFUNCTION()
-		void LostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	// 플레이어의 위치를 적 AI가 추적하기 위해 위치를 받아 저장시키는 함수
 	void SetEnemyLocation(FVector location) { EnemyLocation = location; }
 
 	// 입력된 값을 이용해 터렛을 회전
-	void RotateTurret(float);
+	void RotateTurret(FRotator);
 
-	// ViewBox의 크기를 늘이거나 줄이는 함수
-	void ScaleViewBox();
 
-	// ViewBox를 Activate
-	void OnViewBox() {
-		ViewBox->Activate();
-		ViewBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		ViewBox->SetCollisionResponseToChannel(ECC_Vehicle, ECR_Overlap);
-
-	}
-
-	// ViewBox를 Deactivate
-	void OffViewBox() {
-		ViewBox->Deactivate();
-		ViewBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		ViewBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	}
 
 	// 현재 발사중인지 아닌지를 게임모드에서 확인하기 위해 값을 리턴
 	bool GetbIsShoot() { return bIsShoot; }
 
 
-	UBoxComponent* GetViewBox() { return ViewBox; }
 
 	// AI가 어느 방향으로 회전해야할지 계산하기 위해 메쉬의 위치와 포신의 forwardVector를 리턴
 	FVector ReturnMeshLocation() { return GetMesh()->GetComponentLocation(); }
 	FVector ReturnTurretForwardVector() { return TurretMesh->GetForwardVector(); }
+
+	
 };
