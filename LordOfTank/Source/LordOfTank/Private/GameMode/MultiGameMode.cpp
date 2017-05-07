@@ -9,7 +9,7 @@
 
 AMultiGameMode::AMultiGameMode()
 {
-	i = 0;
+	
 	DroneSpawningHeight = 10000.f;
 	DefaultPawnClass = NULL;
 	PrimaryActorTick.bCanEverTick = true;
@@ -36,6 +36,8 @@ void AMultiGameMode::StartPlay()
 
 		EnemyPlayer.Tank = World->SpawnActor<ALOTMultiPlayer>(ALOTMultiPlayer::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
 		EnemyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart2->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart2->GetActorRotation());
+
+	
 	}
 
 	else if (TestInstance->PlayerNum == 2)
@@ -47,12 +49,8 @@ void AMultiGameMode::StartPlay()
 		MyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart2->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart2->GetActorRotation());
 	}
 
-
 	Test->Possess(MyPlayer.Tank);
-	//MyPlayer.Tank->EnableInput(Test);
-	//Test->AcknowledgePossession(MyPlayer.Tank);
-
-
+	TestInstance->SendFinishLoad();
 }
 
 void AMultiGameMode::BeginPlay()
@@ -68,44 +66,30 @@ void AMultiGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
 	ApplyMovement();
-	
-	//SetWorldTransform();
-	//SetWorldTransform(Test->Location, false, nullptr, ETeleportType::TeleportPhysics);
-	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("X값 %f Y값 %f,z값 %f"), Test->Location.GetLocation().X, Test->Location.GetLocation().Y,Test->Location.GetLocation().Z));
-	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("속도 %f/,속도 %f/,속도 %f"), MyPlayer.Tank->GetVelocity().X, MyPlayer.Tank->GetVelocity().Y, MyPlayer.Tank->GetVelocity().Z));
-	//MyPlayer.Tank->SetActorTransform(Test->Location, false, nullptr, ETeleportType::TeleportPhysics);
-	//MyPlayer.Tank->GetMesh()->SetWorldTransform(Test->Location, false, nullptr, ETeleportType::TeleportPhysics);
-	//MyPlayer.Tank->GetMesh()->SetAllPhysicsLinearVelocity(Test->Velocity, false);
-	//MyPlayer.Tank->SetActorRelativeTransform(Test->Location, true, nullptr, ETeleportType::TeleportPhysics);
+
+
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	//droneTransform
+	MyInstance->SendLocationInfo(MyPlayer.Tank->GetMesh()->GetPhysicsLinearVelocity(), MyPlayer.Tank->GetMesh()->GetPhysicsAngularVelocity()
+		, MyPlayer.Tank->GetMesh()->K2_GetComponentLocation(), MyPlayer.Tank->GetMesh()->K2_GetComponentRotation(), MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->K2_GetActorRotation());
+
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("X = %f,Y = %f Z = %f"), MyPlayer.Drone->GetActorLocation().X, MyPlayer.Drone->GetActorLocation().Y, MyPlayer.Drone->GetActorLocation().Z));
 }
 
 void AMultiGameMode::ApplyMovement()
 {
-	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
-	if (TestInstance->PlayerNum == 1)
-	{
 
-		MyPlayer.Tank->GetRootComponent()->SetWorldTransform(TestInstance->Location, false, nullptr, ETeleportType::TeleportPhysics);
-		EnemyPlayer.Tank->GetRootComponent()->SetWorldTransform(TestInstance->Location2, false, nullptr, ETeleportType::TeleportPhysics);
-	}
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	
+	EnemyPlayer.Tank->GetMesh()->SetPhysicsLinearVelocity(MyInstance->EnemyLinearVelocity);
+	EnemyPlayer.Tank->GetMesh()->SetPhysicsAngularVelocity(MyInstance->EnemyAngularVelocity);
+	EnemyPlayer.Tank->SetActorLocation(MyInstance->EnemyWorldLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	EnemyPlayer.Tank->SetActorRotation(MyInstance->EnemyRotation, ETeleportType::TeleportPhysics);
+	EnemyPlayer.Drone->SetActorLocation(MyInstance->EnemyDroneLocation, false, nullptr, ETeleportType::TeleportPhysics);
+	EnemyPlayer.Drone->SetActorRotation(MyInstance->EnemyDroneRotation, ETeleportType::TeleportPhysics);
+	
+	
 
-	if (TestInstance->PlayerNum == 2)
-	{
-		MyPlayer.Tank->GetRootComponent()->SetWorldTransform(TestInstance->Location2, false, nullptr, ETeleportType::TeleportPhysics);
-		EnemyPlayer.Tank->GetRootComponent()->SetWorldTransform(TestInstance->Location, false, nullptr, ETeleportType::TeleportPhysics);
-	}
-
-	if (TestInstance->bIsmyTurn)
-	{
-		if(TestInstance->PlayerNum == 1)
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내턴이다!!!(1p)")));
-		else
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내턴이다!!!(2p)")));
-		MyPlayer.Tank->bIsTurn = true;
-	}
-	else
-		MyPlayer.Tank->bIsTurn = false;
 }
 

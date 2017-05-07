@@ -23,9 +23,13 @@ namespace EGameState
 {
 	enum Type
 	{
+		
 		Mode_Main				UMETA(DisplayName = "MainScreen"),
+		
 		Mode_SinglePlay			UMETA(DisplayName = "SinglePlay"),
+		
 		Mode_Multiplay	UMETA(DisplayName = "Multiplay"),
+		
 		Mode_tutorial			UMETA(DisplayName = "tutorial")
 	};
 }
@@ -35,13 +39,16 @@ namespace EGameState
 struct Packet
 {
 	BYTE size;
+	
 	FVector Pos;
 };
 
 struct MyApp
 {
 	SOCKET sarr[WSA_MAXIMUM_WAIT_EVENTS];
+	
 	HANDLE hEarr[WSA_MAXIMUM_WAIT_EVENTS];
+	
 	int now;
 };
 
@@ -53,15 +60,19 @@ struct FShowRoom
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		int roomNum;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		int counts;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room")
 		int state;
 
 	FShowRoom()
 	{
 		roomNum = 0;
+		
 		counts = 0;
+		
 		state = 0;
 	}
 
@@ -71,25 +82,36 @@ USTRUCT(BlueprintType)
 struct FShowLobby
 {
 	GENERATED_USTRUCT_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
+	
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	bool canStart;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	bool isReady1;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	bool isReady2;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	int counts;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	FString name1;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Lobby")
 	FString name2;
 
 	FShowLobby() {
 		canStart = false;
+		
 		isReady1 = false;
+		
 		isReady2 = false;
+		
 		counts = 0;
+		
 		name1 = "none";
+		
 		name2 = "none";
 	}
 
@@ -129,19 +151,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickStartBT();
 
-	UFUNCTION(BlueprintCallable, Category = "test")
-		void testfunc();
-
-	void MoveForward(float val);
-
-	void MoveRight(float val);
-
-	FTransform Location;
-	FTransform Location2;
-	bool bIsmyTurn;
-	//FVector Velocity;
-
-
+	//CS_FINISH_LOA
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
 		FShowRoom RoomInfo;
 
@@ -173,34 +183,69 @@ public:
 		int LeftTime;
 
 	char send_buffer[4000];
+
 	WSADATA wsa;
+
 	WSABUF   recv_wsabuf;
+
 	char   recv_buffer[BUF_SIZE];
+
 	char   packet_buffer[BUF_SIZE];
+
 	DWORD      in_packet_size = 0;
+
 	int      saved_packet_size = 0;
+
 	SOCKET sock;
+
 	thread* event_thread;
+
 	WSAEVENT myevent;
+
 	HWND main_window_handle = NULL;
+
 	WSABUF send_wsabuf;
+
 	MyApp app;
+
 	WSAOVERLAPPED wsaOverlapped;
+
 	WSAEVENT wsaEvent;
+
 	bool bIsTryConnecting;
-	void SendPos(FVector pos);
+
 	void eventThread();
+
 	static void ToCalleventThread(LPVOID p);
-	/*void ReadPacket(SOCKET sock);*/
+
 	void ReadPacket(int index);
+
 	void ProcessPacket(char *ptr);
+
 	void InitEvent(SOCKET sock);
+
 	void connectProc(int index);
+
 	void DeleteSocket(int index);
+
 	void CloseProc(int index);
 
-	//FVector Velocity;
-	//FVector Angular;
+	void SendLocationInfo(FVector LinearVel, FVector AngularVel, FVector Location, FRotator Rotation, FVector DroneLocation, FRotator DroneRotation);
 
+	void SendFinishLoad();
+
+	FVector EnemyWorldLocation;
+	
+	FVector EnemyLinearVelocity;
+	
+	FVector EnemyAngularVelocity;
+	
+	FRotator EnemyRotation;
+
+	FVector EnemyDroneLocation;
+	
+	FRotator EnemyDroneRotation;
+
+	bool bIsmyTurn;
 	
 };

@@ -2,21 +2,18 @@
 
 #pragma once
 
-#include "GameFramework/Pawn.h"
+#include "WheeledVehicle.h"
 #include "LOTMultiPlayer.generated.h"
 
 /**
- * 
- */
+*
+*/
 UCLASS()
-class LORDOFTANK_API ALOTMultiPlayer : public APawn
+class LORDOFTANK_API ALOTMultiPlayer : public AWheeledVehicle
 {
 	GENERATED_BODY()
-
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		class USkeletalMeshComponent* BodyMesh;
 		//탱크상체 메쉬
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		class UStaticMeshComponent* TurretMesh;
 
 	//탱크포신 메쉬
@@ -40,14 +37,14 @@ class LORDOFTANK_API ALOTMultiPlayer : public APawn
 		UCameraComponent* FireModeCamera;
 
 	//탱크 엔진 사운드
-	//UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	//	UAudioComponent* EngineSoundComponent;
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UAudioComponent* EngineSoundComponent;
 
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* CrossHair;
 
-	/*UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* UI;*/
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UChildActorComponent* UI;
 
 
 
@@ -64,8 +61,6 @@ public:
 	void MoveForward(float Val);
 
 	void MoveRight(float Val);
-
-	bool bIsTurn;
 
 	//void OnResetVR();
 
@@ -108,6 +103,8 @@ private:
 	////사격모드일 때 Barrel과 Gun 메쉬 변환.
 	void ChangeFiremodeBody();
 
+	void ChangePawn();
+
 	//FVector GetSegmentatTime(FVector StartLocation, FVector InitialVelocity, FVector Gravity, float time);
 
 	//void DrawTrajectory();
@@ -146,6 +143,18 @@ private:
 	//발사 파워
 	float CurShootingPower;
 
+	float CurForwardVal;
+
+	float CurRightVal;
+
+	float ExForwardVal;
+
+	float ExRightVal;
+
+	bool bIsSendForward;
+
+	bool bIsSendRight;
+
 	//발사중인가?
 	bool bIsShoot;
 
@@ -154,5 +163,5 @@ private:
 
 
 
-	
+
 };

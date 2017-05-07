@@ -2,6 +2,8 @@
 
 #include "LordOfTank.h"
 #include "LOTMultiDrone.h"
+#include "GameMode/MultiGameMode.h"
+#include "LOTGameInstance.h"
 #include "LOTPlayer.h"
 
 
@@ -302,13 +304,14 @@ void ALOTMultiDrone::SetTarget()
 
 void ALOTMultiDrone::MoveForwardInput(float Val)
 {
+	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("val값= %ff"), Val));
 	//Val이 0.f와 근사치에 가깝다면 true,아니면 false를 반환.
 	bHasInputForward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
 
 	//키 입력을 했다면
-	if (bHasInputForward)
+	if (bHasInputForward && TestInstance->bIsmyTurn)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
@@ -338,12 +341,14 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 void ALOTMultiDrone::MoveUpwardInput(float Val)
 {
 
+	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
 
+	
 	bHasInputUpward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward)
+	if (bHasInputUpward && TestInstance->bIsmyTurn)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
@@ -448,5 +453,8 @@ void ALOTMultiDrone::DetectMode()
 
 void ALOTMultiDrone::ChangePawn()
 {
-	;
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	//ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(getgamemode);
+	Test->Possess(GameModeTest->MyPlayer.Tank);
 }

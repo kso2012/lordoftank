@@ -301,10 +301,10 @@ void ALOTDrone::SetTarget()
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
 	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
 	{
-		if (HomingTarget != NULL)
-			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
+		//if (HomingTarget != NULL)
+			//HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
 		HomingTarget = OutHit.GetActor();
-		HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+		//HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
 		//DrawBeam(StartTrace, EndTrace);
 	}

@@ -72,25 +72,7 @@ bool ULOTGameInstance::ClickIpEntBT()
 
 }
 
-void ULOTGameInstance::SendPos(FVector pos)
-{
-	/*int retval;
-	Packet *a = reinterpret_cast<Packet *>(send_buffer);
 
-	a->size = sizeof(Packet);
-	a->Pos = pos;
-	send_wsabuf.len = sizeof(Packet);
-
-	DWORD iobyte;
-
-	retval = WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
-	if (retval) {
-	int error_code = WSAGetLastError();
-	if(WSA_IO_PENDING != error_code)
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Send Error"));
-	}*/
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("센드 성공"));
-}
 
 void ULOTGameInstance::ClickNameEntBT()
 {
@@ -152,7 +134,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	case SC_GAME_START:
 	{
 		sc_packet_game_start *my_packet = reinterpret_cast<sc_packet_game_start*>(ptr);
-
+		GameStateEnum = EGameState::Mode_Multiplay;
 		bIsStart = true;
 		bIsmyTurn = my_packet->turn;
 		break;
@@ -163,20 +145,28 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		bIsmyTurn = my_packet->turn;
 		break;
 	}
-	case SC_TANK_MOVE:
-	{
-		
-		sc_packet_tank_move *my_packet = reinterpret_cast<sc_packet_tank_move*>(ptr);
-		
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f,%f,%f"), my_packet->velocity.X, my_packet->velocity.Y, my_packet->velocity.Z));
-		
-		Location = my_packet->location;
-		Location2 = my_packet->location2;
-		//Velocity = my_packet->velocity;
 
-		
+	case SC_TIMER:
+	{
+		sc_packet_timer *my_packet = reinterpret_cast<sc_packet_timer*>(ptr);
+		LeftTime = my_packet->timer;
 		break;
 	}
+	case SC_PLAYER_MOVE:
+	{
+		
+		sc_packet_player_move *my_packet = reinterpret_cast<sc_packet_player_move*>(ptr);
+
+		EnemyWorldLocation = my_packet->worldLocation;
+		EnemyLinearVelocity = my_packet->linearVelocity;
+		EnemyAngularVelocity = my_packet->angularVelocity;
+		EnemyRotation = my_packet->rotation;
+		EnemyDroneLocation = my_packet->droneLocation;
+		EnemyDroneRotation = my_packet->droneRotation;
+
+		break;
+	}
+
 
 	default:
 	{
@@ -377,6 +367,7 @@ void ULOTGameInstance::ClickStartBT()
 	game_start->size = sizeof(cs_packet_game_start);
 	send_wsabuf.len = sizeof(cs_packet_game_start);
 	DWORD iobyte;
+	
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
 
@@ -396,34 +387,31 @@ void ULOTGameInstance::FinishDestroy()
 
 }
 
-void ULOTGameInstance::testfunc()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("게임 스타트")));
-	AStartGameMode* const Testa = Cast<AStartGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	Testa->StartMultiGame();
-}
 
-void ULOTGameInstance::MoveForward(float val)
+void ULOTGameInstance::SendLocationInfo(FVector LinearVel, FVector AngularVel, FVector Location, FRotator Rotation,FVector DroneLocation,FRotator DroneRotation)
 {
-	cs_packet_tank_move *tank_move = reinterpret_cast<cs_packet_tank_move *>(send_buffer);
+	cs_packet_player_move *player_move = reinterpret_cast<cs_packet_player_move*>(send_buffer);
+	player_move->linearVelocity = LinearVel;
+	player_move->angularVelocity = AngularVel;
+	player_move->worldLocation = Location;
+	player_move->rotation = Rotation;
+	player_move->droneLocation = DroneLocation;
+	player_move->droneRotation = DroneRotation;
+	player_move->type = CS_PLAYER_MOVE;
+	player_move->size = sizeof(cs_packet_player_move);
+	send_wsabuf.len = sizeof(cs_packet_player_move);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 	
-	tank_move->val = val;
-	tank_move->type = CS_TANK_FORWARD;
-	tank_move->size = sizeof(cs_packet_tank_move);
-	send_wsabuf.len = sizeof(cs_packet_tank_move);
-	DWORD iobyte;
-	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+
 }
 
-void ULOTGameInstance::MoveRight(float val)
+void ULOTGameInstance::SendFinishLoad()
 {
-	cs_packet_tank_move *tank_move = reinterpret_cast<cs_packet_tank_move *>(send_buffer);
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("오른쪽 send%f"), val));
-	tank_move->val = val;
-	tank_move->type = CS_TANK_RIGHT;
-	tank_move->size = sizeof(cs_packet_tank_move);
-	send_wsabuf.len = sizeof(cs_packet_tank_move);
+	cs_packet_finish_load *finish_load = reinterpret_cast<cs_packet_finish_load *>(send_buffer);
+	finish_load->type = CS_FINISH_LOAD;
+	finish_load->size = sizeof(cs_packet_finish_load);
+	send_wsabuf.len = sizeof(cs_packet_finish_load);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
-
