@@ -18,8 +18,10 @@ struct PlayerInfomation
 	FVector Velocity;
 	FVector Angular;
 	float AP;
+	float Shield;
 	float HP;
 	float PlayerNum;
+	bool Moveable;
 };
 
 UCLASS()
@@ -30,17 +32,47 @@ class LORDOFTANK_API AMultiGameMode : public AGameModeBase
 public:
 
 	AMultiGameMode();
+	
 	float i;
+	
 	virtual void StartPlay() override;
+	
 	virtual void BeginPlay() override;
+	
 	virtual void Tick(float DeltaTime) override;
+	
 	void ApplyMovement();
+	
+	void ApplyDamage();
+	
+	void EnemyFire();
+	
+	void InitPlayer();
 
+	void TurnChange();
+	
 	PlayerInfomation MyPlayer;
+	
 	PlayerInfomation EnemyPlayer;
+
+	bool bIsMyTurn;
 
 private:
 	
 	float DroneSpawningHeight;
+
+	float MaxHealth;
+
+	float MaxAP;
+
+	float MaxShield;
+
+	float MinHeath;
+
+	float MinAP;
+
+	float MinShield;
+
+	
 
 };

@@ -52,7 +52,7 @@ AProjectile::AProjectile()
 	ProjectileMovement->bShouldBounce = true;
 	ProjectileMovement->ProjectileGravityScale = 1.f;
 
-
+	bIsFireEnemy = false;
 }
 
 // Called when the game starts or when spawned
@@ -90,4 +90,9 @@ void AProjectile::SetInitialVelocity(FVector velocity)
 void AProjectile::SetHomingTarget(AActor* HomingTarget)
 {
 	;
+}
+
+void AProjectile::SetEnemyFire(bool bEnemy)
+{
+	bIsFireEnemy = bEnemy;
 }

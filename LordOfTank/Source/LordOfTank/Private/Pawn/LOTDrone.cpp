@@ -297,16 +297,13 @@ void ALOTDrone::SetTarget()
 	//결과를 담을 구조체변수
 	FHitResult OutHit;
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
-<<<<<<< HEAD
-	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
-	{
-		//if (HomingTarget != NULL)
-			//HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
-=======
+//<<<<<<< HEAD
+
+//=======
 	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true)){
 		if (HomingTarget != NULL)
 			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
->>>>>>> cb758b4ed7d64fbd794d75d0df6effa2faafda77
+//>>>>>>> cb758b4ed7d64fbd794d75d0df6effa2faafda77
 		HomingTarget = OutHit.GetActor();
 		//HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());

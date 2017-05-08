@@ -13,7 +13,6 @@
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetArrayLibrary.h"
-#include "LOTDrone.h"
 #include "LOTMultiPlayer.h"
 
 
@@ -132,23 +131,8 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	}
 
 
-
-	//CrossHair->attach
-
-	/*if (CrossHairBP.Class != NULL)
-	{
-	CrossHair = CrossHairBP.Class;
-
-	}*/
-
-
 	bIsFireMode = false;
 	bIsPushFire = false;
-	MaxHealth = 100.f;
-	CurrentHealth = MaxHealth;
-
-	// 초기 AP를 100으로 설정
-	AP = 100.f;
 
 	MinShootingPower = 100.f;
 	RaisingRate = 50.f;
@@ -169,15 +153,26 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 
 	bIsSendRight = false;
 
+	MoveAP = 1.0f;
 }
 
 void ALOTMultiPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	UWorld* const World = GetWorld();
-
+	SetDefaultInvetory();
 	EngineSoundComponent->Play();
 
+}
+void ALOTMultiPlayer::SetDefaultInvetory()
+{
+	if (ProjectileInventory.Num() == 0)
+	{
+		ProjectileInventory.AddUnique(ACommonProjectile::StaticClass());
+		ProjectileInventory.AddUnique(AArmorPiercingProjectile::StaticClass());
+		ProjectileInventory.AddUnique(AHomingProjectile::StaticClass());
+		CurrentProjectile = ProjectileInventory[0];
+
+	}
 }
 
 
@@ -188,8 +183,8 @@ void ALOTMultiPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	check(InputComponent);
 	InputComponent->BindAxis("Forward", this, &ALOTMultiPlayer::MoveForward);
 	InputComponent->BindAxis("Right", this, &ALOTMultiPlayer::MoveRight);
-	//InputComponent->BindAction("Fire", IE_Released, this, &ALOTMultiPlayer::FireEnd);
-	//InputComponent->BindAction("Fire", IE_Pressed, this, &ALOTMultiPlayer::FireStart);
+	InputComponent->BindAction("Fire", IE_Released, this, &ALOTMultiPlayer::FireEnd);
+	InputComponent->BindAction("Fire", IE_Pressed, this, &ALOTMultiPlayer::FireStart);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTMultiPlayer::FireMode);
 
 	InputComponent->BindAction("ChangePawn", IE_Pressed, this, &ALOTMultiPlayer::ChangePawn);
@@ -210,7 +205,8 @@ void ALOTMultiPlayer::Tick(float DeltaTime)
 
 	if (bIsPushFire)
 	{
-
+		DrawTrajectory();
+		RaisePower();
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재파워 %f"), CurShootingPower));
 	}
 
@@ -231,9 +227,11 @@ void ALOTMultiPlayer::ChangeFiremodeBody()
 
 }
 
+
+
 void ALOTMultiPlayer::FireMode()
 {
-
+	ClearBeam();
 	if (bIsFireMode == false)
 	{
 		bIsFireMode = true;
@@ -247,22 +245,54 @@ void ALOTMultiPlayer::FireMode()
 
 }
 
-//void ALOTMultiPlayer::FireStart()
-//{
-//	if (bIsFireMode == true)
-//	{
-//		bIsPushFire = true;
-//		CurShootingPower = MinShootingPower;
-//	}
-//}
-//
-//
-//void ALOTMultiPlayer::FireEnd()
-//{
-//
-//
-//}
-//
+void ALOTMultiPlayer::FireStart()
+{
+
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	
+	if (bIsFireMode == true && GameModeTest->bIsMyTurn)
+	{
+		bIsPushFire = true;
+		CurShootingPower = MinShootingPower;
+		
+	}
+}
+
+void ALOTMultiPlayer::FireEnd()
+{
+	
+	ClearBeam();
+	if (CurrentProjectile != NULL && bIsPushFire)
+	{
+		ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		bIsPushFire = false;
+		bIsShoot = true;
+		FRotator SpawnRotation = GetActorRotation() + FireModeCamera->RelativeRotation;//
+		SpawnRotation = MuzzleLocation->GetComponentRotation();
+		const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
+		UWorld* const World = GetWorld();
+		if (World != NULL)
+		{
+			//SendFire(FVector Location, FRotator Rotation, float Power)
+			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
+				FRotator(0.f, 0.f, 0.f), FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
+
+
+			AProjectile* TempActor = World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation);
+			TempActor->SetInitialVelocity(InitialVelocity);
+			TempActor->ParentTank = this;
+			TempActor->SetEnemyFire(false);
+			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
+			UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.4f, VTBlend_Linear, 0.0f, true);
+			TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower);
+			
+		}
+	}
+	
+
+
+}
+
 void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 {
 
@@ -297,11 +327,17 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 //
 void ALOTMultiPlayer::MoveForward(float Val)
 {
-	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-
-	if (!bIsFireMode && TestInstance->bIsmyTurn) {
+	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
+		if (Val != 0.f)
+		{
+			GameModeTest->MyPlayer.AP -= MoveAP;
+			if (GameModeTest->MyPlayer.AP <= 0) 
+				GameModeTest->MyPlayer.AP = 0;
+			
+		}
 	}
 	else
 		GetVehicleMovementComponent()->SetThrottleInput(0.f);
@@ -310,10 +346,16 @@ void ALOTMultiPlayer::MoveForward(float Val)
 
 void ALOTMultiPlayer::MoveRight(float Val)
 {
-	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
-
-	if (!bIsFireMode && TestInstance->bIsmyTurn) {
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	//bIsMyTurn
+	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable) {
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
+		if (Val != 0.f)
+		{
+			GameModeTest->MyPlayer.AP -= MoveAP;
+			if (GameModeTest->MyPlayer.AP <= 0)
+				GameModeTest->MyPlayer.AP = 0;
+		}
 	}
 	else
 		GetVehicleMovementComponent()->SetThrottleInput(0.f);
@@ -332,41 +374,92 @@ void ALOTMultiPlayer::ChangePawn()
 
 
 
-//
-//void ALOTMultiPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-//{
-//
-//	// Only add impulse and destroy projectile if we hit a physics
-//	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
-//	{
-//		;
-//	}
-//}
+
+void ALOTMultiPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+
+	// Only add impulse and destroy projectile if we hit a physics
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
+	{
+		;
+	}
+}
 
 
 
-//void ALOTMultiPlayer::ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent)
-//{
-//	if (MovementComponent)
-//	{
-//		SetVehicleMovement();
-//	}
-//	//SetVehicleMovement(MovementComponent);
-//	
-//}
+FVector ALOTMultiPlayer::GetSegmentatTime(FVector StartLocation, FVector InitialVelocity, FVector Gravity, float time)
+{
+	return StartLocation + (InitialVelocity*time) + (time*time*0.5f*Gravity);
+}
+
+void ALOTMultiPlayer::DrawTrajectory()
+{
+	ClearBeam();
+	const FRotator SpawnRotation = GetActorRotation() + FireModeCamera->RelativeRotation;//
+
+	const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
+
+	const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
+		SpawnRotation, FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
+
+	const float PathLifetime = 5.0f;
+	const float TimeInterval = 0.05f;
+	const int32 FloorTime = UKismetMathLibrary::FFloor(PathLifetime / TimeInterval);
+
+	float time1, time2;
+	FVector point1, point2;
+
+	//타겟설정 가능한 타입을 넣을 배열
+	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
+	//비히클타입만 체크하도록 한다.
+
+	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Visibility));
+	//현재 월드를 가져온다.
+	UWorld* const World = GetWorld();
+
+	FHitResult OutHit;
 
 
+	//for (int32 index = 0; index < 3; ++index)
+	for (int32 index = 0; index < FloorTime; ++index)
+	{
+		time1 = index * TimeInterval;
+		time2 = (index + 1) * TimeInterval;
+		point1 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time1);
+		point2 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time2);
+		DrawBeam(point1, point2);
 
+		if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
+			break;
 
+	}
+}
 
-//void ALOTMultiPlayer::ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent)
-//{
-//	if (MovementComponent)
-//	{
-//		SetVehicleMovement();
-//	}
-//	//SetVehicleMovement(MovementComponent);
-//	
-//}
+void ALOTMultiPlayer::DrawBeam(FVector StartLocation, FVector EndLocation)
+{
+	UParticleSystemComponent* TrajectoryBeam = NewObject<UParticleSystemComponent>(this);
+	TrajectoryBeam->RegisterComponent();
+	TrajectoryBeam->SetTemplate(LoadObject<UParticleSystem>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Particles/PT_ArcingAim.PT_ArcingAim")));
+
+	TrajectoryBeam->SetBeamSourcePoint(0, StartLocation, 0);
+	TrajectoryBeam->SetBeamTargetPoint(0, EndLocation, 0);
+	BeamArray.Add(TrajectoryBeam);
+
+}
+
+void ALOTMultiPlayer::RaisePower()
+{
+	if (CurShootingPower<MaxShootingPower)
+		CurShootingPower += RaisingRate;
+}
+
+void ALOTMultiPlayer::ClearBeam()
+{
+	for (auto&i : BeamArray)
+	{
+		i->DestroyComponent();
+	}
+	BeamArray.Empty();
+}
 
 

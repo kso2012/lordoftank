@@ -24,6 +24,8 @@
 #define CS_GAME_START 5
 #define CS_PLAYER_MOVE 6
 #define CS_FINISH_LOAD 7
+#define CS_TANK_SHOT 8
+#define CS_TANK_HIT 9
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
@@ -33,6 +35,8 @@
 #define SC_PLAYER_MOVE 6
 #define SC_TURN 7
 #define SC_TIMER 8
+#define SC_TANK_SHOT 9
+#define SC_TANK_HIT 10
 
 
 #pragma pack (push, 1)
@@ -86,10 +90,26 @@ struct cs_packet_player_move
 	FRotator droneRotation;
 };
 
+struct sc_packet_player_ap
+{
+	BYTE size;
+	BYTE type;
+};
+
 struct cs_packet_tank_shot
 {
 	BYTE size;
 	BYTE type;
+	FVector location;
+	float power;
+	FRotator rotation;
+};
+
+struct cs_packet_tank_hit
+{
+	BYTE size;
+	BYTE type;
+	float damage;
 };
 
 struct sc_packet_room_show
@@ -141,6 +161,7 @@ struct sc_packet_turn
 	BYTE size;
 	BYTE type;
 	bool turn;
+	float ap;
 };
 
 struct sc_packet_timer
@@ -160,6 +181,24 @@ struct sc_packet_player_move
 	FRotator rotation;
 	FVector droneLocation;
 	FRotator droneRotation;
+};
+
+struct sc_packet_tank_shot
+{
+	BYTE size;
+	BYTE type;
+	FVector location;
+	float power;
+	FRotator rotation;
+};
+
+struct sc_packet_tank_hit
+{
+	BYTE size;
+	BYTE type;
+	float hp;
+	float shield;
+	int playerNum;
 };
 
 struct sc_packet_finish_game

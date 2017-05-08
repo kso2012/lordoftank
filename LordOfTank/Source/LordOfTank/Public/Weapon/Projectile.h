@@ -4,6 +4,8 @@
 
 #include "GameFramework/Actor.h"
 #include "LOTPlayer.h"
+#include "GameMode/MultiGameMode.h"
+#include "LOTGameInstance.h"
 #include "Projectile.generated.h"
 
 UCLASS()
@@ -45,7 +47,7 @@ public:
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
-		
+
 	virtual void SetHomingTarget(AActor* HomingTarget);
 
 protected:
@@ -56,6 +58,10 @@ protected:
 	//Åº¾Ë µ¥¹ÌÁö
 	float ProjectileDamage;
 
+	bool bIsFireEnemy;
+
+
+
 
 
 public:	
@@ -64,9 +70,11 @@ public:
 
 	void SetInitialVelocity(FVector velocity);
 
-	ALOTPlayer *ParentTank;
+	AActor* ParentTank;
 
 	void GetTank(ALOTPlayer * tank) { ParentTank = tank; }
 
-	void SendMessage() { ParentTank->ChangeTurn(); }
+	//void SendMessage() { ParentTank->ChangeTurn(); }
+
+	void SetEnemyFire(bool bEnemy);
 };

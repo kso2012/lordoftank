@@ -155,7 +155,7 @@ void AHomingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 
 
-	AProjectile::SendMessage();
+
 
 
 	Destroy();

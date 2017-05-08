@@ -127,6 +127,8 @@ private:
 
 	uint32 bIsDetectMode : 1;
 
+	float MoveAP;
+
 	class AActor* HomingTarget;
 
 	//날개와 몸통 애니메이션 지정.

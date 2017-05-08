@@ -267,7 +267,7 @@ void ALOTPlayer::FireEnd()
 				UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
 				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.25f, VTBlend_Linear, 0.0f, true);
 			}
-			TempActor->GetTank(this);
+			//TempActor->GetTank(this);
 		}
 	}
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
@@ -333,6 +333,7 @@ void ALOTPlayer::MoveRight(float Val)
 
 }
 
+
 void ALOTPlayer::SetDefaultInvetory()
 {
 	if (ProjectileInventory.Num() == 0)
@@ -344,7 +345,6 @@ void ALOTPlayer::SetDefaultInvetory()
 
 	}
 }
-
 
 
 //void ALOTPlayer::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

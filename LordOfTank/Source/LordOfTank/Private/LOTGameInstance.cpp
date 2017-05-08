@@ -12,10 +12,13 @@ ULOTGameInstance::ULOTGameInstance()
 {
 	bIsConnected = false;
 	bIsStart = false;
+	bIsHurt = false;
 	bIsTryConnecting = false;
 	PlayerNum = 0;
 	LeftTime = 0;
 	GameStateEnum = EGameState::Mode_Main;
+	bEnemyIsShot = false;
+	bChangeTurn = false;
 	//Velocity = FVector(0.f,0.f,0.f);
 	//Angular = FVector(0.f,0.f,0.f);
 }
@@ -139,10 +142,22 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		bIsmyTurn = my_packet->turn;
 		break;
 	}
+	case SC_TANK_HIT:
+	{
+		sc_packet_tank_hit *my_packet = reinterpret_cast<sc_packet_tank_hit*>(ptr);
+		bIsHurt = true;
+		HP = my_packet->hp;
+		Shield = my_packet->shield;
+		HitPlayerNum = my_packet->playerNum;
+
+		break;
+	}
 	case SC_TURN:
 	{
 		sc_packet_turn *my_packet = reinterpret_cast<sc_packet_turn*>(ptr);
+		bChangeTurn = true;
 		bIsmyTurn = my_packet->turn;
+		ChargingAP = my_packet->ap;
 		break;
 	}
 
@@ -164,6 +179,16 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		EnemyDroneLocation = my_packet->droneLocation;
 		EnemyDroneRotation = my_packet->droneRotation;
 
+		break;
+	}
+	case SC_TANK_SHOT:
+	{
+		sc_packet_tank_shot *my_packet = reinterpret_cast<sc_packet_tank_shot*>(ptr);
+		EnemyShotLocation = my_packet->location;
+		EnemyShotPower = my_packet->power;
+		EnemyShotRotation = my_packet->rotation;
+		bEnemyIsShot = true;
+		
 		break;
 	}
 
@@ -406,12 +431,41 @@ void ULOTGameInstance::SendLocationInfo(FVector LinearVel, FVector AngularVel, F
 
 }
 
+void ULOTGameInstance::SendFire(FVector Location, FRotator Rotation, float Power)
+{
+
+	cs_packet_tank_shot *tank_shot = reinterpret_cast<cs_packet_tank_shot *>(send_buffer);
+
+	tank_shot->type = CS_TANK_SHOT;
+	tank_shot->size = sizeof(cs_packet_tank_shot);
+	tank_shot->location = Location;
+	tank_shot->rotation = Rotation;
+	tank_shot->power = Power;
+
+	send_wsabuf.len = sizeof(cs_packet_tank_shot);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+
+}
+
 void ULOTGameInstance::SendFinishLoad()
 {
 	cs_packet_finish_load *finish_load = reinterpret_cast<cs_packet_finish_load *>(send_buffer);
 	finish_load->type = CS_FINISH_LOAD;
 	finish_load->size = sizeof(cs_packet_finish_load);
 	send_wsabuf.len = sizeof(cs_packet_finish_load);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::SendTankHit(float Damage)
+{
+
+	cs_packet_tank_hit *tank_hit = reinterpret_cast<cs_packet_tank_hit *>(send_buffer);
+	tank_hit->type = CS_TANK_HIT;
+	tank_hit->size = sizeof(cs_packet_tank_hit);
+	tank_hit->damage = Damage;
+	send_wsabuf.len = sizeof(cs_packet_tank_hit);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }

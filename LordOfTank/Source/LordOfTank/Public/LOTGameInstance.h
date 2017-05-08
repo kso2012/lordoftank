@@ -234,6 +234,11 @@ public:
 
 	void SendFinishLoad();
 
+	void SendFire(FVector Location, FRotator Rotation, float Power);
+
+	void SendTankHit(float Damage);
+
+	//적 무브먼트 동기화
 	FVector EnemyWorldLocation;
 	
 	FVector EnemyLinearVelocity;
@@ -245,7 +250,34 @@ public:
 	FVector EnemyDroneLocation;
 	
 	FRotator EnemyDroneRotation;
+	//----
+
+	//포탄 동기화
+	FVector EnemyShotLocation;
+
+	float EnemyShotPower;
+
+	FRotator EnemyShotRotation;
+
+	bool bEnemyIsShot;
+
+	//----
+
+	//체력,실드 동기화
+
+	float HP;
+	float Shield;
+	float HitPlayerNum;
+	bool bIsHurt;
+	//----
+
+
+
+	//턴 변경시 동기화
+	float ChargingAP;
 
 	bool bIsmyTurn;
-	
+
+	bool bChangeTurn;
+	//----
 };

@@ -215,6 +215,7 @@ ALOTMultiDrone::ALOTMultiDrone()
 	bHasInputUpward = false;
 	bHasInputForward = false;
 	bIsDetectMode = false;
+	MoveAP = 5.f;
 
 }
 
@@ -304,18 +305,22 @@ void ALOTMultiDrone::SetTarget()
 
 void ALOTMultiDrone::MoveForwardInput(float Val)
 {
-	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("val값= %ff"), Val));
 	//Val이 0.f와 근사치에 가깝다면 true,아니면 false를 반환.
 	bHasInputForward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
 
 	//키 입력을 했다면
-	if (bHasInputForward && TestInstance->bIsmyTurn)
+	if (bHasInputForward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+		GameModeTest->MyPlayer.AP -= MoveAP;
+		if (GameModeTest->MyPlayer.AP <= 0) 
+			GameModeTest->MyPlayer.AP = 0;
+		
 	}
 	//정지상태가 아니라면
 	else if (CurrentForwardSpeed != 0.f)
@@ -341,18 +346,23 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 void ALOTMultiDrone::MoveUpwardInput(float Val)
 {
 
-	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	
 	bHasInputUpward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward && TestInstance->bIsmyTurn)
+	if (bHasInputUpward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
+		GameModeTest->MyPlayer.AP -= MoveAP;
+		if (GameModeTest->MyPlayer.AP <= 0) 
+			GameModeTest->MyPlayer.AP = 0;
+		
+		
 
 	}
 

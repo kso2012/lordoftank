@@ -26,7 +26,7 @@ ACommonProjectile::ACommonProjectile()
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
 	FlareParticle->SetTemplate(FlareParticleAsset.Object);
-	
+	FlareParticle->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
 	ExplosionParticle = ExplosionParticleAsset.Object;
 
@@ -39,7 +39,7 @@ ACommonProjectile::ACommonProjectile()
 
 	RadialRadius = 1000.f; //폭발 반경
 	ImpulseStrength = 1000000.f;
-	ProjectileDamage = 10.f;
+	ProjectileDamage = 50.f;
 	
 
 }
@@ -116,24 +116,70 @@ void ACommonProjectile::FireImpulse()
 			}
 		}
 
-
 		PrimitiveComponent->AddRadialImpulse(Origin, RadialRadius, ImpulseStrength, Falloff, false);
 	}
 
 	for (AActor* InsideActor : AffectedActors)
 	{
-		if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
-			FVector ActorLocation = InsideActor->GetActorLocation();
-			float CenterToLength=UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X) 
-				+ UKismetMathLibrary::Square(Origin.Y-ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
-			if (CenterToLength > RadialRadius)
-				CenterToLength = RadialRadius;
+		AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		//멀티게임
+		if (GameMode)
+		{
 
-			float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-			
-			Test->ApplyDamage(ProjectileDamage*DamageRatio);
+			if (ALOTMultiPlayer* const Test = Cast<ALOTMultiPlayer>(InsideActor)) {
+				//쏜 자신에게 맞았을 경우 
+				if ((bIsFireEnemy == false && Test == ParentTank))
+				{
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+				}
+				//적에게 맞았을 경우
+				else if ((bIsFireEnemy == true && Test != ParentTank))
+				{
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+				}
+			}
 		}
+		//싱글게임
+		else {
+
+				if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
+
+					//Test->GetRootPrimitiveComponent()->addradialim
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+
+					Test->ApplyDamage(ProjectileDamage*DamageRatio);
+				}
+			}
+
+
+
+
+
 	}
 
 		//UPrimitiveComponent* Primitive = InsideActor->GetRootPrimitiveComponent();
@@ -148,15 +194,17 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 {
 	
 	
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) )
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
+
 		FireImpulse();
 		
 		
 	}
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
 
-	AProjectile::SendMessage();
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+
+
 
 	Destroy();
 }
