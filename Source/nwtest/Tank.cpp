@@ -12,7 +12,8 @@
 
 ATank::ATank()
 {
-
+	forwardVal = 0;
+	rightVal = 0;
 	PrimaryActorTick.bCanEverTick = true;
 	//½ºÄÌ·¹ÅæÄÄÆ÷³ÍÆ®¿¡ ¸Þ½¬ Àû¿ë.
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> BodySkeletalMesh(TEXT("/Game/LOTAssets/TankAssets/LOTBody.LOTBody"));
@@ -29,7 +30,6 @@ ATank::ATank()
 	//TurretMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
 	TurretMesh->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	TurretMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 
 	BarrelMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BarrelMesh"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> BarrelStaticMesh(TEXT("/Game/LOTAssets/TankAssets/Meshes/LBX1Barrel_SM"));
@@ -122,23 +122,23 @@ void ATank::SetupPlayerInputComponent(UInputComponent* InputComponent)
 void ATank::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-
-
-FTransform ATank::MoveForward(float Val)
-{
-	
-	GetVehicleMovementComponent()->SetThrottleInput(Val);
-	return GetActorTransform();
+	GetVehicleMovementComponent()->SetThrottleInput(forwardVal);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("%f"), forwardVal));
+	GetVehicleMovementComponent()->SetSteeringInput(rightVal);
 	
 }
 
 
-FTransform ATank::MoveRight(float Val)
+
+void ATank::SetMoveForward(float Val)
 {
-	GetVehicleMovementComponent()->SetSteeringInput(Val);
-	return GetActorTransform();
+	forwardVal = Val;
+}
+
+
+void ATank::SetMoveRight(float Val)
+{
+	rightVal = Val;
 }
 
 
