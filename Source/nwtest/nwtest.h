@@ -17,17 +17,22 @@
 #define CS_READY_CLICK 3
 #define CS_EXIT_CLICK 4
 #define CS_GAME_START 5
-#define CS_TANK_FORWARD 6
-#define CS_TANK_RIGHT 7
+#define CS_PLAYER_MOVE 6
+#define CS_FINISH_LOAD 7
+#define CS_TANK_SHOT 8
+#define CS_TANK_HIT 9
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
 #define SC_ROOM_INFO 3
 #define SC_ROOM_READY 4
 #define SC_GAME_START 5
-#define SC_TANK_MOVE 6
+#define SC_PLAYER_MOVE 6
 #define SC_TURN 7
 #define SC_TIMER 8
+#define SC_TANK_SHOT 9
+#define SC_TANK_HIT 10
+
 
 #pragma pack (push, 1)
 struct cs_packet_player_name
@@ -62,36 +67,38 @@ struct cs_packet_game_start
 	BYTE type;
 };
 
-struct cs_packet_info
+struct cs_packet_finish_load
 {
 	BYTE size;
 	BYTE type;
-	std::string name;
 };
 
-struct cs_packet_tank_move
+struct cs_packet_player_move
 {
 	BYTE size;
 	BYTE type;
-	float val;
+	FVector worldLocation;
+	FVector linearVelocity;
+	FVector angularVelocity;
+	FRotator rotation;
+	FVector droneLocation;
+	FRotator droneRotation;
 };
 
 struct cs_packet_tank_shot
 {
 	BYTE size;
 	BYTE type;
+	FVector location;
+	float power;
+	FRotator rotation;
 };
 
-struct cs_packet_dron_move
+struct cs_packet_tank_hit
 {
 	BYTE size;
 	BYTE type;
-};
-
-struct cs_packet_dron_targeting
-{
-	BYTE size;
-	BYTE type;
+	float damage;
 };
 
 struct sc_packet_room_show
@@ -143,15 +150,50 @@ struct sc_packet_turn
 	BYTE size;
 	BYTE type;
 	bool turn;
+	float ap;
 };
 
-struct sc_packet_tank_move
+struct sc_packet_timer
 {
 	BYTE size;
 	BYTE type;
-	FTransform location;
-	FTransform location2;
-	float velocity;
+	int timer;
+};
+
+struct sc_packet_player_move
+{
+	BYTE size;
+	BYTE type;
+	FVector worldLocation;
+	FVector linearVelocity;
+	FVector angularVelocity;
+	FRotator rotation;
+	FVector droneLocation;
+	FRotator droneRotation;
+};
+
+struct sc_packet_tank_shot
+{
+	BYTE size;
+	BYTE type;
+	FVector location;
+	float power;
+	FRotator rotation;
+};
+
+struct sc_packet_tank_hit
+{
+	BYTE size;
+	BYTE type;
+	float hp;
+	float shield;
+	int playerNum;
+};
+
+struct sc_packet_finish_game
+{
+	BYTE size;
+	BYTE type;
 };
 
 #pragma pack (pop)

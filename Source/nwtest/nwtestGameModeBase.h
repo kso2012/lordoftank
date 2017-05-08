@@ -38,18 +38,25 @@ struct Client {
 	string name;
 	bool isReady;
 	bool turn;
+	bool isLoad;
+	float hp;
+	float shield;
 	int playerNum;
 	int state; // 클라이언트의 상태 1이면 로비, 2이면 대기방, 3이면 게임시작
 	mutex my_lock;
 	OverlapEx m_recv_overlap;
 	int previous_data;
 	unsigned char packet[MAX_PACKET_SIZE];
+	//FVector worldLocation;
+	//FVector linearVelocity;
+	//FVector angularVelocity;
+	//FRotator rotation;
 };
 
 struct Room {
 	int roomNum;
 	int counts;
-	int state; // 방의 상태
+	int state; // 방의 상태 0이면 빈방, 1이면 1명, 2면 2명, 3이면 게임 시작
 	bool canStart;
 	Client* client1;
 	Client* client2;
@@ -78,33 +85,31 @@ public:
 	Client clients[MAX_USER];
 	Room room;
 	bool g_isshutdown;
-	bool PlayTick = false;
-	bool SpawnClient = false;
-	bool TankForward = false;
-	bool TankRight = false;
-	bool client1_turn = true;
-	bool client2_turn = false;
-	int MyID = -1;
-	int OtherID = -1;
-	int whoTurn = -1;
-	int timerTurn = 1;
-	float moveVal = 0;
-	float moveVal2 = 0;
-	float moveVal3 = 0;
-	float moveVal4 = 0;
+	bool PlayTick;
+	bool StartTimer;
+	bool SpawnClient;
+	bool TankForward;
+	bool TankRight;
+	bool ForwardSend;
+	bool RightSend;
+	bool client1_turn;
+	bool client2_turn;
+	int timerTurn;
+	float moveVal;
+	float moveVal2;
+	float moveVal3;
+	float moveVal4;
 	FTransform moveTf;
 	FTransform moveTf2;
 	ATank* testtank;
-	sc_packet_tank_move Tank_Move;
+	//sc_packet_tank_move Tank_Move;
 	APlayerController*  Test;
-	int mytime = 0;
+	int mytime;
 	FTimerHandle CountdownTimerHandle;
 	mutex mylock;
 
-	//void error_display(char *msg, int err_no);
 
 	void Initialize_Server();
-
 	void workerthread();
 	static void ToCallworkerthread(LPVOID p);
 	void acceptthread();
@@ -114,9 +119,8 @@ public:
 	vector <thread *> worker_threads;
 	thread* accept_threads;
 	bool threadkey;
-	float tesking;
 	void ProcessPacket(int id, unsigned char *packet);
 	void SendPacket(int id, unsigned char *packet);
-	int GetID();
+	
 
 };
