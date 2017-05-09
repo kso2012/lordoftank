@@ -76,11 +76,12 @@ void ALordOfTankGameModeBase::InitAI() {
 
 
 	EnemyPlayer.Tank = World->SpawnActor<ALOTPlayer>(ALOTPlayer::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
-	EnemyPlayer.Drone = World->SpawnActor<ALOTDrone>(ALOTDrone::StaticClass(), PlayerStart2->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart2->GetActorRotation());
+	EnemyPlayer.Drone = World->SpawnActor<ALOTDrone>(ALOTDrone::StaticClass(), PlayerStart2->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart2->GetActorRotation()); 
 	EnemyPlayer.PlayerNum = 2;
 	EnemyPlayer.Tank->SetTurn(false);
 	EnemyPlayer.ControlledPawn = PawnTank;
 	EnemyPlayer.Tank->SetisNotAI(false);
+	EnemyPlayer.Tank->Player = MyPlayer.Tank;
 
 	EnemyPlayer.Drone->OnViewBox();
 	IsEnemyFound = false;
@@ -88,17 +89,6 @@ void ALordOfTankGameModeBase::InitAI() {
 	//AI->Possess(EnemyPlayer.Tank);
 }
 
-
-/*
-void ALordOfTankGameModeBase::SavePlayerInfo(ALOTPlayer *T, ALOTDrone *D, int PlayerNum) {
-	Info.InsertPawn(T, D, PlayerNum);
-	ALordOfTankGameModeBase::IncreasePlayerCount();
-}
-
-void ALordOfTankGameModeBase::IncreasePlayerCount() {
-	ALordOfTankGameModeBase::PlayerCount ++;
-}
-*/
 
 void ALordOfTankGameModeBase::ChangePawn() {
 	if (PlayerTurn == 1) {
@@ -119,12 +109,6 @@ void ALordOfTankGameModeBase::ChangePawn() {
 }
 
 
-//float ALordOfTankGameModeBase::ReturnProjectileVelocity() {
-//	//ALordOfTankGameModeBase *mode = this;
-//	ALOTPlayer *Tank = Info.ReturnData(PlayerTurn).ReturnTank();
-//	return (*Tank).ReturnVelocity();
-//}
-
 void ALordOfTankGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -135,7 +119,6 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 			// AI에게 턴이 넘어갈 때 조작을 금지시킴
 			MyPlayer.Tank->DisableInput(Control);
 		}
-		//IsLookEnemyTank();
 	}
 	else if (PlayerTurn == 2) {
 		if (!EnemyPlayer.Tank->GetTurn()) {
@@ -167,7 +150,6 @@ void ALordOfTankGameModeBase::Think() {
 					FVector DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Drone->ReturnForwardVector(), DroneDirection, 0.01f);
 					EnemyPlayer.Drone->RotateDrone(DVector.Rotation());
 
-					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Drone Rotation");
 					if (((DroneDirection.X - 0.1f) < EnemyPlayer.Drone->ReturnForwardVector().X && EnemyPlayer.Drone->ReturnForwardVector().X  < (DroneDirection.X + 0.1f))
 						 && ((DroneDirection.Y - 0.1f) < EnemyPlayer.Drone->ReturnForwardVector().Y && EnemyPlayer.Drone->ReturnForwardVector().Y < (DroneDirection.Y + 0.1f))) {
 
@@ -178,6 +160,7 @@ void ALordOfTankGameModeBase::Think() {
 						DroneRotateDirection = None;
 						DroneDirection = FVector(0, 0, 0);
 
+						//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Drone Rotation Done");
 					}
 				}
 			}
@@ -222,8 +205,10 @@ void ALordOfTankGameModeBase::Think() {
 				EnemyPlayer.Tank->RotateTurret(DVector.Rotation());
 				if (((TurretDirection.X - 0.1f) < EnemyPlayer.Tank->ReturnTurretForwardVector().X && EnemyPlayer.Tank->ReturnTurretForwardVector().X  < (TurretDirection.X + 0.1f))
 					&& ((TurretDirection.Y - 0.1f) < EnemyPlayer.Tank->ReturnTurretForwardVector().Y && EnemyPlayer.Tank->ReturnTurretForwardVector().Y < (TurretDirection.Y + 0.1f))) {
+					
 					DVector = UKismetMathLibrary::VLerp(EnemyPlayer.Tank->ReturnTurretForwardVector(), TurretDirection, 1.f);
-					EnemyPlayer.Tank->RotateTurret(DVector.Rotation());
+					EnemyPlayer.Tank->RotateTurret(TurretDirection.Rotation());
+					
 					
 					bIsTurretRightDirection = true;
 					TurretRotateDirection = None;
@@ -235,13 +220,18 @@ void ALordOfTankGameModeBase::Think() {
 				}
 			}
 			// AI 포신이 제대로 조준이 되었을 경우 파워 조절 후 발사
-			else {
+			else if(EnemyPlayer.Tank->TurretAim == CorrectAim && !EnemyPlayer.Tank->bIsWaiting) {
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "SetAim()");
 				if (distance == 0.f)
 					SetPower();
-				EnemyPlayer.Tank->CommandShoot(distance);
-				bIsTurretRightDirection = false;
-				EnemyPlayer.Tank->TurretAim = None;
-				distance = 0.f;
+				//EnemyPlayer.Tank->CommandShoot(distance);
+				EnemyPlayer.Tank->SetAim(distance);
+				if (EnemyPlayer.Tank->RightShot) {
+
+					bIsTurretRightDirection = false;
+					EnemyPlayer.Tank->TurretAim = None;
+					distance = 0.f;
+				}
 			}
 		}
 

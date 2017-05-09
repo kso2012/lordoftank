@@ -248,5 +248,18 @@ public:
 	FVector ReturnMeshLocation() { return GetMesh()->GetComponentLocation(); }
 	FVector ReturnTurretForwardVector() { return TurretMesh->GetForwardVector(); }
 
+	void SetAim(float distance);
+
+	bool RightShot;
+
+	ALOTPlayer* Player;
+
+	bool bIsWaiting;
+
+	bool bIsTestShot;
+
+	int AimCount;
+
+	void SetbIsShoot() { bIsShoot = false; }
 	
 };

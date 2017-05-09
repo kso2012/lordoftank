@@ -18,7 +18,7 @@
 #define PawnTank 1
 #define PawnDrone 2
 
-#define None 0
+#define Nope 0
 #define CorrectAim 1
 #define InCorrectAim 2
 
@@ -144,7 +144,11 @@ ALOTPlayer::ALOTPlayer()
 	isNotAI = true;
 	bIsShoot = false;
 
-	TurretAim = None; 
+	TurretAim = Nope;
+	RightShot = false;
+	AimCount = 0;
+	bIsWaiting = false;
+	bIsTestShot = false;
 }
 
 void ALOTPlayer::BeginPlay()
@@ -194,7 +198,7 @@ void ALOTPlayer::Tick(float DeltaTime)
 	float RPMToAudioScale = 2500.0f / GetVehicleMovement()->GetEngineMaxRotationSpeed();
 	EngineSoundComponent->SetFloatParameter("RPM", GetVehicleMovement()->GetEngineRotationSpeed()*RPMToAudioScale);
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), myTurn));
-
+	
 	
 }
 
@@ -267,11 +271,13 @@ void ALOTPlayer::FireEnd()
 				UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
 				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.25f, VTBlend_Linear, 0.0f, true);
 			}
-			//TempActor->GetTank(this);
+			TempActor->GetTank(this);
 		}
 	}
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("배열길이 %d"), ProjectileInventory.Num()));
 	FireMode();
+	if(isNotAI)
+		CurShootingPower = MinShootingPower;
 
 }
 
@@ -333,7 +339,6 @@ void ALOTPlayer::MoveRight(float Val)
 
 }
 
-
 void ALOTPlayer::SetDefaultInvetory()
 {
 	if (ProjectileInventory.Num() == 0)
@@ -345,6 +350,7 @@ void ALOTPlayer::SetDefaultInvetory()
 
 	}
 }
+
 
 
 //void ALOTPlayer::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -409,12 +415,13 @@ void ALOTPlayer::DrawTrajectory()
 	{
 		time1 = index * TimeInterval;
 		time2 = (index + 1) * TimeInterval;
-		point1 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time1);
-		point2 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time2);
 		DrawBeam(point1, point2);
 
-		if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
+		if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true)) {
+			//RightShot = true;
+			//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("crash")));
 			break;
+		}
 		
 	}
 }
@@ -483,6 +490,7 @@ void ALOTPlayer::ChangeTurn() {
 			myTurn = true;
 		// 발사중일 땐 bIsShoot = true인데 포탄이 폭발할 때 턴을 넘기도록 함. 이 함수는 Projectile에서 호출됨
 		bIsShoot = false; 
+		RightShot = false;
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Trun Changed")));
 }
 
@@ -491,7 +499,9 @@ void ALOTPlayer::ShootAI(float power) {
 	if (myTurn && !isNotAI && !bIsShoot) {
 		bIsFireMode = true;
 		bIsShoot = true;
-		CurShootingPower = power;
+		//CurShootingPower = power;
+		if(RightShot)
+			AimCount = 0;
 		FireEnd();
 	}
 }
@@ -505,8 +515,32 @@ void ALOTPlayer::TurnAI() {
 
 
 void ALOTPlayer::RotateTurret(FRotator RotateDirection) {
-	if (TurretAim == None) {
+	if (TurretAim == Nope) {
 		TurretMesh->SetWorldRotation(RotateDirection);
 	}
 }
 
+void ALOTPlayer::SetAim(float distance) {
+	if (AimCount == 0) {
+		CurShootingPower = distance - 10000;
+		AimCount++;
+		bIsTestShot = true;
+	}
+	if (!bIsWaiting) {
+		CurShootingPower += 1000;
+
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Power = %f"), CurShootingPower));
+		bIsWaiting = true;
+		ShootAI(CurShootingPower);
+	}
+
+
+	if ((CurShootingPower > distance + 30000.f || CurShootingPower > MaxShootingPower) && !RightShot) {
+		CurShootingPower = MinShootingPower;
+		BarrelMesh->AddLocalRotation(FRotator(1.f, 0, 0));
+		if (BarrelMesh->GetComponentRotation().Roll > 80.f)
+			BarrelMesh->AddLocalRotation(FRotator(-1.f, 0, 0));
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Barrel Rotate")));
+	}
+
+}

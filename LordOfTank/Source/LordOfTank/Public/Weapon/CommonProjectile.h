@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Weapon/Projectile.h"
+#include "LordOfTankGameModeBase.h"
 #include "CommonProjectile.generated.h"
 
 /**
@@ -13,6 +14,7 @@ class LORDOFTANK_API ACommonProjectile : public AProjectile
 {
 	GENERATED_BODY()
 
+	void BeginPlay();
 
 	void AddCollisionChannelToAffect(enum ECollisionChannel CollisionChannel);
 
@@ -27,7 +29,9 @@ class LORDOFTANK_API ACommonProjectile : public AProjectile
 
 	float ImpulseStrength;
 
+	ALordOfTankGameModeBase* Single ;
 	
+	void MakeInvisability();
 
 protected:
 

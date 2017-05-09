@@ -437,6 +437,8 @@ void ALOTDrone::DetectMode()
 	{
 		bIsDetectMode = true;
 		bDetectMode = true;
+		if (!isNotAI)
+			OffViewBox();
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("Å½»ö¸ðµå!!!"));
 		Camera->Deactivate();
 		DetectCamera->Activate();
@@ -449,6 +451,8 @@ void ALOTDrone::DetectMode()
 	{
 		bIsDetectMode = false;
 		bDetectMode = false;
+		if(!isNotAI)
+			OnViewBox();
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("³ëÅ½»ö¸ðµå!!!"));
 		Camera->Activate();
 		DetectCamera->Deactivate();

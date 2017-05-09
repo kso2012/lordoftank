@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "LordOfTank.h"
+#include "LordOfTankGameModeBase.h"
 #include "Pawn/LOTPlayer.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Weapon/CommonProjectile.h"
@@ -11,25 +12,28 @@
 
 ACommonProjectile::ACommonProjectile()
 {
-	
+
 	CollisionComp->OnComponentHit.AddDynamic(this, &ACommonProjectile::OnHit);		
 
-
-	
-
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> AmmoStaticMesh(TEXT("StaticMesh'/Game/LOTAssets/TankAssets/Meshes/CommonAmmo.CommonAmmo'"));
-	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
 	
 	
 	//static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
 	//TrailParticle->SetTemplate(TrailParticleAsset.Object);
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
+
+	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
 	FlareParticle->SetTemplate(FlareParticleAsset.Object);
 	FlareParticle->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
 	ExplosionParticle = ExplosionParticleAsset.Object;
 
+
+	RadialRadius = 1000.f; //폭발 반경
+	ImpulseStrength = 1000000.f;
+	ProjectileDamage = 50.f;
+	
 	AddCollisionChannelToAffect(ECC_MAX);
 	//AddCollisionChannelToAffect(ECC_Pawn);
 	//AddCollisionChannelToAffect(ECC_PhysicsBody);
@@ -37,11 +41,28 @@ ACommonProjectile::ACommonProjectile()
 	//AddCollisionChannelToAffect(ECC_Destructible);
 	UpdateCollisionObjectQueryParams();
 
-	RadialRadius = 1000.f; //폭발 반경
-	ImpulseStrength = 1000000.f;
-	ProjectileDamage = 50.f;
-	
 
+}
+
+void ACommonProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//MakeInvisability();
+
+
+}
+
+void ACommonProjectile::MakeInvisability() {
+	Single = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(AActor::GetWorld()));
+	//ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	ALOTPlayer* const Test = Cast<ALOTPlayer>(ParentTank);
+
+	//if (Single == UGameplayStatics::GetGameMode(GetWorld()) && Test->bIsTestShot == true) {
+	//if(Test->bIsTestShot == true) {
+		AmmoMesh->SetVisibility(false, false); 
+		FlareParticle->SetVisibility(false, false);
+	//}
 }
 
 void ACommonProjectile::AddObjectTypeToAffect(TEnumAsByte<enum EObjectTypeQuery> ObjectType)
@@ -121,10 +142,12 @@ void ACommonProjectile::FireImpulse()
 
 	for (AActor* InsideActor : AffectedActors)
 	{
+
 		AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 		//멀티게임
-		if (GameMode)
+		if (GameMode == UGameplayStatics::GetGameMode(GetWorld()))
 		{
 
 			if (ALOTMultiPlayer* const Test = Cast<ALOTMultiPlayer>(InsideActor)) {
@@ -158,11 +181,12 @@ void ACommonProjectile::FireImpulse()
 			}
 		}
 		//싱글게임
-		else {
+		else if (SingleMode == UGameplayStatics::GetGameMode(GetWorld())){
 
-				if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
-
-					//Test->GetRootPrimitiveComponent()->addradialim
+			if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
+				//쏜 자신에게 맞았을 경우 
+				if ((bIsFireEnemy == false && Test == ParentTank))
+				{
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
 						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
@@ -171,13 +195,24 @@ void ACommonProjectile::FireImpulse()
 						CenterToLength = RadialRadius;
 
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-
-					Test->ApplyDamage(ProjectileDamage*DamageRatio);
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+				}
+				//적에게 맞았을 경우
+				else if ((bIsFireEnemy == true && Test != ParentTank))
+				{
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
 				}
 			}
-
-
-
+		}
 
 
 	}
@@ -193,19 +228,44 @@ void ACommonProjectile::FireImpulse()
 void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	
-	
+
+	ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	ALOTPlayer* const Test = Cast<ALOTPlayer>(ParentTank);
+
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
-
-		FireImpulse();
+		if (SingleMode == UGameplayStatics::GetGameMode(GetWorld()) && Test->bIsTestShot && Test->GetisAI() && OtherActor == Test->Player) {
+			Test->bIsTestShot = false;
+			Test->RightShot = true;
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("테스트 끝")));
+		}
+		else {
+			FireImpulse();
+			if (SingleMode == UGameplayStatics::GetGameMode(GetWorld()) && !Test->bIsTestShot)
+				Test->ChangeTurn();
+		}
 		
 		
 	}
 
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
-	ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
-	GameInstance->SendExplosion();
+	if (SingleMode == UGameplayStatics::GetGameMode(GetWorld())) {
+		Test->bIsWaiting = false;
+		Test->SetbIsShoot();
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("bIsWaiting %d"), Test->bIsWaiting));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("bIsTestShot %d"), Test->bIsTestShot));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("RightShot %d"), Test->RightShot));
+	}
+	if (SingleMode == UGameplayStatics::GetGameMode(GetWorld()) && Test->bIsTestShot) {}
+	else UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+
+
+
+	AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	//멀티게임
+	if (GameMode == UGameplayStatics::GetGameMode(GetWorld())) {
+		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		GameInstance->SendExplosion();
+	}
 
 	Destroy();
-
 }
