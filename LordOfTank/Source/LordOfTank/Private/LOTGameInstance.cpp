@@ -43,8 +43,8 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
-	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
+	//serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	InitEvent(sock);
@@ -188,6 +188,13 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		EnemyShotPower = my_packet->power;
 		EnemyShotRotation = my_packet->rotation;
 		bEnemyIsShot = true;
+		
+		break;
+	}
+	case SC_FINISH_GAME:
+	{
+		sc_packet_finish_game *my_packet = reinterpret_cast<sc_packet_finish_game*>(ptr);
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("상대 쳐나감")));
 		
 		break;
 	}
@@ -466,6 +473,16 @@ void ULOTGameInstance::SendTankHit(float Damage)
 	tank_hit->size = sizeof(cs_packet_tank_hit);
 	tank_hit->damage = Damage;
 	send_wsabuf.len = sizeof(cs_packet_tank_hit);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::SendExplosion()
+{
+	cs_packet_tank_explosion *tank_explosion = reinterpret_cast<cs_packet_tank_explosion *>(send_buffer);
+	tank_explosion->type = CS_TANK_EXPLOSION;
+	tank_explosion->size = sizeof(cs_packet_tank_explosion);
+	send_wsabuf.len = sizeof(cs_packet_tank_explosion);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }

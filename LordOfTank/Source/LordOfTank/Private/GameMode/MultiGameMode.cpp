@@ -49,11 +49,15 @@ void AMultiGameMode::InitPlayer()
 
 	MyPlayer.Shield = MaxShield;
 
+	MyPlayer.Dead = false;
+
 	EnemyPlayer.AP = MaxAP;
 
 	EnemyPlayer.HP = MaxHealth;
 
 	EnemyPlayer.Shield = MaxShield;
+
+	EnemyPlayer.Dead = false;
 
 	MyPlayer.Moveable = true;
 }
@@ -79,7 +83,9 @@ void AMultiGameMode::StartPlay()
 
 		EnemyPlayer.Tank = World->SpawnActor<ALOTMultiPlayer>(ALOTMultiPlayer::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
 		EnemyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart2->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart2->GetActorRotation());
-
+		
+		MyPlayer.PlayerNum = 1;
+		EnemyPlayer.PlayerNum = 2;
 	
 	}
 
@@ -90,8 +96,15 @@ void AMultiGameMode::StartPlay()
 
 		MyPlayer.Tank = World->SpawnActor<ALOTMultiPlayer>(ALOTMultiPlayer::StaticClass(), PlayerStart2->GetActorLocation(), PlayerStart2->GetActorRotation());
 		MyPlayer.Drone = World->SpawnActor<ALOTMultiDrone>(ALOTMultiDrone::StaticClass(), PlayerStart2->GetActorLocation() + FVector(0.f, 0.f, DroneSpawningHeight), PlayerStart2->GetActorRotation());
+		
+		MyPlayer.PlayerNum = 2;
+		EnemyPlayer.PlayerNum = 1;
+
 	}
 
+	EnemyPlayer.Tank->SetUI(false);
+	EnemyPlayer.Drone->SetUI(false);
+	MyPlayer.Drone->SetUI(false);
 	Test->Possess(MyPlayer.Tank);
 	InitPlayer();
 	TestInstance->SendFinishLoad();
@@ -112,6 +125,7 @@ void AMultiGameMode::Tick(float DeltaTime)
 	TurnChange();
 	ApplyMovement();
 	EnemyFire();
+	ApplyDamage();
 
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
 
@@ -169,22 +183,77 @@ void AMultiGameMode::EnemyFire()
 void AMultiGameMode::ApplyDamage()
 {
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
-	if (MyInstance->bIsHurt)
+	
 	{
-		//1피가 다쳤다면
+		//1p가 다쳤다면
 		if (MyInstance->HitPlayerNum == 1)
 		{
-			MyPlayer.Shield = MyInstance->Shield;
-			MyPlayer.HP = MyInstance->HP;
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("1피가 다침 hp = %f,shield = %f!"), MyPlayer.HP, MyPlayer.Shield));
+
+			
+			//내가 다쳤다면
+			if (MyInstance->PlayerNum == 1)
+			{
+				MyPlayer.Shield = MyInstance->Shield;
+				MyPlayer.HP = MyInstance->HP;
+				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 다침 hp = %f,shield = %f!"), MyPlayer.HP, MyPlayer.Shield));
+
+				if (MyPlayer.HP <= 0.f)
+				{
+					MyPlayer.HP = 0.f;
+					MyPlayer.Dead = true;
+					MyPlayer.Tank->SetDead();
+				}
+			}
+			//적이 다쳤다면
+			if (MyInstance->PlayerNum == 2)
+			{
+				EnemyPlayer.Shield = MyInstance->Shield;
+				EnemyPlayer.HP = MyInstance->HP;
+				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 다침 hp = %f,shield = %f!"), EnemyPlayer.HP, EnemyPlayer.Shield));
+
+				if (EnemyPlayer.HP <= 0.f)
+				{
+					EnemyPlayer.HP = 0.f;
+					EnemyPlayer.Dead = true;
+					EnemyPlayer.Tank->SetDead();
+				}
+			}
+
+
+			
 		
 		}
-		//2피가 다쳤다면
+		//2p가 다쳤다면
 		else if (MyInstance->HitPlayerNum == 2)
 		{
-			EnemyPlayer.Shield = MyInstance->Shield;
-			EnemyPlayer.HP = MyInstance->HP;
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("2피가 다침 hp = %f,shield = %f!"), EnemyPlayer.HP, EnemyPlayer.Shield));
+			//내가 다쳤다면
+			if (MyInstance->PlayerNum == 2)
+			{
+				MyPlayer.Shield = MyInstance->Shield;
+				MyPlayer.HP = MyInstance->HP;
+				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 다침 hp = %f,shield = %f!"), MyPlayer.HP, MyPlayer.Shield));
+
+				if (MyPlayer.HP <= 0.f)
+				{
+					MyPlayer.HP = 0.f;
+					MyPlayer.Dead = true;
+					MyPlayer.Tank->SetDead();
+				}
+			}
+			//적이 다쳤다면
+			if (MyInstance->PlayerNum == 1)
+			{
+				EnemyPlayer.Shield = MyInstance->Shield;
+				EnemyPlayer.HP = MyInstance->HP;
+				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 다침 hp = %f,shield = %f!"), EnemyPlayer.HP, EnemyPlayer.Shield));
+
+				if (EnemyPlayer.HP <= 0.f)
+				{
+					EnemyPlayer.HP = 0.f;
+					EnemyPlayer.Dead = true;
+					EnemyPlayer.Tank->SetDead();
+				}
+			}
 		}
 		MyInstance->bIsHurt = false;
 	}

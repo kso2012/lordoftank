@@ -238,6 +238,8 @@ public:
 
 	void SendTankHit(float Damage);
 
+	void SendExplosion();
+
 	//적 무브먼트 동기화
 	FVector EnemyWorldLocation;
 	

@@ -204,6 +204,13 @@ ALOTMultiDrone::ALOTMultiDrone()
 		//CrossHair->CreateChildActor();
 	}
 
+	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
+	UI = CreateDefaultSubobject<UChildActorComponent>("UI");
+	if (UIBP.Class != NULL)
+	{
+		UI->SetChildActorClass(UIBP.Class);
+		UI->SetupAttachment(Camera);
+	}
 
 
 	Acceleration = 500.f;
@@ -312,7 +319,7 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 	//키 입력을 했다면
-	if (bHasInputForward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable)
+	if (bHasInputForward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
@@ -353,7 +360,7 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable)
+	if (bHasInputUpward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
@@ -440,7 +447,9 @@ void ALOTMultiDrone::DetectMode()
 		bIsDetectMode = true;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("탐색모드!!!"));
 		Camera->Deactivate();
+		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		DetectCamera->Activate();
+		UI->AttachToComponent(DetectCamera, FAttachmentTransformRules::KeepRelativeTransform);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true);
 		CrossHair->SetVisibility(true, true);
@@ -450,9 +459,12 @@ void ALOTMultiDrone::DetectMode()
 	{
 		bIsDetectMode = false;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노탐색모드!!!"));
-		Camera->Activate();
-		DetectCamera->Deactivate();
+		
 
+		DetectCamera->Deactivate();
+		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		Camera->Activate();
+		UI->AttachToComponent(Camera, FAttachmentTransformRules::KeepRelativeTransform);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(true, true);
 		CrossHair->SetVisibility(false, true);
@@ -463,8 +475,43 @@ void ALOTMultiDrone::DetectMode()
 
 void ALOTMultiDrone::ChangePawn()
 {
+	//APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	//AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	////ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(getgamemode);
+	//Test->Possess(GameModeTest->MyPlayer.Tank);
+
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	//ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(getgamemode);
+	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Tank, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	FLatentActionInfo LatentActionInfo;
+	LatentActionInfo.CallbackTarget = this;
+	LatentActionInfo.ExecutionFunction = "PossessCall";
+	LatentActionInfo.UUID = 123;
+	LatentActionInfo.Linkage = 0;
+
+	UKismetSystemLibrary::Delay(GetWorld(), 1.f, LatentActionInfo);
+
+}
+
+void ALOTMultiDrone::PossessCall()
+{
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	SetUI(false);
+	GameModeTest->MyPlayer.Tank->SetUI(true);
 	Test->Possess(GameModeTest->MyPlayer.Tank);
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
+}
+
+void ALOTMultiDrone::SetUI(bool bIsPlayer)
+{
+	if (!bIsPlayer)
+	{
+		UI->SetVisibility(false, true);
+	}
+	else
+		UI->SetVisibility(true, true);
+
 }

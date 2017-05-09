@@ -44,7 +44,7 @@ class LORDOFTANK_API ALOTMultiPlayer : public AWheeledVehicle
 		UChildActorComponent* CrossHair;
 
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* UI;
+		UChildActorComponent* UI;
 
 
 
@@ -62,10 +62,17 @@ public:
 
 	void MoveRight(float Val);
 
+	void SetUI(bool bIsPlayer);
+
+	void SetDead();
+
 	//void OnResetVR();
 
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Custom")
+		void PossessCall();
 
 	
 
@@ -145,6 +152,8 @@ private:
 	bool bIsShoot;
 
 	bool bIsPushFire;
+
+	
 
 
 

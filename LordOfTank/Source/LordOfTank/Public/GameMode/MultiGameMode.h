@@ -10,19 +10,31 @@
 /**
  * 
  */
-struct PlayerInfomation
+USTRUCT(BlueprintType)
+struct FPlayerInfomation
 {
-	ALOTMultiPlayer* Tank;
+	GENERATED_USTRUCT_BODY()
+	
+		ALOTMultiPlayer* Tank;
 	ALOTMultiDrone* Drone;
 	AActor* TargetActor;
 	FVector Velocity;
 	FVector Angular;
-	float AP;
-	float Shield;
-	float HP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
+		float AP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
+		float Shield;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
+		float HP;
+	
 	float PlayerNum;
 	bool Moveable;
+	bool Dead;
 };
+
+
+
 
 UCLASS()
 class LORDOFTANK_API AMultiGameMode : public AGameModeBase
@@ -50,10 +62,10 @@ public:
 	void InitPlayer();
 
 	void TurnChange();
-	
-	PlayerInfomation MyPlayer;
-	
-	PlayerInfomation EnemyPlayer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+		FPlayerInfomation MyPlayer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+		FPlayerInfomation EnemyPlayer;
 
 	bool bIsMyTurn;
 

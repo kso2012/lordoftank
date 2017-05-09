@@ -203,8 +203,9 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	}
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
-
-
+	ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	GameInstance->SendExplosion();
 
 	Destroy();
+
 }

@@ -75,6 +75,9 @@ class LORDOFTANK_API ALOTMultiDrone : public APawn
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* CrossHair;
 
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* UI;
+
 
 protected:
 
@@ -159,7 +162,12 @@ public:
 
 	FORCEINLINE class AActor* GetHomingTarget() const { return HomingTarget; }
 
+	UFUNCTION(BlueprintCallable, Category = "Custom")
+		void PossessCall();
+
 	void DetectMode();
+
+	void SetUI(bool bIsPlayer);
 
 
 

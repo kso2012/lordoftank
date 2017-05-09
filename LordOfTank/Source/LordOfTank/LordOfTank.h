@@ -26,6 +26,7 @@
 #define CS_FINISH_LOAD 7
 #define CS_TANK_SHOT 8
 #define CS_TANK_HIT 9
+#define CS_TANK_EXPLOSION 10
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
@@ -37,6 +38,7 @@
 #define SC_TIMER 8
 #define SC_TANK_SHOT 9
 #define SC_TANK_HIT 10
+#define SC_FINISH_GAME 11
 
 
 #pragma pack (push, 1)
@@ -90,12 +92,6 @@ struct cs_packet_player_move
 	FRotator droneRotation;
 };
 
-struct sc_packet_player_ap
-{
-	BYTE size;
-	BYTE type;
-};
-
 struct cs_packet_tank_shot
 {
 	BYTE size;
@@ -110,6 +106,12 @@ struct cs_packet_tank_hit
 	BYTE size;
 	BYTE type;
 	float damage;
+};
+
+struct cs_packet_tank_explosion
+{
+	BYTE size;
+	BYTE type;
 };
 
 struct sc_packet_room_show

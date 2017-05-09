@@ -13,6 +13,7 @@
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetArrayLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "LOTMultiPlayer.h"
 
 
@@ -154,12 +155,14 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	bIsSendRight = false;
 
 	MoveAP = 1.0f;
+
 }
 
 void ALOTMultiPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	SetDefaultInvetory();
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 	EngineSoundComponent->Play();
 
 }
@@ -250,7 +253,7 @@ void ALOTMultiPlayer::FireStart()
 
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	if (bIsFireMode == true && GameModeTest->bIsMyTurn)
+	if (bIsFireMode == true && GameModeTest->bIsMyTurn && !GameModeTest->MyPlayer.Dead)
 	{
 		bIsPushFire = true;
 		CurShootingPower = MinShootingPower;
@@ -299,24 +302,30 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 	if (bIsFireMode == true)
 	{
 		MoveModeCamera->Deactivate();
+		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		FireModeCamera->Activate();
+		UI->AttachToComponent(FireModeCamera,FAttachmentTransformRules::KeepRelativeTransform);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		TurretMesh->SetVisibility(false, false);
 		GetMesh()->SetVisibility(false, false);
 		BarrelMesh->SetVisibility(false, false);
 		CrossHair->SetVisibility(true, true);
-		UI->SetupAttachment(FireModeCamera);
+		
+
 	}
 	else if (bIsFireMode == false)
 	{
-		MoveModeCamera->Activate();
 		FireModeCamera->Deactivate();
+		//UI->DetachFromParent(true, true);
+		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		MoveModeCamera->Activate();
+		UI->AttachToComponent(MoveModeCamera, FAttachmentTransformRules::KeepRelativeTransform);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		TurretMesh->SetVisibility(true, false);
 		GetMesh()->SetVisibility(true, false);
 		BarrelMesh->SetVisibility(true, false);
 		CrossHair->SetVisibility(false, true);
-		UI->SetupAttachment(MoveModeCamera);
+		
 	}
 }
 //
@@ -329,7 +338,7 @@ void ALOTMultiPlayer::MoveForward(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable) {
+	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 		if (Val != 0.f)
 		{
@@ -341,6 +350,7 @@ void ALOTMultiPlayer::MoveForward(float Val)
 	}
 	else
 		GetVehicleMovementComponent()->SetThrottleInput(0.f);
+	//GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
 
@@ -348,28 +358,42 @@ void ALOTMultiPlayer::MoveRight(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	//bIsMyTurn
-	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable) {
+	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
-		if (Val != 0.f)
-		{
-			GameModeTest->MyPlayer.AP -= MoveAP;
-			if (GameModeTest->MyPlayer.AP <= 0)
-				GameModeTest->MyPlayer.AP = 0;
-		}
+		
 	}
 	else
 		GetVehicleMovementComponent()->SetThrottleInput(0.f);
+	//GetVehicleMovementComponent()->SetSteeringInput(Val);
 
 }
 
 void ALOTMultiPlayer::ChangePawn()
 {
-	
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	//ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(getgamemode);
-	Test->Possess(GameModeTest->MyPlayer.Drone);
+	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Drone, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	FLatentActionInfo LatentActionInfo;
+	LatentActionInfo.CallbackTarget = this;
+	LatentActionInfo.ExecutionFunction = "PossessCall";
+	LatentActionInfo.UUID = 123;
+	LatentActionInfo.Linkage = 0;
 
+	UKismetSystemLibrary::Delay(GetWorld(), 1.f, LatentActionInfo);
+	
+
+}
+
+void ALOTMultiPlayer::PossessCall()
+{
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	SetUI(false);
+	GameModeTest->MyPlayer.Drone->SetUI(true);
+	Test->Possess(GameModeTest->MyPlayer.Drone);
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
 }
 
 
@@ -462,4 +486,23 @@ void ALOTMultiPlayer::ClearBeam()
 	BeamArray.Empty();
 }
 
+void ALOTMultiPlayer::SetUI(bool bIsPlayer)
+{
+	if (!bIsPlayer)
+	{
+		UI->SetVisibility(false, true);
+	}
+	else
+		UI->SetVisibility(true, true);
+
+	
+}
+
+void ALOTMultiPlayer::SetDead()
+{
+	TurretMesh->SetSimulatePhysics(true);
+	BarrelMesh->SetSimulatePhysics(true);
+	TurretMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BarrelMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
 
