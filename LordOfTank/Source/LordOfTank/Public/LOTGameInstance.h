@@ -280,6 +280,8 @@ public:
 
 	bool bIsmyTurn;
 
-	bool bChangeTurn;
+	bool bChangeTurnMS;//턴 메세지를 받았는가?
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Playing")
+	bool bIsWaiting;
 	//----
 };

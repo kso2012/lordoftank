@@ -171,6 +171,7 @@ struct sc_packet_timer
 	BYTE size;
 	BYTE type;
 	int timer;
+	bool isWaiting;
 };
 
 struct sc_packet_player_move
@@ -207,6 +208,9 @@ struct sc_packet_finish_game
 {
 	BYTE size;
 	BYTE type;
+	int roomNum;
+	int counts;
+	int state;
 };
 
 #pragma pack (pop)

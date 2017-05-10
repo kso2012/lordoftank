@@ -15,7 +15,7 @@ struct FPlayerInfomation
 {
 	GENERATED_USTRUCT_BODY()
 	
-		ALOTMultiPlayer* Tank;
+	ALOTMultiPlayer* Tank;
 	ALOTMultiDrone* Drone;
 	AActor* TargetActor;
 	FVector Velocity;

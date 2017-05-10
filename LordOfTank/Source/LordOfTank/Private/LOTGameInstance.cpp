@@ -18,7 +18,8 @@ ULOTGameInstance::ULOTGameInstance()
 	LeftTime = 0;
 	GameStateEnum = EGameState::Mode_Main;
 	bEnemyIsShot = false;
-	bChangeTurn = false;
+	bChangeTurnMS = false;
+	bIsWaiting = true;
 	//Velocity = FVector(0.f,0.f,0.f);
 	//Angular = FVector(0.f,0.f,0.f);
 }
@@ -43,8 +44,8 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	//serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
-	serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
+	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	InitEvent(sock);
@@ -155,7 +156,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	case SC_TURN:
 	{
 		sc_packet_turn *my_packet = reinterpret_cast<sc_packet_turn*>(ptr);
-		bChangeTurn = true;
+		bChangeTurnMS = true;
 		bIsmyTurn = my_packet->turn;
 		ChargingAP = my_packet->ap;
 		break;
@@ -164,6 +165,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	case SC_TIMER:
 	{
 		sc_packet_timer *my_packet = reinterpret_cast<sc_packet_timer*>(ptr);
+		bIsWaiting = my_packet->isWaiting;
 		LeftTime = my_packet->timer;
 		break;
 	}

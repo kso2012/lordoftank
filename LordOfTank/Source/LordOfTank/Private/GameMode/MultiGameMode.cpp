@@ -129,7 +129,7 @@ void AMultiGameMode::Tick(float DeltaTime)
 
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
 
-	if (MyPlayer.AP <= 0)
+	if (MyPlayer.AP <= 0 || MyInstance->bIsWaiting)
 		MyPlayer.Moveable = false;
 	else
 		MyPlayer.Moveable = true;
@@ -137,7 +137,8 @@ void AMultiGameMode::Tick(float DeltaTime)
 	MyInstance->SendLocationInfo(MyPlayer.Tank->GetMesh()->GetPhysicsLinearVelocity(), MyPlayer.Tank->GetMesh()->GetPhysicsAngularVelocity()
 		, MyPlayer.Tank->GetMesh()->K2_GetComponentLocation(), MyPlayer.Tank->GetMesh()->K2_GetComponentRotation(), MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->K2_GetActorRotation());
 
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 ap = %f"), MyPlayer.AP));
+	
+	
 }
 
 void AMultiGameMode::ApplyMovement()
@@ -263,18 +264,18 @@ void AMultiGameMode::TurnChange()
 {
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
 	//턴이 변경됐다면
-	if (MyInstance->bChangeTurn)
+	if (MyInstance->bChangeTurnMS)
 	{
 		//내턴으로 변경됐다면
 		if (MyInstance->bIsmyTurn)
 		{
-			
+			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 ap = %f"), MyInstance->ChargingAP));
 			if (MyPlayer.AP + MyInstance->ChargingAP >= MaxAP)
 				MyPlayer.AP = MaxAP;
 			else
 				MyPlayer.AP += MyInstance->ChargingAP;
 		}
 		bIsMyTurn = MyInstance->bIsmyTurn;
-		MyInstance->bChangeTurn = false;
+		MyInstance->bChangeTurnMS = false;
 	}
 }
