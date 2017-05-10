@@ -85,6 +85,9 @@ class LORDOFTANK_API ALOTDrone : public APawn
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* CrossHair;
 
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* UI;
+
 
 protected:
 
@@ -202,8 +205,16 @@ private:
 	// collision box 초기화 함수
 	void SetViewBoxLocation();
 
+	float AP;
+
+	float MoveAP; 
+	
+	void PossessCall();
+
+
 public:
 
+	void SetSingleUI(bool);
 	// 게임모드에서 이 탱크가 AI인지 아닌지를 설정해주는 함수
 	void SetisNotAI(bool isntAI) { isNotAI = isntAI; }
 
@@ -254,4 +265,8 @@ public:
 
 	FVector ReturnMeshLocation() { return Root->GetComponentLocation(); }
 	FVector ReturnForwardVector() { return Root->GetForwardVector(); }
+
+
+	void SetAP(float ap) { AP = ap; }
+	float ReturnAP() { return AP; }
 };

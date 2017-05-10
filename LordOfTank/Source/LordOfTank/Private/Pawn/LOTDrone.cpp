@@ -3,6 +3,7 @@
 #include "LordOfTank.h"
 #include "LOTDrone.h"
 #include "LOTPlayer.h"
+#include "LordOfTank/LordOfTankGameModeBase.h"
 
 #define PawnTank 1
 #define PawnDrone 2
@@ -204,7 +205,15 @@ ALOTDrone::ALOTDrone()
 		CrossHair->SetVisibility(false, true);
 		//CrossHair->CreateChildActor();
 	}
-										
+
+	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
+	UI = CreateDefaultSubobject<UChildActorComponent>("UI");
+	if (UIBP.Class != NULL)
+	{
+		UI->SetChildActorClass(UIBP.Class);
+		UI->SetupAttachment(Camera);
+	}
+
 	Acceleration = 500.f;
 	TurnSpeed = 50.f;
 	MaxSpeed = 4000.f;
@@ -218,6 +227,9 @@ ALOTDrone::ALOTDrone()
 	bIsDetectMode = false; 
 	PossessDrone = false;
 	bDetectMode = false;
+
+	MoveAP = 2.f;
+	AP = 2500.f;
 
 	//PawnNum = PawnDrone;
 
@@ -305,7 +317,7 @@ void ALOTDrone::SetTarget()
 			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
 //>>>>>>> cb758b4ed7d64fbd794d75d0df6effa2faafda77
 		HomingTarget = OutHit.GetActor();
-		//HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+		HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
 		//DrawBeam(StartTrace, EndTrace);
 	}
@@ -317,13 +329,16 @@ void ALOTDrone::MoveForwardInput(float Val)
 	bHasInputForward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
 
+
 	//키 입력을 했다면
-	if (bHasInputForward)
+	if (bHasInputForward && AP > 0)
 	{
 		CurrentAcc = Val * Acceleration;
 		bAcceleratedForward = (Val > 0) ? true : false;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+		if(Val)
+			AP -= MoveAP;
 	}
 	//정지상태가 아니라면
 	else if (CurrentForwardSpeed != 0.f)
@@ -355,12 +370,14 @@ void ALOTDrone::MoveUpwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward)
+	if (bHasInputUpward && AP > 0)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
 
+		if(Val)
+			AP -= MoveAP;
 	}
 
 	else if (CurrentUpwardSpeed != 0.f)
@@ -471,7 +488,44 @@ void ALOTDrone::ChangePawn()
 		PossessDrone = false;
 	else
 		PossessDrone = true;
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), PossessDrone));
+
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Tank, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	FLatentActionInfo LatentActionInfo;
+	LatentActionInfo.CallbackTarget = this;
+	LatentActionInfo.ExecutionFunction = "PossessCall";
+	LatentActionInfo.UUID = 123;
+	LatentActionInfo.Linkage = 0;
+
+	UKismetSystemLibrary::Delay(GetWorld(), 1.f, LatentActionInfo);
+	SetSingleUI(false);
+	GameModeTest->MyPlayer.Tank->SetSingleUI(true);
+}
+
+
+void ALOTDrone::PossessCall()
+{
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	SetSingleUI(false);
+	GameModeTest->MyPlayer.Tank->SetSingleUI(true);
+	Test->UnPossess();
+	Test->Possess(GameModeTest->MyPlayer.Tank);
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
+}
+
+void ALOTDrone::SetSingleUI(bool bIsPlayer)
+{
+	if (!bIsPlayer)
+	{
+		UI->SetVisibility(false, true);
+	}
+	else
+		UI->SetVisibility(true, true);
+
 }
 
 void ALOTDrone::SetViewBoxLocation() {
