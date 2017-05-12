@@ -12,6 +12,7 @@
 #include "WheeledVehicleMovementComponent4W.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetArrayLibrary.h"
+#include "LordOfTank/LordOfTankGameModeBase.h"
 #include "LOTDrone.h"
 #include "LOTPlayer.h"
 
@@ -123,7 +124,15 @@ ALOTPlayer::ALOTPlayer()
 		//CrossHair->CreateChildActor();
 	}
 	
-	
+
+	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
+	UI = CreateDefaultSubobject<UChildActorComponent>("UI");
+	if (UIBP.Class != NULL)
+	{
+		UI->SetChildActorClass(UIBP.Class);
+		UI->SetupAttachment(MoveModeCamera);
+	}
+
 	
 	
 	bIsFireMode = false;
@@ -132,7 +141,7 @@ ALOTPlayer::ALOTPlayer()
 	CurrentHealth = MaxHealth;
 
 	// 초기 AP를 100으로 설정
-	AP = 100.f;
+	AP = 2500.f;
 
 	MinShootingPower=100.f;
 	RaisingRate = 50.f;
@@ -149,6 +158,7 @@ ALOTPlayer::ALOTPlayer()
 	AimCount = 0;
 	bIsWaiting = false;
 	bIsTestShot = false;
+	MoveAP = 1.0f;
 }
 
 void ALOTPlayer::BeginPlay()
@@ -254,6 +264,7 @@ void ALOTPlayer::FireEnd()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
+			ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
 			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
 				FRotator(0.f,0.f,0.f), FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
 
@@ -269,7 +280,8 @@ void ALOTPlayer::FireEnd()
 			
 			if (isNotAI) {
 				UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
-				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.25f, VTBlend_Linear, 0.0f, true);
+				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.4f, VTBlend_Linear, 0.0f, true);
+				TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower);
 			}
 			TempActor->GetTank(this);
 		}
@@ -288,7 +300,9 @@ void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 		if (bIsFireMode == true)
 		{
 			MoveModeCamera->Deactivate();
+			UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 			FireModeCamera->Activate();
+			UI->AttachToComponent(FireModeCamera, FAttachmentTransformRules::KeepRelativeTransform);
 			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 			TurretMesh->SetVisibility(false, false);
 			GetMesh()->SetVisibility(false, false);
@@ -298,7 +312,9 @@ void ALOTPlayer::ChangeCamera(bool bIsFireMode)
 		else if (bIsFireMode == false)
 		{
 			MoveModeCamera->Activate();
+			UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 			FireModeCamera->Deactivate();
+			UI->AttachToComponent(MoveModeCamera, FAttachmentTransformRules::KeepRelativeTransform);
 			//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 			TurretMesh->SetVisibility(true, false);
 			GetMesh()->SetVisibility(true, false);
@@ -320,21 +336,26 @@ void ALOTPlayer::OnResetVR()
 void ALOTPlayer::MoveForward(float Val)
 {
 	//SetVehicleMovement();
-	if (!bIsFireMode) {
+	if (!bIsFireMode && AP > 0) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 		
 		ULOTGameInstance* const Test = Cast<ULOTGameInstance>(GetGameInstance());
 		//GetVehicleMovementComponent()->set
 		//Test->SendPos(GetActorLocation(),GetVehicleMovementComponent());
 		//ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)
+		if(Val)
+			AP -= MoveAP;
 	}
 }
 
 
 void ALOTPlayer::MoveRight(float Val)
 {
-	if(!bIsFireMode)
+	if (!bIsFireMode && AP > 0) {
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
+		if(Val)
+			AP -= MoveAP;
+	}
 	GetMesh();
 
 }
@@ -469,8 +490,46 @@ void ALOTPlayer::ChangePawn()
 		PossessTank = false;
 	else
 		PossessTank = true;
+
+	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Drone, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	FLatentActionInfo LatentActionInfo;
+	LatentActionInfo.CallbackTarget = this;
+	LatentActionInfo.ExecutionFunction = "PossessCall";
+	LatentActionInfo.UUID = 123;
+	LatentActionInfo.Linkage = 0;
+
+	UKismetSystemLibrary::Delay(GetWorld(), 1.f, LatentActionInfo);
+	SetSingleUI(false);
+	GameModeTest->MyPlayer.Drone->SetSingleUI(true);
 }
 
+
+void ALOTPlayer::PossessCall()
+{
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	SetSingleUI(false);
+	GameModeTest->MyPlayer.Drone->SetSingleUI(true);
+	Test->UnPossess();
+	Test->Possess(GameModeTest->MyPlayer.Drone);
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
+}
+
+void ALOTPlayer::SetSingleUI(bool bIsPlayer)
+{
+	if (!bIsPlayer)
+	{
+		UI->SetVisibility(false, true);
+	}
+	else
+		UI->SetVisibility(true, true);
+
+
+}
 
 //void ALOTPlayer::ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent)
 //{
@@ -491,6 +550,7 @@ void ALOTPlayer::ChangeTurn() {
 		// 발사중일 땐 bIsShoot = true인데 포탄이 폭발할 때 턴을 넘기도록 함. 이 함수는 Projectile에서 호출됨
 		bIsShoot = false; 
 		RightShot = false;
+		AP += 20;
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Trun Changed")));
 }
 

@@ -59,6 +59,8 @@ class LORDOFTANK_API ALOTPlayer : public AWheeledVehicle
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* CrossHair;
 
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* UI;
 
 public:
 
@@ -168,6 +170,8 @@ private:
 	//현재AP
 	float AP;
 
+	float MoveAP;
+
 	bool myTurn;
 
 	float RaisingRate;
@@ -206,8 +210,11 @@ private:
 	FVector EnemyLocation;
 
 
+	void PossessCall();
+
 public:
 
+	void SetSingleUI(bool);
 	// AI가 포신을 회전시킬 때 ViewBox에 충돌이 되었는지 확인하는 변수
 	int TurretAim;
 
@@ -261,5 +268,8 @@ public:
 	int AimCount;
 
 	void SetbIsShoot() { bIsShoot = false; }
+
+	void SetAP(float ap) { AP = ap; }
+	float ReturnAP() { return AP; }
 	
 };

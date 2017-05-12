@@ -6,20 +6,26 @@
 #include "Pawn/LOTPlayer.h"
 #include "Pawn/LOTDrone.h"
 #include "PlayerInfo.h"
-#include "AIController.h"
 #include "LordOfTankGameModeBase.generated.h"
 
 /**
  * 
  */
-
-struct PlayerInfomations
+USTRUCT(BlueprintType)
+struct FPlayerInfomations
 {
+	GENERATED_USTRUCT_BODY()
+
 	ALOTPlayer* Tank;
 	ALOTDrone* Drone;
 	AActor* TargetActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
 	float AP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
 	float HP;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
+	float Shield;
 	int PlayerNum;
 	int ControlledPawn;
 };
@@ -71,14 +77,30 @@ public:
 	float DroneSpawningHeight;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+		FPlayerInfomations MyPlayer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
+		FPlayerInfomations EnemyPlayer;
 
 
 private:
 
-	PlayerInfomations MyPlayer;
-	PlayerInfomations EnemyPlayer;
+
 	APlayerController* Control;
 	APlayerController* AI;
+
+
+	float MaxHealth;
+
+	float MaxAP;
+
+	float MaxShield;
+
+	float MinHeath;
+
+	float MinAP;
+
+	float MinShield;
 
 	UFUNCTION(BlueprintCallable)
 		void ChangePawn();
@@ -127,6 +149,8 @@ private:
 
 	int DroneRotateDirection;
 
+	void SyncTankAP();
 
+	void SyncDroneAP();
 
 };

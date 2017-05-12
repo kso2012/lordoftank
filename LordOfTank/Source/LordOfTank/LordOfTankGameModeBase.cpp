@@ -40,6 +40,19 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 	DroneRotateDirection = None;
 	bIsRightDirection = false;
 	bIsTurretRightDirection = false;
+
+	MaxHealth = 100.f;
+
+	MaxAP = 2500.f;
+
+	MaxShield = 100.f;
+
+	MinHeath = 0.f;
+
+	MinAP = 0.f;
+
+	MinShield = 0.f;
+
 }
 
 void ALordOfTankGameModeBase::StartPlay()
@@ -66,6 +79,11 @@ void ALordOfTankGameModeBase::InitPlayer() {
 
 	MyPlayer.Drone->OffViewBox();
 	Control->Possess(MyPlayer.Tank);
+	MyPlayer.AP = MaxAP;
+
+	MyPlayer.HP = MaxHealth;
+
+	MyPlayer.Shield = MaxShield;
 }
 
 void ALordOfTankGameModeBase::InitAI() {
@@ -85,6 +103,11 @@ void ALordOfTankGameModeBase::InitAI() {
 
 	EnemyPlayer.Drone->OnViewBox();
 	IsEnemyFound = false;
+	EnemyPlayer.AP = MaxAP;
+
+	EnemyPlayer.HP = MaxHealth;
+
+	EnemyPlayer.Shield = MaxShield;
 
 	//AI->Possess(EnemyPlayer.Tank);
 }
@@ -93,16 +116,14 @@ void ALordOfTankGameModeBase::InitAI() {
 void ALordOfTankGameModeBase::ChangePawn() {
 	if (PlayerTurn == 1) {
 		if (MyPlayer.ControlledPawn == PawnTank && !MyPlayer.Tank->PossessTank && !MyPlayer.Drone->PossessDrone) {
-			MyPlayer.ControlledPawn = PawnDrone;
-			Control->UnPossess();
-			Control->Possess(MyPlayer.Drone);
+			MyPlayer.ControlledPawn = PawnDrone;	
 			MyPlayer.Drone->PossessDrone = true;
+			SyncTankAP();
 		}
 		else if(MyPlayer.ControlledPawn == PawnDrone && !MyPlayer.Tank->PossessTank && !MyPlayer.Drone->PossessDrone) {
 			MyPlayer.ControlledPawn = PawnTank;
-			Control->UnPossess();
-			Control->Possess(MyPlayer.Tank);
 			MyPlayer.Tank->PossessTank = true;
+			SyncDroneAP();
 		}
 	}
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), PlayerTurn));
@@ -128,6 +149,10 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 			MyPlayer.Tank->EnableInput(Control);
 		}
 	}
+	if (MyPlayer.ControlledPawn == PawnTank)
+		SyncTankAP();
+	else
+		SyncDroneAP();
 	ChangePawn();
 	Think();
 }
@@ -177,12 +202,14 @@ void ALordOfTankGameModeBase::Think() {
 			}
 			else if (Drone_Tank_Distance < 25000.f) {
 				EnemyPlayer.Drone->CommandMoveForward(-2.f);
+				SyncDroneAP();
 			}
 
 		}
 		else if(PlayerTurn == 2 && EnemyPlayer.Drone->ReturnDroneSpeed() != 0.f && bIsInRange) {
 			if (EnemyPlayer.Drone->ReturnDroneSpeed() < -50.f) {
 				EnemyPlayer.Drone->CommandMoveForward(10.f);
+				SyncDroneAP();
 				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("%f FSpeed"), EnemyPlayer.Drone->ReturnDroneSpeed()));
 			}
 			else if (EnemyPlayer.Drone->ReturnDroneSpeed() < 50.f) {
@@ -191,6 +218,7 @@ void ALordOfTankGameModeBase::Think() {
 			}
 			else {
 				EnemyPlayer.Drone->CommandMoveForward(-10.f);
+				SyncDroneAP();
 				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("%f BSpeed"), EnemyPlayer.Drone->ReturnDroneSpeed()));
 			}
 		}
@@ -308,5 +336,44 @@ void ALordOfTankGameModeBase::SetDroneDirection() {
 
 		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "Set Drone Direction()");
 
+	}
+}
+
+void ALordOfTankGameModeBase::SyncDroneAP() {
+	if (MyPlayer.Tank->GetTurn()) {
+		MyPlayer.AP = MyPlayer.Drone->ReturnAP();
+		if (MyPlayer.AP < 0)
+			MyPlayer.AP = 0.f;
+		MyPlayer.Tank->SetAP(MyPlayer.AP);
+		MyPlayer.Drone->SetAP(MyPlayer.AP);
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("MYAP : %f"), MyPlayer.AP));
+	}
+	else {
+		EnemyPlayer.AP = EnemyPlayer.Drone->ReturnAP();
+		if (EnemyPlayer.AP < 0)
+			EnemyPlayer.AP = 0.f;
+		EnemyPlayer.Tank->SetAP(EnemyPlayer.AP);
+		EnemyPlayer.Drone->SetAP(EnemyPlayer.AP);
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("EnemyAP : %f"), EnemyPlayer.AP));
+	}
+	
+}
+
+void ALordOfTankGameModeBase::SyncTankAP() {
+	if (MyPlayer.Tank->GetTurn()) {
+		MyPlayer.AP = MyPlayer.Tank->ReturnAP();
+		if (MyPlayer.AP < 0)
+			MyPlayer.AP = 0.f;
+		MyPlayer.Tank->SetAP(MyPlayer.AP);
+		MyPlayer.Drone->SetAP(MyPlayer.AP); 
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("MYAP : %f"), MyPlayer.AP));
+	}
+	else {
+		EnemyPlayer.AP = EnemyPlayer.Tank->ReturnAP();
+		if (EnemyPlayer.AP < 0)
+			EnemyPlayer.AP = 0.f;
+		EnemyPlayer.Tank->SetAP(EnemyPlayer.AP);
+		EnemyPlayer.Drone->SetAP(EnemyPlayer.AP);
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("EnemyAP : %f"), EnemyPlayer.AP));
 	}
 }
