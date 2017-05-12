@@ -9,7 +9,6 @@
 #include <thread>
 #include <mutex>
 #include <vector>
-#include "Tank.h"
 #include <set>
 #include "HideWindowsPlatformTypes.h"
 #include "nwtestGameModeBase.generated.h"
@@ -25,15 +24,10 @@ struct OverlapEx
 	int packet_size;
 };
 
-struct Player {
-	ATank* Tank;
-};
-
 struct Client {
 	int   m_id;
 	bool is_connected;
 	SOCKET m_s;
-	Player m_player;
 	int roomNum;
 	string name;
 	bool isReady;
@@ -47,10 +41,6 @@ struct Client {
 	OverlapEx m_recv_overlap;
 	int previous_data;
 	unsigned char packet[MAX_PACKET_SIZE];
-	//FVector worldLocation;
-	//FVector linearVelocity;
-	//FVector angularVelocity;
-	//FRotator rotation;
 };
 
 struct Room {
@@ -94,20 +84,17 @@ public:
 	bool RightSend;
 	bool client1_turn;
 	bool client2_turn;
+	bool TankShot;
+	bool TankExplosion;
+	bool Explosion1;
+	bool Explosion2;
+	bool isWaiting;
+	bool FinishTimer;
 	int timerTurn;
-	float moveVal;
-	float moveVal2;
-	float moveVal3;
-	float moveVal4;
-	FTransform moveTf;
-	FTransform moveTf2;
-	ATank* testtank;
-	//sc_packet_tank_move Tank_Move;
-	APlayerController*  Test;
+	int timerState;
 	int mytime;
 	FTimerHandle CountdownTimerHandle;
 	mutex mylock;
-
 
 	void Initialize_Server();
 	void workerthread();
@@ -121,6 +108,4 @@ public:
 	bool threadkey;
 	void ProcessPacket(int id, unsigned char *packet);
 	void SendPacket(int id, unsigned char *packet);
-	
-
 };
