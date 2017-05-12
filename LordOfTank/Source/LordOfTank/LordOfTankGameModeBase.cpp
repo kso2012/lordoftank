@@ -346,7 +346,7 @@ void ALordOfTankGameModeBase::SyncDroneAP() {
 			MyPlayer.AP = 0.f;
 		MyPlayer.Tank->SetAP(MyPlayer.AP);
 		MyPlayer.Drone->SetAP(MyPlayer.AP);
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("MYAP : %f"), MyPlayer.AP));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("MYAP : %f"), MyPlayer.AP));
 	}
 	else {
 		EnemyPlayer.AP = EnemyPlayer.Drone->ReturnAP();
@@ -366,7 +366,7 @@ void ALordOfTankGameModeBase::SyncTankAP() {
 			MyPlayer.AP = 0.f;
 		MyPlayer.Tank->SetAP(MyPlayer.AP);
 		MyPlayer.Drone->SetAP(MyPlayer.AP); 
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("MYAP : %f"), MyPlayer.AP));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("MYAP : %f"), MyPlayer.AP));
 	}
 	else {
 		EnemyPlayer.AP = EnemyPlayer.Tank->ReturnAP();

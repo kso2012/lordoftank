@@ -188,6 +188,10 @@ private:
 
 	bool bIsPushFire;
 
+	float timercounter;
+
+	bool timercounteron;
+
 
 	/////////////////////////////
 	// AI°ü·Ã 
@@ -210,7 +214,7 @@ private:
 	FVector EnemyLocation;
 
 
-	void PossessCall();
+	void DronePossess();
 
 public:
 

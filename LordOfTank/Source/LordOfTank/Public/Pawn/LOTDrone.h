@@ -164,6 +164,10 @@ private:
 
 	void ChangePawn();
 
+	bool timercounteron;
+
+	float timercounter;
+
 
 public:
 
@@ -209,7 +213,7 @@ private:
 
 	float MoveAP; 
 	
-	void PossessCall();
+	void TankPossess();
 
 
 public:
