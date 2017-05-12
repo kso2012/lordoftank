@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "LOTPlayer.h"
 #include "GameMode/MultiGameMode.h"
+#include "LordOfTankGameModeBase.h"
 #include "LOTGameInstance.h"
 #include "Projectile.generated.h"
 

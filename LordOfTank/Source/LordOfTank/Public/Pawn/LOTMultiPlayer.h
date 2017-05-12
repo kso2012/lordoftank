@@ -66,6 +66,10 @@ public:
 
 	void SetDead();
 
+	void NextWeapon();
+
+	void ExWeapon();
+
 	//void OnResetVR();
 
 	UFUNCTION()
@@ -73,9 +77,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Custom")
 		void PossessCall();
-
 	
-
+	
+	void SetbIsShoot(bool IsShoot);
 
 	//사격버튼 눌렀을 때
 	void FireStart();
@@ -148,6 +152,9 @@ private:
 
 	bool bIsSendRight;
 
+	int CurInventoryIndex;
+
+	int Type;
 	//발사중인가?
 	bool bIsShoot;
 

@@ -13,15 +13,32 @@ ULOTGameInstance::ULOTGameInstance()
 	bIsConnected = false;
 	bIsStart = false;
 	bIsHurt = false;
-	bIsTryConnecting = false;
 	PlayerNum = 0;
 	LeftTime = 0;
 	GameStateEnum = EGameState::Mode_Main;
 	bEnemyIsShot = false;
 	bChangeTurnMS = false;
 	bIsWaiting = true;
-	//Velocity = FVector(0.f,0.f,0.f);
-	//Angular = FVector(0.f,0.f,0.f);
+	bRecvIsEndGame = false;
+	bIsTargetMS = false;
+	bIsTarget = false;
+	EndState = 0;
+}
+
+void ULOTGameInstance::ResetVar()
+{
+	bIsStart = false;
+	bIsHurt = false;
+	bEnemyIsShot = false;
+	bChangeTurnMS = false;
+	bIsWaiting = true;
+	bRecvIsEndGame = false;
+	PlayerNum = 0;
+	LeftTime = 0;
+	bIsTargetMS = false;
+	bIsTarget = false;
+	GameStateEnum = EGameState::Mode_Main;
+	EndState = 0;
 }
 
 bool ULOTGameInstance::ClickIpEntBT()
@@ -59,13 +76,13 @@ bool ULOTGameInstance::ClickIpEntBT()
 		app.now++;
 		// 스레드 생성
 		event_thread = new thread{ &ToCalleventThread, this };
-		bIsTryConnecting = true;
+		bIsConnected = true;
 		return true;
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 실패"));
-		bIsTryConnecting = false;
+		//bIsTryConnecting = false;
 		bIsConnected = false;
 		closesocket(sock);
 		WSACleanup();
@@ -189,14 +206,26 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		EnemyShotLocation = my_packet->location;
 		EnemyShotPower = my_packet->power;
 		EnemyShotRotation = my_packet->rotation;
+		EnemyShotProjectileType = my_packet->projectile;
 		bEnemyIsShot = true;
 		
+		break;
+	}
+
+	case SC_DRONE_TARGETING:
+	{
+		sc_packet_drone_targeting *my_packet = reinterpret_cast<sc_packet_drone_targeting*>(ptr);
+		bIsTargetMS = true;
+		bIsTarget = my_packet->isTargeting;
 		break;
 	}
 	case SC_FINISH_GAME:
 	{
 		sc_packet_finish_game *my_packet = reinterpret_cast<sc_packet_finish_game*>(ptr);
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("상대 쳐나감")));
+		EndState = my_packet->state;
+		bRecvIsEndGame = true;
+
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("상대 쳐나감")));
 		
 		break;
 	}
@@ -211,44 +240,6 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	}
 }
 
-void ULOTGameInstance::ReadPacket(int index)
-{
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Read Packet 진입")));
-	SOCKET sock = app.sarr[index];
-	DWORD iobyte, ioflag = 0;
-	wsaEvent = WSACreateEvent();
-	ZeroMemory(&wsaOverlapped, sizeof(wsaOverlapped));
-	wsaOverlapped.hEvent = wsaEvent;
-	recv_wsabuf.len = sizeof(recv_buffer);
-	recv_wsabuf.buf = recv_buffer;
-
-	int ret = WSARecv(sock, &recv_wsabuf, 1, &iobyte, &ioflag, &wsaOverlapped, NULL);
-	if (ret) {
-		int err_code = WSAGetLastError();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("Recv Error")));
-	}
-	WSAWaitForMultipleEvents(1, &wsaEvent, TRUE, WSA_INFINITE, FALSE);
-
-	BYTE *ptr = reinterpret_cast<BYTE *>(recv_buffer);
-
-	while (0 != iobyte) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("데이터 확실히 받음")));
-		if (0 == in_packet_size) in_packet_size = ptr[0];
-		if (iobyte + saved_packet_size >= in_packet_size) {
-			memcpy(packet_buffer + saved_packet_size, ptr, in_packet_size - saved_packet_size);
-			ProcessPacket(packet_buffer);
-			ptr += in_packet_size - saved_packet_size;
-			iobyte -= in_packet_size - saved_packet_size;
-			in_packet_size = 0;
-			saved_packet_size = 0;
-		}
-		else {
-			memcpy(packet_buffer + saved_packet_size, ptr, iobyte);
-			saved_packet_size += iobyte;
-			iobyte = 0;
-		}
-	}
-}
 
 void ULOTGameInstance::ToCalleventThread(LPVOID p)
 {
@@ -355,7 +346,7 @@ void ULOTGameInstance::CloseProc(int index)
 
 bool ULOTGameInstance::ClickRoomBT(int roomnum)
 {
-	if (RoomInfo.counts < 2)
+	if (RoomInfo.state == 0 || RoomInfo.state == 1)
 	{
 
 		cs_packet_room_click *room_click = reinterpret_cast<cs_packet_room_click *>(send_buffer);
@@ -412,7 +403,7 @@ void ULOTGameInstance::FinishDestroy()
 
 	Super::FinishDestroy();
 
-	if (bIsTryConnecting) {
+	if (bIsConnected) {
 		closesocket(sock);
 		event_thread->detach();
 		delete(event_thread);
@@ -440,7 +431,7 @@ void ULOTGameInstance::SendLocationInfo(FVector LinearVel, FVector AngularVel, F
 
 }
 
-void ULOTGameInstance::SendFire(FVector Location, FRotator Rotation, float Power)
+void ULOTGameInstance::SendFire(FVector Location, FRotator Rotation, float Power, int Type)
 {
 
 	cs_packet_tank_shot *tank_shot = reinterpret_cast<cs_packet_tank_shot *>(send_buffer);
@@ -450,7 +441,8 @@ void ULOTGameInstance::SendFire(FVector Location, FRotator Rotation, float Power
 	tank_shot->location = Location;
 	tank_shot->rotation = Rotation;
 	tank_shot->power = Power;
-
+	tank_shot->projectile = Type;
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("탄 타입 %d"), Type));
 	send_wsabuf.len = sizeof(cs_packet_tank_shot);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
@@ -467,13 +459,14 @@ void ULOTGameInstance::SendFinishLoad()
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
 
-void ULOTGameInstance::SendTankHit(float Damage)
+void ULOTGameInstance::SendTankHit(float Damage,int Type)
 {
 
 	cs_packet_tank_hit *tank_hit = reinterpret_cast<cs_packet_tank_hit *>(send_buffer);
 	tank_hit->type = CS_TANK_HIT;
 	tank_hit->size = sizeof(cs_packet_tank_hit);
 	tank_hit->damage = Damage;
+	tank_hit->projectile = Type;
 	send_wsabuf.len = sizeof(cs_packet_tank_hit);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
@@ -487,4 +480,36 @@ void ULOTGameInstance::SendExplosion()
 	send_wsabuf.len = sizeof(cs_packet_tank_explosion);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::ReturnMain()
+{
+	cs_packet_return_main *return_main = reinterpret_cast<cs_packet_return_main *>(send_buffer);
+	return_main->type = CS_RETURN_MAIN;
+	return_main->size = sizeof(cs_packet_return_main);
+	send_wsabuf.len = sizeof(cs_packet_return_main);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::SendTargeting(bool bTarget)
+{
+	cs_packet_drone_targeting *drone_targeting = reinterpret_cast< cs_packet_drone_targeting *>(send_buffer);
+	drone_targeting->type = CS_DRONE_TARGETING;
+	drone_targeting->size = sizeof(cs_packet_drone_targeting);
+	drone_targeting->isTargeting = bTarget;
+	send_wsabuf.len = sizeof(cs_packet_drone_targeting);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::Disconnect()
+{
+	if (bIsConnected) {
+		closesocket(sock);
+		event_thread->detach();
+		delete(event_thread);
+		WSACleanup();
+		bIsConnected = false;
+	}
 }

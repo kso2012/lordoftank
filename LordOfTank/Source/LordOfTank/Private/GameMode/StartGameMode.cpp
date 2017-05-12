@@ -19,7 +19,6 @@ AStartGameMode::AStartGameMode()
 		//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("dd")));
 	}
 
-
 }
 
 //void AStartGameMode::test()
@@ -41,6 +40,7 @@ void AStartGameMode::StartMultiGame_Implementation()
 void AStartGameMode::StartPlay()
 {
 	Super::StartPlay();
+
 }
 //void EndPlay(const EEndPlayReason::Type EndPlayReason)
 //{

@@ -151,6 +151,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MenuClick")
 		void ClickStartBT();
 
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
+		void ReturnMain();
+
+	UFUNCTION(BlueprintCallable, Category = "Lobby")
+		void ResetVar();
+
+	UFUNCTION(BlueprintCallable, Category = "Main")
+		void Disconnect();
+
 	//CS_FINISH_LOA
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
 		FShowRoom RoomInfo;
@@ -234,11 +243,16 @@ public:
 
 	void SendFinishLoad();
 
-	void SendFire(FVector Location, FRotator Rotation, float Power);
+	void SendFire(FVector Location, FRotator Rotation, float Power,int Type);
 
-	void SendTankHit(float Damage);
+	void SendTankHit(float Damage,int Type);
 
 	void SendExplosion();
+
+	void SendTargeting(bool bTarget);
+
+	
+	
 
 	//적 무브먼트 동기화
 	FVector EnemyWorldLocation;
@@ -252,6 +266,7 @@ public:
 	FVector EnemyDroneLocation;
 	
 	FRotator EnemyDroneRotation;
+
 	//----
 
 	//포탄 동기화
@@ -262,6 +277,10 @@ public:
 	FRotator EnemyShotRotation;
 
 	bool bEnemyIsShot;
+
+	//int ProjectileType;
+
+	int EnemyShotProjectileType;
 
 	//----
 
@@ -282,6 +301,18 @@ public:
 
 	bool bChangeTurnMS;//턴 메세지를 받았는가?
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Playing")
-	bool bIsWaiting;
+		bool bIsWaiting;
 	//----
+
+
+	//게임 종료
+	bool bRecvIsEndGame;
+	int EndState;
+
+	//타겟팅 상태
+	bool bIsTargetMS;
+	bool bIsTarget;
+	//-----
+
+
 };

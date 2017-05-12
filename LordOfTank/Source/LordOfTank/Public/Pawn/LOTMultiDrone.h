@@ -132,7 +132,7 @@ private:
 
 	float MoveAP;
 
-	class AActor* HomingTarget;
+//	class AActor* HomingTarget;
 
 	//날개와 몸통 애니메이션 지정.
 	void SetAnim();
@@ -160,7 +160,7 @@ public:
 	//타겟설정
 	void SetTarget();
 
-	FORCEINLINE class AActor* GetHomingTarget() const { return HomingTarget; }
+	//FORCEINLINE class AActor* GetHomingTarget() const { return HomingTarget; }
 
 	UFUNCTION(BlueprintCallable, Category = "Custom")
 		void PossessCall();

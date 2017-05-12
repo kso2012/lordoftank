@@ -39,6 +39,8 @@ AMultiGameMode::AMultiGameMode()
 
 	bIsMyTurn = false;
 
+	bIsEndGame = false;
+
 }
 
 void AMultiGameMode::InitPlayer()
@@ -122,22 +124,18 @@ void AMultiGameMode::BeginPlay()
 void AMultiGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	TurnChange();
-	ApplyMovement();
-	EnemyFire();
-	ApplyDamage();
 
-	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (!bIsEndGame) {
+		EnemyTargeting();
+		TurnChange();
+		ApplyMovement();
+		EnemyFire();
+		ApplyDamage();
+		SetMoveable();
+		EndGame();
+		SendLocation();
 
-	if (MyPlayer.AP <= 0 || MyInstance->bIsWaiting)
-		MyPlayer.Moveable = false;
-	else
-		MyPlayer.Moveable = true;
-
-	MyInstance->SendLocationInfo(MyPlayer.Tank->GetMesh()->GetPhysicsLinearVelocity(), MyPlayer.Tank->GetMesh()->GetPhysicsAngularVelocity()
-		, MyPlayer.Tank->GetMesh()->K2_GetComponentLocation(), MyPlayer.Tank->GetMesh()->K2_GetComponentRotation(), MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->K2_GetActorRotation());
-
-	
+	}
 	
 }
 
@@ -167,14 +165,36 @@ void AMultiGameMode::EnemyFire()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
+			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 발사 타입은 %d"), MyInstance->EnemyShotProjectileType));
 			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(MyInstance->EnemyShotLocation,
 				FRotator(0.f, 0.f, 0.f), FVector(1.f, 1.f, 1.f)), FVector(MyInstance->EnemyShotPower, 0.f, 0.f));
+			if (MyInstance->EnemyShotProjectileType == PROJECTILE_COMMON) {
+				ACommonProjectile* TempActor = World->SpawnActor<ACommonProjectile>(ACommonProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
+				TempActor->SetInitialVelocity(InitialVelocity);
+				TempActor->ParentTank = EnemyPlayer.Tank;
+				TempActor->SetEnemyFire(true);
+				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 보통탄 발사")));
+			}
+			else if (MyInstance->EnemyShotProjectileType == PROJECTILE_ARMORPIERCING)
+			{
+				AArmorPiercingProjectile* TempActor = World->SpawnActor<AArmorPiercingProjectile>(AArmorPiercingProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
+				TempActor->SetInitialVelocity(InitialVelocity);
+				TempActor->ParentTank = EnemyPlayer.Tank;
+				TempActor->SetEnemyFire(true);
+				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 관통탄 발사")));
+			}
+			else if (MyInstance->EnemyShotProjectileType == PROJECTILE_HOMING)
+			{
+				AHomingProjectile* TempActor = World->SpawnActor<AHomingProjectile>(AHomingProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
+				TempActor->SetInitialVelocity(InitialVelocity);
+				TempActor->ParentTank = EnemyPlayer.Tank;
+				TempActor->SetEnemyFire(true);
+				if(MyInstance->bIsTarget)
+					TempActor->SetHomingTarget(MyPlayer.Tank);
+				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 유도탄 발사")));
 
-
-			ACommonProjectile* TempActor = World->SpawnActor<ACommonProjectile>(ACommonProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
-			TempActor->SetInitialVelocity(InitialVelocity);
-			TempActor->ParentTank = EnemyPlayer.Tank;
-			TempActor->SetEnemyFire(true);
+			}
+			
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), MyInstance->EnemyShotLocation, 0.f, 500.f, false);
 			MyInstance->bEnemyIsShot = false;
 		}
@@ -184,7 +204,7 @@ void AMultiGameMode::EnemyFire()
 void AMultiGameMode::ApplyDamage()
 {
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
-	
+	if(MyInstance->bIsHurt)
 	{
 		//1p가 다쳤다면
 		if (MyInstance->HitPlayerNum == 1)
@@ -196,7 +216,7 @@ void AMultiGameMode::ApplyDamage()
 			{
 				MyPlayer.Shield = MyInstance->Shield;
 				MyPlayer.HP = MyInstance->HP;
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 다침 hp = %f,shield = %f!"), MyPlayer.HP, MyPlayer.Shield));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 다침 hp = %f,shield = %f!"), MyPlayer.HP, MyPlayer.Shield));
 
 				if (MyPlayer.HP <= 0.f)
 				{
@@ -210,7 +230,7 @@ void AMultiGameMode::ApplyDamage()
 			{
 				EnemyPlayer.Shield = MyInstance->Shield;
 				EnemyPlayer.HP = MyInstance->HP;
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 다침 hp = %f,shield = %f!"), EnemyPlayer.HP, EnemyPlayer.Shield));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 다침 hp = %f,shield = %f!"), EnemyPlayer.HP, EnemyPlayer.Shield));
 
 				if (EnemyPlayer.HP <= 0.f)
 				{
@@ -232,7 +252,7 @@ void AMultiGameMode::ApplyDamage()
 			{
 				MyPlayer.Shield = MyInstance->Shield;
 				MyPlayer.HP = MyInstance->HP;
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 다침 hp = %f,shield = %f!"), MyPlayer.HP, MyPlayer.Shield));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 다침 hp = %f,shield = %f!"), MyPlayer.HP, MyPlayer.Shield));
 
 				if (MyPlayer.HP <= 0.f)
 				{
@@ -246,7 +266,7 @@ void AMultiGameMode::ApplyDamage()
 			{
 				EnemyPlayer.Shield = MyInstance->Shield;
 				EnemyPlayer.HP = MyInstance->HP;
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 다침 hp = %f,shield = %f!"), EnemyPlayer.HP, EnemyPlayer.Shield));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 다침 hp = %f,shield = %f!"), EnemyPlayer.HP, EnemyPlayer.Shield));
 
 				if (EnemyPlayer.HP <= 0.f)
 				{
@@ -277,5 +297,76 @@ void AMultiGameMode::TurnChange()
 		}
 		bIsMyTurn = MyInstance->bIsmyTurn;
 		MyInstance->bChangeTurnMS = false;
+	}
+}
+
+void AMultiGameMode::SetMoveable()
+{
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+
+	if (MyPlayer.AP <= 0 || MyInstance->bIsWaiting)
+		MyPlayer.Moveable = false;
+	else
+		MyPlayer.Moveable = true;
+
+}
+
+void AMultiGameMode::SendLocation()
+{
+
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if(!bIsEndGame)
+	MyInstance->SendLocationInfo(MyPlayer.Tank->GetMesh()->GetPhysicsLinearVelocity(), MyPlayer.Tank->GetMesh()->GetPhysicsAngularVelocity()
+		, MyPlayer.Tank->GetMesh()->K2_GetComponentLocation(), MyPlayer.Tank->GetMesh()->K2_GetComponentRotation(), MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->K2_GetActorRotation());
+}
+
+void AMultiGameMode::EndGame()
+{
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+
+	if (MyInstance->bRecvIsEndGame)
+	{
+		
+		/*FLatentActionInfo LatentActionInfo;
+		LatentActionInfo.CallbackTarget = this;
+		LatentActionInfo.ExecutionFunction = "OpenLevelCall";
+		LatentActionInfo.UUID = 123;
+		LatentActionInfo.Linkage = 0;
+		UKismetSystemLibrary::Delay(GetWorld(), 10.f, LatentActionInfo);*/
+
+		bIsEndGame = true;
+		EndState = MyInstance->EndState;
+		MyInstance->bRecvIsEndGame = false;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("게임끝남!!! = %d"), EndState));
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("게임끝남!!! = %d"), EndState));
+		OpenLevelCall();
+	}
+}
+
+
+
+
+void AMultiGameMode::OpenLevelCall_Implementation()
+{
+	//UGameplayStatics::OpenLevel(GetWorld(), "MainMap");
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("OpenLevelCall!!!")));
+}
+
+void AMultiGameMode::EnemyTargeting()
+{
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+
+	if (MyInstance->bIsTargetMS)
+	{
+
+		if (MyInstance->bIsTarget)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 나를 락온")));
+			//감지 사운드
+		}
+		else
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 나를 락온해제")));//해제 사운드
+
+		MyInstance->bIsTargetMS = false;
 	}
 }

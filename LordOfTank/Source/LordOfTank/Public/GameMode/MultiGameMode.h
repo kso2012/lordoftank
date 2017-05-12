@@ -52,20 +52,43 @@ public:
 	virtual void BeginPlay() override;
 	
 	virtual void Tick(float DeltaTime) override;
+
+	/*UFUNCTION(BlueprintCallable, Category = "Custom")
+		void OpenLevelCall();*/
+
+	UFUNCTION(BlueprintNativeEvent, Category = "NetFuntion")
+		void OpenLevelCall();
+		void OpenLevelCall_Implementation();
+	
 	
 	void ApplyMovement();
 	
 	void ApplyDamage();
 	
 	void EnemyFire();
+
+	void SetMoveable();
+
+	void SendLocation();
+
+	void EndGame();
 	
 	void InitPlayer();
 
 	void TurnChange();
+
+	void EnemyTargeting();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 		FPlayerInfomation MyPlayer;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 		FPlayerInfomation EnemyPlayer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Playing")
+		bool bIsEndGame;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Playing")
+		int EndState;
 
 	bool bIsMyTurn;
 

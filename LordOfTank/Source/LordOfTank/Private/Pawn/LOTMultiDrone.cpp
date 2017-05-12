@@ -284,6 +284,7 @@ void ALOTMultiDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 
 void ALOTMultiDrone::SetTarget()
 {
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	//ClearBeam();
 	//타겟설정 가능한 타입을 넣을 배열
 	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
@@ -294,18 +295,30 @@ void ALOTMultiDrone::SetTarget()
 	//벡터의 시작점
 	FVector StartTrace = DetectCamera->K2_GetComponentLocation() + DetectCamera->GetForwardVector() * 500;
 	//벡터의 끝점
-	FVector EndTrace = StartTrace + DetectCamera->GetForwardVector() * 500000;
+	FVector EndTrace = StartTrace + DetectCamera->GetForwardVector() * 1000000;
 	//결과를 담을 구조체변수
 	FHitResult OutHit;
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
 	if(UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
 	{
-		if(HomingTarget != NULL)
-			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
-		HomingTarget = OutHit.GetActor();
-		HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
-		//DrawBeam(StartTrace, EndTrace);
+		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		//GameInstance->
+		if (OutHit.GetActor() != GameModeTest->MyPlayer.Tank)
+		{
+			if (GameModeTest->MyPlayer.TargetActor == NULL) {
+				GameModeTest->MyPlayer.TargetActor = OutHit.GetActor();
+				GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+				GameInstance->SendTargeting(true);
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 적을 락온")));
+			}
+			else {
+				GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
+				GameModeTest->MyPlayer.TargetActor = NULL;
+				GameInstance->SendTargeting(false);
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 락온 해제")));
+				
+			}
+		}
 	}
 
 }

@@ -15,8 +15,9 @@ AHomingProjectile::AHomingProjectile()
 	CollisionComp->OnComponentHit.AddDynamic(this, &AHomingProjectile::OnHit);		
 
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> AmmoStaticMesh(TEXT("StaticMesh'/Game/ProjectilesPack/Meshes/Projectiles/Rockets/SM_Rocket_05.SM_Rocket_05'"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> AmmoStaticMesh(TEXT("StaticMesh'/Game/ProjectilesPack/Meshes/Projectiles/Rockets/SM_Rocket_04.SM_Rocket_04'"));
 	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
+	AmmoMesh->SetRelativeLocation(FVector(-300.0f, 0.0f, 0.0f));
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
 	TrailParticle->SetTemplate(TrailParticleAsset.Object);
@@ -37,10 +38,9 @@ AHomingProjectile::AHomingProjectile()
 
 	RadialRadius = 1000.f; //폭발 반경
 	ImpulseStrength = 1000000.f;
-	ProjectileDamage = 20.f;
-
-	
-	
+	ProjectileDamage = 50.f;
+	ProjectileMovement->bIsHomingProjectile = true;
+	ProjectileMovement->HomingAccelerationMagnitude = 100.f;
 
 }
 
@@ -76,14 +76,15 @@ void AHomingProjectile::FireImpulse()
 	TArray<FOverlapResult> Overlaps;
 
 	FCollisionQueryParams Params(FireImpulseOverlapName, false);
-	Params.bTraceAsyncScene = true; 
+	Params.bTraceAsyncScene = true;
 
-									
+
 
 	Params.AddIgnoredActor(GetOwner());
 	int count = 0;
 
 	GetWorld()->OverlapMultiByObjectType(Overlaps, Origin, FQuat::Identity, CollisionObjectQueryParams, FCollisionShape::MakeSphere(RadialRadius), Params);
+
 	TArray<UPrimitiveComponent*, TInlineAllocator<1>> AffectedComponents;
 	TArray<AActor*, TInlineAllocator<1>> AffectedActors;
 	AffectedComponents.Reserve(Overlaps.Num());
@@ -115,24 +116,84 @@ void AHomingProjectile::FireImpulse()
 			}
 		}
 
-
 		PrimitiveComponent->AddRadialImpulse(Origin, RadialRadius, ImpulseStrength, Falloff, false);
 	}
 
 	for (AActor* InsideActor : AffectedActors)
 	{
-		if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
-			FVector ActorLocation = InsideActor->GetActorLocation();
-			float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
-				+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
-			if (CenterToLength > RadialRadius)
-				CenterToLength = RadialRadius;
 
-			float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+		AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		//멀티게임
+		if (GameMode)
+		{
 
-			Test->ApplyDamage(ProjectileDamage*DamageRatio);
+			if (ALOTMultiPlayer* const Test = Cast<ALOTMultiPlayer>(InsideActor)) {
+				//쏜 자신에게 맞았을 경우 
+				if ((bIsFireEnemy == false && Test == ParentTank))
+				{
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					GameInstance->SendTankHit(ProjectileDamage*DamageRatio, PROJECTILE_HOMING);
+				}
+				//적에게 맞았을 경우
+				else if ((bIsFireEnemy == true && Test != ParentTank))
+				{
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					GameInstance->SendTankHit(ProjectileDamage*DamageRatio, PROJECTILE_HOMING);
+				}
+			}
 		}
+		//싱글게임
+		else if (SingleMode == UGameplayStatics::GetGameMode(GetWorld())) {
+
+			if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
+				//쏜 자신에게 맞았을 경우 
+				if ((bIsFireEnemy == false && Test == ParentTank))
+				{
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+				}
+				//적에게 맞았을 경우
+				else if ((bIsFireEnemy == true && Test != ParentTank))
+				{
+					FVector ActorLocation = InsideActor->GetActorLocation();
+					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
+						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					if (CenterToLength > RadialRadius)
+						CenterToLength = RadialRadius;
+					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
+					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+				}
+			}
+		}
+
+
 	}
 
 	//UPrimitiveComponent* Primitive = InsideActor->GetRootPrimitiveComponent();
@@ -143,19 +204,29 @@ void AHomingProjectile::FireImpulse()
 }
 
 
+
 void AHomingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
-		FireImpulse();
+		
 		
 	}
+
+	FireImpulse();
+
+	
+
+	AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	//멀티게임
+	if (GameMode) {
+		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+
+		GameInstance->SendExplosion();
+	}
+
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
-
-
-
-
 
 
 	Destroy();
@@ -166,6 +237,8 @@ void AHomingProjectile::SetHomingTarget(AActor* HomingTarget)
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "SetHomingTarget Call!!");
 	if (HomingTarget) {
 		ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
+		ALOTMultiPlayer* MultiParent = Cast<ALOTMultiPlayer>(ParentTank);
+		MultiParent->SetbIsShoot(false);
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, HomingTarget->GetName() +"SetHomingTarget Success!!");
 		
 	}
