@@ -70,14 +70,28 @@ ALOTMultiDrone::ALOTMultiDrone()
 	};
 	static FConstructorStatics ConstructorStatics;
 
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
+	//Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	//RootComponent = Root;
+
+	CollisionComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("SphereComp"));
+	// Use a sphere as a simple collision representation
+	CollisionComp->InitCapsuleSize(400.f,900.f);
+	//CollisionComp->InitSphereRadius(1.0f);
+	CollisionComp->BodyInstance.SetCollisionProfileName("Drone");
+	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	CollisionComp->CanCharacterStepUpOn = ECB_No;
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComp->SetCollisionObjectType(ECC_Pawn);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
+	CollisionComp->SetRelativeRotation(FRotator(80.f, 0.f, 0.f));
+	//CollisionComp->SetupAttachment(Root);
+	RootComponent = CollisionComp;
 
 	BabylonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh"));
 	BabylonMesh->SetStaticMesh(ConstructorStatics.BabylonMesh.Get());
-	BabylonMesh->SetupAttachment(Root);
-
-	BabylonMesh->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f));
+	BabylonMesh->SetupAttachment(CollisionComp);
+	BabylonMesh->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	
 
 	BabylonMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh1"));
 	BabylonMesh1->SetStaticMesh(ConstructorStatics.BabylonMesh1.Get());
@@ -180,17 +194,30 @@ ALOTMultiDrone::ALOTMultiDrone()
 	SpringArm->SocketOffset = FVector(0.f, 0.f, 60.f);
 	SpringArm->bEnableCameraLag = false;
 	SpringArm->CameraLagSpeed = 15.f;
-	SpringArm->SetRelativeRotation(FRotator(-30.f, 0.0f, 0.0f));
-	SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
+	//SpringArm->SetRelativeRotation(FRotator(-110.f, 0.0f, 0.0f));
+	SpringArm->SetRelativeRotation(FRotator(-80.f, 0.0f, 0.0f));
+	SpringArm->SetRelativeLocation(FVector(500.0f, 0.0f, 1300.0f));
+	//SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false;
 
+	
+
+	SpringArm2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm1"));
+	SpringArm2->SetupAttachment(RootComponent);
+	SpringArm2->TargetArmLength = 0.0f;
+	SpringArm2->SocketOffset = FVector(0.f, 0.f, 0.f);
+	SpringArm2->bEnableCameraLag = false;
+	SpringArm2->CameraLagSpeed = 0.f;
+	//SpringArm->SetRelativeRotation(FRotator(-110.f, 0.0f, 0.0f));
+	SpringArm2->SetRelativeRotation(FRotator(-80.f, 0.0f, 0.0f));
+	//SpringArm2->SetRelativeLocation(FVector(500.0f, 0.0f, 1300.0f));
+
 	DetectCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
+	DetectCamera->SetupAttachment(SpringArm2, USpringArmComponent::SocketName);
 	DetectCamera->bUsePawnControlRotation = false;
-	DetectCamera->FieldOfView = 90.f;
-	DetectCamera->SetupAttachment(RootComponent);
 	DetectCamera->Deactivate();
 
 
@@ -214,7 +241,8 @@ ALOTMultiDrone::ALOTMultiDrone()
 	}
 
 
-	Acceleration = 500.f;
+	Acceleration = 300.f;
+	DecreaseAccel = -150.f;
 	TurnSpeed = 50.f;
 	MaxSpeed = 4000.f;
 	MinSpeed = -4000.f;
@@ -241,11 +269,11 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
-	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, CurrentUpwardSpeed * DeltaTime);
+	const FVector LocalMove = FVector(CurrentUpwardSpeed * DeltaTime, 0.f, CurrentForwardSpeed * DeltaTime);
 
 	AddActorLocalOffset(LocalMove, true);
 
-
+	//AddActorWorldOffset(LocalMove, true);
 
 	FRotator DeltaRotation(0, 0, 0);
 	DeltaRotation.Pitch = CurrentPitchSpeed * DeltaTime;
@@ -253,8 +281,8 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 	DeltaRotation.Roll = CurrentRollSpeed * DeltaTime;
 
 
-	AddActorLocalRotation(DeltaRotation);
-
+	//AddActorLocalRotation(DeltaRotation);
+	AddActorWorldRotation(DeltaRotation);
 	Super::Tick(DeltaTime);
 
 	SetAnim();
@@ -336,7 +364,7 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	//키 입력을 했다면
 	if (bHasInputForward /*&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead*/)
 	{
-		CurrentAcc = Val * Acceleration;
+		CurrentAcc = Val* (-1.0f) * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 		/*GameModeTest->MyPlayer.AP -= MoveAP;
@@ -349,11 +377,11 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	{
 		if (CurrentForwardSpeed > 0)
 		{
-			CurrentAcc = -1.f * Acceleration;
+			CurrentAcc = -1.f * DecreaseAccel;
 		}
 		else if (CurrentForwardSpeed < 0)
 		{
-			CurrentAcc = Acceleration;
+			CurrentAcc = DecreaseAccel;
 		}
 		
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
@@ -377,7 +405,7 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 
 	if (bHasInputUpward /*&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead*/)
 	{
-		CurrentAcc = Val * Acceleration;
+		CurrentAcc = Val*  Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
 		/*GameModeTest->MyPlayer.AP -= MoveAP;
@@ -392,11 +420,11 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 	{
 		if (CurrentUpwardSpeed > 0)
 		{
-			CurrentAcc = -1.f * Acceleration;
+			CurrentAcc = -1.f * DecreaseAccel;
 		}
 		else if (CurrentUpwardSpeed < 0)
 		{
-			CurrentAcc = Acceleration;
+			CurrentAcc = DecreaseAccel;
 		}
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		float TempClamp = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
@@ -469,6 +497,8 @@ void ALOTMultiDrone::DetectMode()
 		BabylonMesh->SetVisibility(false, true);
 		CrossHair->SetVisibility(true, true);
 
+		SetUI(false);
+
 	}
 	else
 	{
@@ -484,6 +514,7 @@ void ALOTMultiDrone::DetectMode()
 		BabylonMesh->SetVisibility(true, true);
 		CrossHair->SetVisibility(false, true);
 
+		SetUI(true);
 
 	}
 }

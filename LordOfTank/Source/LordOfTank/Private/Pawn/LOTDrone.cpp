@@ -191,10 +191,19 @@ ALOTDrone::ALOTDrone()
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->bUsePawnControlRotation = false; 
 
+	SpringArm2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm1"));
+	SpringArm2->SetupAttachment(RootComponent);
+	SpringArm2->TargetArmLength = 0.0f;
+	SpringArm2->SocketOffset = FVector(0.f, 0.f, 0.f);
+	SpringArm2->bEnableCameraLag = false;
+	SpringArm2->CameraLagSpeed = 0.f;
+	//SpringArm->SetRelativeRotation(FRotator(-110.f, 0.0f, 0.0f));
+	SpringArm2->SetRelativeRotation(FRotator(-80.f, 0.0f, 0.0f));
+	//SpringArm2->SetRelativeLocation(FVector(500.0f, 0.0f, 1300.0f));
+
 	DetectCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
+	DetectCamera->SetupAttachment(SpringArm2, USpringArmComponent::SocketName);
 	DetectCamera->bUsePawnControlRotation = false;
-	DetectCamera->FieldOfView = 90.f;
-	DetectCamera->SetupAttachment(RootComponent);
 	DetectCamera->Deactivate();
 
 	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
@@ -202,8 +211,8 @@ ALOTDrone::ALOTDrone()
 	if (CrossHairBP.Class != NULL){
 		CrossHair->SetChildActorClass(CrossHairBP.Class);
 		CrossHair->SetupAttachment(DetectCamera);
+		CrossHair->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
 		CrossHair->SetVisibility(false, true);
-		//CrossHair->CreateChildActor();
 	}
 
 	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
@@ -252,8 +261,8 @@ void ALOTDrone::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
-	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, CurrentUpwardSpeed * DeltaTime);
-
+	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, CurrentUpwardSpeed * DeltaTime);
+	const FVector LocalMove = FVector(CurrentUpwardSpeed * DeltaTime, 0.f, CurrentForwardSpeed * DeltaTime);
 	AddActorLocalOffset(LocalMove, true);
 
 
@@ -264,7 +273,7 @@ void ALOTDrone::Tick(float DeltaTime)
 	DeltaRotation.Roll = CurrentRollSpeed * DeltaTime;
 
 
-	AddActorLocalRotation(DeltaRotation);
+	AddActorWorldRotation(DeltaRotation);;
 
 	Super::Tick(DeltaTime);
 
@@ -342,7 +351,7 @@ void ALOTDrone::MoveForwardInput(float Val)
 	//키 입력을 했다면
 	if (bHasInputForward && AP > 0)
 	{
-		CurrentAcc = Val * Acceleration;
+		CurrentAcc = Val* (-1.0f) * Acceleration;
 		bAcceleratedForward = (Val > 0) ? true : false;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
@@ -471,7 +480,7 @@ void ALOTDrone::DetectMode()
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true); 
 		CrossHair->SetVisibility(true, true);
-
+		
 	}
 	else
 	{

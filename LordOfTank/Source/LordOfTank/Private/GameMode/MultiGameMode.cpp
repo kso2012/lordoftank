@@ -383,7 +383,7 @@ void AMultiGameMode::EnemyActivateHoming()
 		if (AHomingProjectile* const ProjectileType = Cast<AHomingProjectile>(TempActor))
 		{
 			ProjectileType->ActivateHoming();
-			UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/HomingWarning.HomingWarning")));
+			UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/HomingWarinig_Cue.HomingWarinig_Cue")));
 		}
 		MyInstance->bEnemyActivateHoming = false;
 	}

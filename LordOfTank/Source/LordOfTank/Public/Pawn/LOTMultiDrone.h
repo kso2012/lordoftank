@@ -9,8 +9,12 @@ UCLASS()
 class LORDOFTANK_API ALOTMultiDrone : public APawn
 {
 	GENERATED_BODY()
-		UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class USceneComponent* Root;
+		//UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		//class USceneComponent* Root;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
+		class UCapsuleComponent* CollisionComp;
+
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* BabylonMesh;
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -65,6 +69,9 @@ class LORDOFTANK_API ALOTMultiDrone : public APawn
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* SpringArm;
 
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class USpringArmComponent* SpringArm2;
+
 	//이동모드 카메라
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UCameraComponent* Camera;
@@ -106,6 +113,8 @@ private:
 
 	UPROPERTY(Category = Yaw, EditAnywhere)
 		float MinSpeed;
+
+	float DecreaseAccel;
 
 	UParticleSystemComponent* Beam;
 
