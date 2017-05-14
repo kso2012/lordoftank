@@ -137,6 +137,7 @@ void AHomingProjectile::FireImpulse()
 		AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
 		ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		ATrainingMode* const TrainingGameMode = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		//멀티게임
 		if (GameMode)
 		{
@@ -172,7 +173,7 @@ void AHomingProjectile::FireImpulse()
 			}
 		}
 		//싱글게임
-		else if (SingleMode == UGameplayStatics::GetGameMode(GetWorld())) {
+		else if (SingleMode == UGameplayStatics::GetGameMode(GetWorld()) || TrainingGameMode) {
 
 			if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
 				//쏜 자신에게 맞았을 경우 
@@ -188,9 +189,10 @@ void AHomingProjectile::FireImpulse()
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
 					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+					Test->ApplyDamage(ProjectileDamage*DamageRatio, PROJECTILE_HOMING);
 				}
 				//적에게 맞았을 경우
-				else if ((bIsFireEnemy == true && Test != ParentTank))
+				else if ((Test != ParentTank))
 				{
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
@@ -201,6 +203,7 @@ void AHomingProjectile::FireImpulse()
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
 					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+					Test->ApplyDamage(ProjectileDamage*DamageRatio, PROJECTILE_HOMING);
 				}
 			}
 		}

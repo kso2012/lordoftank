@@ -78,6 +78,10 @@ public:
 
 	void OnResetVR();
 
+	void NextWeapon();
+
+	void ExWeapon();
+
 	////void SetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
 	//UFUNCTION(BlueprintCallable, Category = "CustomFunc")
 	//	void ToCallSetVehicleMovement(UWheeledVehicleMovementComponent* MovementComponent);
@@ -100,7 +104,7 @@ public:
 	void SetDefaultInvetory();
 	//탱크에게 데미지를 전달.
 	UFUNCTION()
-	void ApplyDamage(float damage);
+	void ApplyDamage(float damage, int Bullet);
 	
 	//AP를 반환하는 함수
 	float getAP() {
@@ -120,6 +124,16 @@ public:
 	bool PossessTank;
 
 
+	//발사중인가?
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsShoot;
+
+
+	UPROPERTY(BlueprintReadWrite)
+		float HP;
+
+	UPROPERTY(BlueprintReadWrite)
+		float Shield;
 	
 
 private:
@@ -183,14 +197,13 @@ private:
 	//발사 파워
 	float CurShootingPower;
 
-	//발사중인가?
-	bool bIsShoot;
 
 	bool bIsPushFire;
 
 	float timercounter;
 
-	bool timercounteron;
+	int CurInventoryIndex;
+
 
 
 	/////////////////////////////
@@ -217,6 +230,7 @@ private:
 	void DronePossess();
 
 public:
+	bool timercounteron;
 
 	void SetSingleUI(bool);
 	// AI가 포신을 회전시킬 때 ViewBox에 충돌이 되었는지 확인하는 변수
@@ -226,6 +240,7 @@ public:
 	AActor * CollisionActor;
 
 	// 게임모드에서 ShootAI를 호출하기 위한 함수, 게임모드에서 탱크에게 파워값을 보내줌
+	UFUNCTION(BlueprintCallable)
 	void CommandShoot(float power) { ShootAI(power); }
 	void CommandTurn() { TurnAI(); }
 	

@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetArrayLibrary.h"
 #include "LordOfTank/LordOfTankGameModeBase.h"
+#include "GameMode/TrainingMode.h"
 #include "LOTDrone.h"
 #include "LOTPlayer.h"
 
@@ -115,12 +116,13 @@ ALOTPlayer::ALOTPlayer()
 	EngineSoundComponent->SetSound(SoundCue.Object);
 	EngineSoundComponent->SetupAttachment(GetMesh());
 	
-	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
+	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP2.crossBP2_C"));
 	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
 	if (CrossHairBP.Class != NULL){
 		CrossHair->SetChildActorClass(CrossHairBP.Class);
-		CrossHair->SetupAttachment(GetMesh(), TEXT("Body_TR"));
-		CrossHair->SetVisibility(false, true);
+		CrossHair->SetupAttachment(FireModeCamera);
+		CrossHair->SetVisibility(false, true); 
+		CrossHair->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
 		//CrossHair->CreateChildActor();
 	}
 	
@@ -149,7 +151,8 @@ ALOTPlayer::ALOTPlayer()
 	//발사 파워
 	CurShootingPower= MinShootingPower;
 	PossessTank = true;
-
+	Shield = 100;
+	HP = MaxHealth;
 	isNotAI = true;
 	bIsShoot = false;
 
@@ -184,6 +187,8 @@ void ALOTPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTPlayer::FireMode);
 
 	InputComponent->BindAction("ChangePawn", IE_Pressed, this, &ALOTPlayer::ChangePawn);
+	InputComponent->BindAction("Q_BT", IE_Pressed, this, &ALOTPlayer::ExWeapon);
+	InputComponent->BindAction("E_BT", IE_Pressed, this, &ALOTPlayer::NextWeapon);
 
 }
 
@@ -290,7 +295,6 @@ void ALOTPlayer::FireEnd()
 			if (isNotAI) {
 				UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
 				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.4f, VTBlend_Linear, 0.0f, true);
-				
 			}
 			TempActor->GetTank(this);
 		}
@@ -345,6 +349,7 @@ void ALOTPlayer::OnResetVR()
 void ALOTPlayer::MoveForward(float Val)
 {
 	//SetVehicleMovement();
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (!bIsFireMode && AP > 0) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 		
@@ -352,7 +357,7 @@ void ALOTPlayer::MoveForward(float Val)
 		//GetVehicleMovementComponent()->set
 		//Test->SendPos(GetActorLocation(),GetVehicleMovementComponent());
 		//ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)
-		if(Val)
+		if(Val && TGameModeTest != UGameplayStatics::GetGameMode(GetWorld()))
 			AP -= MoveAP;
 	}
 }
@@ -360,9 +365,10 @@ void ALOTPlayer::MoveForward(float Val)
 
 void ALOTPlayer::MoveRight(float Val)
 {
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (!bIsFireMode && AP > 0) {
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
-		if(Val)
+		if(Val && TGameModeTest != UGameplayStatics::GetGameMode(GetWorld()))
 			AP -= MoveAP;
 	}
 	GetMesh();
@@ -393,17 +399,27 @@ void ALOTPlayer::SetDefaultInvetory()
 //	}
 //}
 
-void ALOTPlayer::ApplyDamage(float damage)
+void ALOTPlayer::ApplyDamage(float damage, int Bullet)
 {
-	CurrentHealth -= damage;
+	if (Shield > 0) {
+		if (Bullet != 2)
+			Shield -= damage;
+		else
+			CurrentHealth -= damage;
+	}
+	else
+		CurrentHealth -= damage;
 	if (CurrentHealth <= 0.f) {
 
 		TurretMesh->SetSimulatePhysics(true);
 		BarrelMesh->SetSimulatePhysics(true);
 		TurretMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		BarrelMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
+		CurrentHealth = 0.f;
 	}
+	if (Shield < 0.f)
+		Shield = 0.f;
+	HP = CurrentHealth;
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CurrentHealth));
 }
 
@@ -415,7 +431,11 @@ FVector ALOTPlayer::GetSegmentatTime(FVector StartLocation, FVector InitialVeloc
 void ALOTPlayer::DrawTrajectory()
 {
 	ClearBeam();
-	const FRotator SpawnRotation = GetActorRotation() + FireModeCamera->RelativeRotation;//
+	FRotator SpawnRotation = GetActorRotation() + FireModeCamera->RelativeRotation;//
+
+	if (!isNotAI) {
+		SpawnRotation = GetActorRotation() + BarrelMesh->RelativeRotation;
+	}
 
 	const FVector SpawnLocation = ((MuzzleLocation != nullptr) ? MuzzleLocation->GetComponentLocation() : GetActorLocation());
 
@@ -445,6 +465,8 @@ void ALOTPlayer::DrawTrajectory()
 	{
 		time1 = index * TimeInterval;
 		time2 = (index + 1) * TimeInterval;
+		point1 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time1);
+		point2 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time2);
 		DrawBeam(point1, point2);
 
 		if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true)) {
@@ -502,7 +524,11 @@ void ALOTPlayer::ChangePawn()
 
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Drone, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(GameModeTest == UGameplayStatics::GetGameMode(GetWorld()))
+		Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Drone, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	else if(TGameModeTest == UGameplayStatics::GetGameMode(GetWorld()))
+		Test->SetViewTargetWithBlend(TGameModeTest->MyPlayer.Drone, 1.0f, VTBlend_EaseInOut, 10.f, true);
 	FLatentActionInfo LatentActionInfo;
 	LatentActionInfo.CallbackTarget = this;
 	LatentActionInfo.ExecutionFunction = "DronePossess";
@@ -517,13 +543,27 @@ void ALOTPlayer::DronePossess()
 {
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	SetSingleUI(false);
-	GameModeTest->MyPlayer.Drone->SetSingleUI(true);
-	Test->UnPossess();
-	Test->Possess(GameModeTest->MyPlayer.Drone);
-	GameModeTest->MyPlayer.Tank->DisableInput(Test);
-	GameModeTest->MyPlayer.Drone->EnableInput(Test);
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameModeTest == UGameplayStatics::GetGameMode(GetWorld())) {
+		if (GameModeTest->MyPlayer.Drone->timercounteron == false) {
+			SetSingleUI(false);
+			GameModeTest->MyPlayer.Drone->SetSingleUI(true);
+			Test->UnPossess();
+			Test->Possess(GameModeTest->MyPlayer.Drone);
+			GameModeTest->MyPlayer.Tank->DisableInput(Test);
+			GameModeTest->MyPlayer.Drone->EnableInput(Test);
+		}
+	}
+	else if (TGameModeTest == UGameplayStatics::GetGameMode(GetWorld())) {
+		if (TGameModeTest->MyPlayer.Drone->timercounteron == false) {
+			SetSingleUI(false);
+			TGameModeTest->MyPlayer.Drone->SetSingleUI(true);
+			Test->UnPossess();
+			Test->Possess(TGameModeTest->MyPlayer.Drone);
+			TGameModeTest->MyPlayer.Tank->DisableInput(Test);
+			TGameModeTest->MyPlayer.Drone->EnableInput(Test);
+		}
+	}
 }
 
 void ALOTPlayer::SetSingleUI(bool bIsPlayer)
@@ -566,7 +606,7 @@ void ALOTPlayer::ShootAI(float power) {
 	if (myTurn && !isNotAI && !bIsShoot) {
 		bIsFireMode = true;
 		bIsShoot = true;
-		//CurShootingPower = power;
+		CurShootingPower = power;
 		if(RightShot)
 			AimCount = 0;
 		FireEnd();
@@ -610,4 +650,22 @@ void ALOTPlayer::SetAim(float distance) {
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Barrel Rotate")));
 	}
 
+}
+
+void ALOTPlayer::NextWeapon()
+{
+	if (2 > CurInventoryIndex) {
+		CurInventoryIndex++;
+		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 포탄 %d"), CurInventoryIndex));
+}
+
+void ALOTPlayer::ExWeapon()
+{
+	if (0 < CurInventoryIndex) {
+		CurInventoryIndex--;
+		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 포탄 %d"), CurInventoryIndex));
 }

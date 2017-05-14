@@ -19,8 +19,10 @@ class LORDOFTANK_API ALOTDrone : public APawn
 {
 	GENERATED_BODY()
 
-	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class USceneComponent* Root;
+	//UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	class USceneComponent* Root;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
+		class UCapsuleComponent* CollisionComp;
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* BabylonMesh;
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -165,7 +167,6 @@ private:
 
 	void ChangePawn();
 
-	bool timercounteron;
 
 	float timercounter;
 
@@ -218,6 +219,7 @@ private:
 
 
 public:
+	bool timercounteron;
 
 	void SetSingleUI(bool);
 	// 게임모드에서 이 탱크가 AI인지 아닌지를 설정해주는 함수
@@ -228,23 +230,13 @@ public:
 
 	int GetPawnNum() { return PawnNum; }
 
-	float DecreaseAccel;
-
 	// Drone의 인지 범위 내에 탱크가 들어왔는지 판단하는 변수
 	int DecideCollisionState;
 
 	// ViewBox에 충돌된 Actor를 저장하는 변수
 	AActor * CollisionActor;
 	
-	// ViewBox에 충돌되었을 때 호출되는 함수
-	UFUNCTION()
-		void DroneFindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	// ViewBox에서 벗어났을 때 호출되는 함수
-	UFUNCTION()
-		void DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	float FloatingAnim;
 
 	// ViewBox를 Activate
 	void OnViewBox() {
@@ -271,10 +263,14 @@ public:
 	void SetDroneSpeed() { CurrentForwardSpeed = 0.f; }
 
 
-	FVector ReturnMeshLocation() { return Root->GetComponentLocation(); }
-	FVector ReturnForwardVector() { return Root->GetForwardVector(); }
+	FVector ReturnMeshLocation() { return RootComponent->GetComponentLocation(); }
+	FVector ReturnForwardVector() { return RootComponent->GetForwardVector(); }
 
 
 	void SetAP(float ap) { AP = ap; }
 	float ReturnAP() { return AP; }
+
+	float DecreaseAccel;
+
+	float FloatingAnim;
 };

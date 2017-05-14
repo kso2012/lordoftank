@@ -77,7 +77,6 @@ void ALordOfTankGameModeBase::InitPlayer() {
 	MyPlayer.ControlledPawn = PawnTank;
 	MyPlayer.Tank->SetisNotAI(true);
 
-	MyPlayer.Drone->OffViewBox();
 	Control->Possess(MyPlayer.Tank);
 	MyPlayer.AP = MaxAP;
 
@@ -101,7 +100,6 @@ void ALordOfTankGameModeBase::InitAI() {
 	EnemyPlayer.Tank->SetisNotAI(false);
 	EnemyPlayer.Tank->Player = MyPlayer.Tank;
 
-	EnemyPlayer.Drone->OnViewBox();
 	IsEnemyFound = false;
 	EnemyPlayer.AP = MaxAP;
 
@@ -159,14 +157,6 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 
 
 void ALordOfTankGameModeBase::Think() {
-	// 플레이어나 AI가 포를 발사하고 있을 땐 탱크와 드론의 ViewBox를 사용하지 않음
-	// 남겨둘 경우 포탄이 어딘가에 충돌된 것으로 판단하여 바로 터지게 됌
-	if (MyPlayer.Tank->GetbIsShoot() || EnemyPlayer.Tank->GetbIsShoot() || MyPlayer.Drone->bDetectMode) {
-		EnemyPlayer.Drone->OffViewBox();
-		MyPlayer.Drone->OffViewBox();
-	}
-	else {
-		IsLookEnemyTank();
 		if (PlayerTurn == 2 && !bIsInRange) {
 			if (!bIsRightDirection) {
 				SetDroneDirection(); 
@@ -263,33 +253,9 @@ void ALordOfTankGameModeBase::Think() {
 			}
 		}
 
-	}
-	// 플레이어나 AI가 포를 발사하고 있지 않은 경우에는 ViewBox를 사용하는 상태로 둠
-	if (!(MyPlayer.Tank->GetbIsShoot() && EnemyPlayer.Tank->GetbIsShoot() && MyPlayer.Drone->bDetectMode)) {
-		EnemyPlayer.Drone->OnViewBox();
-	}
 }
 
 
-void ALordOfTankGameModeBase::IsLookEnemyTank() {
-	if (EnemyPlayer.Drone->DecideCollisionState == Find) {
-		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
-			IsEnemyFound = true;
-			//DroneDirection = MyPlayer.Tank->GetActorLocation() - EnemyPlayer.Drone->GetActorLocation();
-		}
-		EnemyPlayer.Drone->DecideCollisionState = None;
-	}
-	else if (EnemyPlayer.Drone->DecideCollisionState == Lost) {
-		if (EnemyPlayer.Drone->CollisionActor == MyPlayer.Tank) {
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
-			IsEnemyFound = false;
-			bIsRightDirection = false;
-			bIsInRange = false;
-		}
-		EnemyPlayer.Drone->DecideCollisionState = None;
-	}
-}
 
 void ALordOfTankGameModeBase::TraceEnemyLocation() {
 	EnemyPlayer.Tank->SetEnemyLocation(MyPlayer.Tank->ReturnMeshLocation());

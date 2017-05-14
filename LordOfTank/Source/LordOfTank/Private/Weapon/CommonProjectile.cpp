@@ -150,6 +150,7 @@ void ACommonProjectile::FireImpulse()
 		AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
 		ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		ATrainingMode* const TrainingGameMode = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 		//멀티게임
 		if (GameMode)
 		{
@@ -185,7 +186,7 @@ void ACommonProjectile::FireImpulse()
 			}
 		}
 		//싱글게임
-		else if (SingleMode == UGameplayStatics::GetGameMode(GetWorld())){
+		else if (SingleMode == UGameplayStatics::GetGameMode(GetWorld()) || TrainingGameMode){
 
 			if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
 				//쏜 자신에게 맞았을 경우 
@@ -194,26 +195,28 @@ void ACommonProjectile::FireImpulse()
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
 						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
 					if (CenterToLength > RadialRadius)
 						CenterToLength = RadialRadius;
 
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+					Test->ApplyDamage(ProjectileDamage*DamageRatio, PROJECTILE_COMMON);
 				}
 				//적에게 맞았을 경우
-				else if ((bIsFireEnemy == true && Test != ParentTank))
+				else if ((Test != ParentTank))
 				{
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
 						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
 					if (CenterToLength > RadialRadius)
 						CenterToLength = RadialRadius;
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
+					Test->ApplyDamage(ProjectileDamage*DamageRatio, PROJECTILE_COMMON);
 				}
 			}
 		}
@@ -234,6 +237,7 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	
 
 	ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	ATrainingMode* const TrainingGameMode = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	ALOTPlayer* const Test = Cast<ALOTPlayer>(ParentTank);
 	//액터에 맞았을 경우임
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
@@ -249,14 +253,8 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		}
 	}
 
-	//if (SingleMode) {
-		//Test->bIsWaiting = false;
-		//Test->SetbIsShoot();
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("bIsWaiting %d"), Test->bIsWaiting));
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("bIsTestShot %d"), Test->bIsTestShot));
-		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("RightShot %d"), Test->RightShot));
-	//}
-	//if (SingleMode&& Test->bIsTestShot) {}
+	if (TrainingGameMode)
+		Test->ChangeTurn();
 	
 	
 	//위에 if문 안에 넣으면 액터에 충돌할때만 데미지줘서 주변에 떨어졌을 때 데미지계산 못함
