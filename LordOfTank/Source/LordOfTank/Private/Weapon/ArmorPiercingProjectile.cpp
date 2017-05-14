@@ -52,7 +52,8 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 	{
 
 		AMultiGameMode* const MultiGameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-		AMultiGameMode* const SingleGameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		ALordOfTankGameModeBase* const SingleGameMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+		ATrainingMode* const TrainingGameMode = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 		if (MultiGameMode)
 		{
@@ -75,11 +76,28 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 
 		}
 
+<<<<<<< HEAD
 		else if (SingleGameMode) {
 			if (OtherActor->IsA(ALOTPlayer::StaticClass())) {
 			//	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "Damage Player!");
 				OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 				Cast<ALOTPlayer>(OtherActor)->ApplyDamage(ProjectileDamage);
+=======
+		else if (SingleGameMode || TrainingGameMode) {
+			if (ALOTPlayer* const Test = Cast<ALOTPlayer>(OtherActor)) {
+				//쏜 자신에게 맞았을 경우 
+				if ((bIsFireEnemy == false && Test == ParentTank))
+				{
+					OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+					Test->ApplyDamage(ProjectileDamage, PROJECTILE_ARMORPIERCING);
+				}
+				//적에게 맞았을 경우
+				else if ((Test != ParentTank))
+				{
+					OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+					Test->ApplyDamage(ProjectileDamage, PROJECTILE_ARMORPIERCING);
+				}
+>>>>>>> 046ad5562b1a29def4d07842db7b68bb0304c612
 			}
 		}
 		
