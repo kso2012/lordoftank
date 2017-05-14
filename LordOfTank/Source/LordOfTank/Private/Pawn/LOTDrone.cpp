@@ -2,9 +2,11 @@
 
 #include "LordOfTank.h"
 #include "LOTDrone.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "LOTPlayer.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "LordOfTank/LordOfTankGameModeBase.h"
+#include "LOTGameInstance.h"
+#include "GameMode/TrainingMode.h"
 
 #define PawnTank 1
 #define PawnDrone 2
@@ -75,12 +77,21 @@ ALOTDrone::ALOTDrone()
 	};
 	static FConstructorStatics ConstructorStatics;
 
-	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-	RootComponent = Root;
+	CollisionComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("SphereComp"));
+	// Use a sphere as a simple collision representation
+	CollisionComp->InitCapsuleSize(900.f, 400.f);
+	//CollisionComp->InitSphereRadius(1.0f);
+	CollisionComp->BodyInstance.SetCollisionProfileName("Drone");
+	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	CollisionComp->CanCharacterStepUpOn = ECB_No;
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComp->SetCollisionObjectType(ECC_Pawn);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
+	RootComponent = CollisionComp;
 
 	BabylonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh"));
 	BabylonMesh->SetStaticMesh(ConstructorStatics.BabylonMesh.Get());
-	BabylonMesh->SetupAttachment(Root);
+	BabylonMesh->SetupAttachment(RootComponent);
 
 	BabylonMesh->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f));
 
@@ -190,7 +201,7 @@ ALOTDrone::ALOTDrone()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
-	Camera->bUsePawnControlRotation = false; 
+	Camera->bUsePawnControlRotation = false;
 
 	SpringArm2 = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm1"));
 	SpringArm2->SetupAttachment(RootComponent);
@@ -206,7 +217,7 @@ ALOTDrone::ALOTDrone()
 
 	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
 	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
-	if (CrossHairBP.Class != NULL){
+	if (CrossHairBP.Class != NULL) {
 		CrossHair->SetChildActorClass(CrossHairBP.Class);
 		CrossHair->SetupAttachment(DetectCamera);
 		CrossHair->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
@@ -235,13 +246,15 @@ ALOTDrone::ALOTDrone()
 	PossessDrone = false;
 	bDetectMode = false;
 	DecreaseAccel = 150.f;
+	FloatingAnim = 0.f;
+
 	MoveAP = 2.f;
 	AP = 2500.f;
-	FloatingAnim = 0.f;
+
 	//PawnNum = PawnDrone;
+	FloatingAnim = 0.f;
 
 	DecideCollisionState = None;
-	SetViewBoxLocation();
 	timercounteron = false;
 }
 
@@ -258,9 +271,9 @@ void ALOTDrone::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, CurrentUpwardSpeed * DeltaTime);
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, CurrentUpwardSpeed * DeltaTime);
+
 	AddActorLocalOffset(LocalMove, true);
 
 
@@ -269,6 +282,8 @@ void ALOTDrone::Tick(float DeltaTime)
 	DeltaRotation.Pitch = CurrentPitchSpeed * DeltaTime;
 	DeltaRotation.Yaw = CurrentYawSpeed * DeltaTime;
 	DeltaRotation.Roll = CurrentRollSpeed * DeltaTime;
+
+
 
 
 	AddActorLocalRotation(DeltaRotation);
@@ -311,6 +326,7 @@ void ALOTDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 
 void ALOTDrone::SetTarget()
 {
+	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	//ClearBeam();
 	//타겟설정 가능한 타입을 넣을 배열
 	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
@@ -319,23 +335,16 @@ void ALOTDrone::SetTarget()
 	//현재 월드를 가져온다.
 	UWorld* const World = GetWorld();
 	//벡터의 시작점
-	FVector StartTrace = DetectCamera->K2_GetComponentLocation() + DetectCamera->GetForwardVector() * 500;
-	//벡터의 끝점
-	FVector EndTrace = StartTrace + DetectCamera->GetForwardVector() * 500000;
+	FVector StartTrace = CrossHair->K2_GetComponentLocation(); //+ DetectCamera->GetForwardVector() * 500;
+															   //벡터의 끝점
+	FVector EndTrace = StartTrace + CrossHair->GetForwardVector() * 1000000000;
 	//결과를 담을 구조체변수
 	FHitResult OutHit;
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
-//<<<<<<< HEAD
-
-//=======
-	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true)){
-		if (HomingTarget != NULL)
-			HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
-//>>>>>>> cb758b4ed7d64fbd794d75d0df6effa2faafda77
-		HomingTarget = OutHit.GetActor();
-		HomingTarget->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Target Name = " + HomingTarget->GetName());
-		//DrawBeam(StartTrace, EndTrace);
+	if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
+	{
+		OutHit.GetActor()->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+		UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TargetLock_Cue.TargetLock_Cue")));
 	}
 }
 
@@ -345,15 +354,16 @@ void ALOTDrone::MoveForwardInput(float Val)
 	bHasInputForward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
 
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	//키 입력을 했다면
 	if (bHasInputForward && AP > 0)
 	{
-		CurrentAcc = Val* Acceleration;
+		CurrentAcc = Val * Acceleration;
 		bAcceleratedForward = (Val > 0) ? true : false;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		if(Val)
+		if(Val && TGameModeTest != UGameplayStatics::GetGameMode(GetWorld()))
 			AP -= MoveAP;
 	}
 	//정지상태가 아니라면
@@ -381,6 +391,7 @@ void ALOTDrone::MoveForwardInput(float Val)
 void ALOTDrone::MoveUpwardInput(float Val)
 {
 
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
 	bHasInputUpward = !FMath::IsNearlyEqual(Val, 0.f);
 	float CurrentAcc = 0.f;
@@ -392,7 +403,7 @@ void ALOTDrone::MoveUpwardInput(float Val)
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
 
-		if(Val)
+		if(Val && TGameModeTest != UGameplayStatics::GetGameMode(GetWorld()))
 			AP -= MoveAP;
 	}
 
@@ -472,22 +483,18 @@ void ALOTDrone::DetectMode()
 	{
 		bIsDetectMode = true;
 		bDetectMode = true;
-		if (!isNotAI)
-			OffViewBox();
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("탐색모드!!!"));
 		Camera->Deactivate();
 		DetectCamera->Activate();
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true); 
 		CrossHair->SetVisibility(true, true);
-		
+
 	}
 	else
 	{
 		bIsDetectMode = false;
 		bDetectMode = false;
-		if(!isNotAI)
-			OnViewBox();
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노탐색모드!!!"));
 		Camera->Activate();
 		DetectCamera->Deactivate();
@@ -509,7 +516,11 @@ void ALOTDrone::ChangePawn()
 
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Tank, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameModeTest == UGameplayStatics::GetGameMode(GetWorld()))
+		Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Tank, 1.0f, VTBlend_EaseInOut, 10.f, true);
+	else if (TGameModeTest == UGameplayStatics::GetGameMode(GetWorld()))
+		Test->SetViewTargetWithBlend(TGameModeTest->MyPlayer.Tank, 1.0f, VTBlend_EaseInOut, 10.f, true);
 	FLatentActionInfo LatentActionInfo;
 	LatentActionInfo.CallbackTarget = this;
 	LatentActionInfo.ExecutionFunction = "TankPossess";
@@ -525,13 +536,27 @@ void ALOTDrone::TankPossess()
 {
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	SetSingleUI(false);
-	GameModeTest->MyPlayer.Tank->SetSingleUI(true);
-	Test->UnPossess();
-	Test->Possess(GameModeTest->MyPlayer.Tank);
-	GameModeTest->MyPlayer.Drone->DisableInput(Test);
-	GameModeTest->MyPlayer.Tank->EnableInput(Test);
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
+	ATrainingMode* const TGameModeTest = Cast<ATrainingMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameModeTest == UGameplayStatics::GetGameMode(GetWorld())) {
+		if (GameModeTest->MyPlayer.Tank->timercounteron == false) {
+			SetSingleUI(false);
+			GameModeTest->MyPlayer.Tank->SetSingleUI(true);
+			Test->UnPossess();
+			Test->Possess(GameModeTest->MyPlayer.Tank);
+			GameModeTest->MyPlayer.Drone->DisableInput(Test);
+			GameModeTest->MyPlayer.Tank->EnableInput(Test);
+		}
+	}
+	else if (TGameModeTest == UGameplayStatics::GetGameMode(GetWorld())) {
+		if (TGameModeTest->MyPlayer.Tank->timercounteron == false) {
+			SetSingleUI(false);
+			TGameModeTest->MyPlayer.Tank->SetSingleUI(true);
+			Test->UnPossess();
+			Test->Possess(TGameModeTest->MyPlayer.Tank);
+			TGameModeTest->MyPlayer.Drone->DisableInput(Test);
+			TGameModeTest->MyPlayer.Tank->EnableInput(Test);
+		}
+	}
 }
 
 void ALOTDrone::SetSingleUI(bool bIsPlayer)
@@ -545,48 +570,6 @@ void ALOTDrone::SetSingleUI(bool bIsPlayer)
 
 }
 
-void ALOTDrone::SetViewBoxLocation() {
-	ViewBox = CreateDefaultSubobject<UBoxComponent>(TEXT("viewbox"));
-	ViewBox->SetCollisionObjectType(ECC_Vehicle);
-
-	ViewBox->SetupAttachment(Root);
-
-	ViewBox->SetBoxExtent(FVector(50000, 50000, 30000));
-	
-	ViewBox->SetRelativeLocation(this->GetActorForwardVector() * 50000);
-
-	ViewBox->SetVisibility(true, true);
-
-	ViewBox->bGenerateOverlapEvents = true;
-	ViewBox->OnComponentBeginOverlap.AddDynamic(this, &ALOTDrone::DroneFindEnemy);
-	ViewBox->OnComponentEndOverlap.AddDynamic(this, &ALOTDrone::DroneLostEnemy);
-
-
-	//ViewBox->Activate();
-
-	OffViewBox();
-}
-
-void ALOTDrone::DroneFindEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	
-	//CollisionActor = SweepResult.GetActor();
-	CollisionActor = OtherActor;
-
-	DecideCollisionState = Find;
-
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Find Enemy");
-
-	
-}
-
-void ALOTDrone::DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-
-	CollisionActor = OtherActor;
-
-	DecideCollisionState = Lost;
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, "Lost Enemy");
-}
-
 void ALOTDrone::RotateDrone(FRotator RotateDirection) {
-	Root->SetWorldRotation(RotateDirection);
+	RootComponent->SetWorldRotation(RotateDirection);
 }
