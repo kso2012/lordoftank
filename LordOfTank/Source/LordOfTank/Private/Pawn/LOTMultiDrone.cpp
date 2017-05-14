@@ -374,12 +374,12 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 		if (CurrentForwardSpeed > 0)
 		{
 			CurrentAcc = -1.f * DecreaseAccel;
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("감속 %f"), DecreaseAccel));
+			//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("감속 %f"), DecreaseAccel));
 		}
 		else if (CurrentForwardSpeed < 0)
 		{
 			CurrentAcc = DecreaseAccel;
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("증속 %f"), DecreaseAccel));
+			//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("증속 %f"), DecreaseAccel));
 		}
 		
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
@@ -488,7 +488,7 @@ void ALOTMultiDrone::DetectMode()
 	if (bIsDetectMode == false)
 	{
 		bIsDetectMode = true;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("탐색모드!!!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("탐색모드!!!"));
 		Camera->Deactivate();
 		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		DetectCamera->Activate();
@@ -503,7 +503,7 @@ void ALOTMultiDrone::DetectMode()
 	else
 	{
 		bIsDetectMode = false;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노탐색모드!!!"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노탐색모드!!!"));
 		
 
 		DetectCamera->Deactivate();
@@ -549,7 +549,7 @@ void ALOTMultiDrone::PossessCall()
 	GameModeTest->MyPlayer.Tank->SetUI(true);
 	Test->Possess(GameModeTest->MyPlayer.Tank);
 	UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Engine/VREditor/Sounds/VR_teleport_Cue.VR_teleport_Cue")));
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
 }
 
 void ALOTMultiDrone::SetUI(bool bIsPlayer)

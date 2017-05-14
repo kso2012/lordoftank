@@ -3,7 +3,6 @@
 #pragma once
 
 #include "WheeledVehicle.h"
-#include "Weapon/Projectile.h"
 #include "LOTMultiPlayer.generated.h"
 
 /**
@@ -163,9 +162,9 @@ private:
 
 	bool bIsPushFire;
 
-	AProjectile* TempActor;
+	class AProjectile* TempActor;
 
-	
+	void TurnOver();
 
 
 

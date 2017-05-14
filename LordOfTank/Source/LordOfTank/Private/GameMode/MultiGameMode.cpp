@@ -166,7 +166,7 @@ void AMultiGameMode::EnemyFire()
 		UWorld* const World = GetWorld();
 		if (World != NULL)
 		{
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 발사 타입은 %d"), MyInstance->EnemyShotProjectileType));
+			//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 발사 타입은 %d"), MyInstance->EnemyShotProjectileType));
 			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(MyInstance->EnemyShotLocation,
 				FRotator(0.f, 0.f, 0.f), FVector(1.f, 1.f, 1.f)), FVector(MyInstance->EnemyShotPower, 0.f, 0.f));
 			if (MyInstance->EnemyShotProjectileType == PROJECTILE_COMMON) {
@@ -174,7 +174,7 @@ void AMultiGameMode::EnemyFire()
 				TempActor->SetInitialVelocity(InitialVelocity);
 				TempActor->ParentTank = EnemyPlayer.Tank;
 				TempActor->SetEnemyFire(true);
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 보통탄 발사")));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 보통탄 발사")));
 			}
 			else if (MyInstance->EnemyShotProjectileType == PROJECTILE_ARMORPIERCING)
 			{
@@ -182,7 +182,7 @@ void AMultiGameMode::EnemyFire()
 				TempActor->SetInitialVelocity(InitialVelocity);
 				TempActor->ParentTank = EnemyPlayer.Tank;
 				TempActor->SetEnemyFire(true);
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 관통탄 발사")));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 관통탄 발사")));
 			}
 			else if (MyInstance->EnemyShotProjectileType == PROJECTILE_HOMING)
 			{
@@ -192,7 +192,7 @@ void AMultiGameMode::EnemyFire()
 				TempActor->SetEnemyFire(true);
 				if(MyInstance->bIsTarget)
 					TempActor->SetHomingTarget(MyPlayer.Tank, MyInstance->EnemyShotPower * 5);
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 유도탄 발사")));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 유도탄 발사")));
 
 			}
 			
@@ -293,7 +293,7 @@ void AMultiGameMode::TurnChange()
 		//내턴으로 변경됐다면
 		if (MyInstance->bIsmyTurn)
 		{
-			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 ap = %f"), MyInstance->ChargingAP));
+			//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 ap = %f"), MyInstance->ChargingAP));
 			if (MyPlayer.AP + MyInstance->ChargingAP >= MaxAP)
 				MyPlayer.AP = MaxAP;
 			else
@@ -340,9 +340,17 @@ void AMultiGameMode::EndGame()
 
 		bIsEndGame = true;
 		EndState = MyInstance->EndState;
+		if (EndState == GAME_LOSE)
+		{
+			UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("SoundCue'/Game/LOTMaps/Sound/Lose_Cue.Lose_Cue")));
+		}
+		else if (EndState == GAME_WIN)
+		{
+			UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTMaps/Sound/Win_Cue.Win_Cue")));
+		}
 		MyInstance->bRecvIsEndGame = false;
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("게임끝남!!! = %d"), EndState));
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("게임끝남!!! = %d"), EndState));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("게임끝남!!! = %d"), EndState));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("게임끝남!!! = %d"), EndState));
 		OpenLevelCall();
 	}
 }
@@ -365,11 +373,11 @@ void AMultiGameMode::EnemyTargeting()
 
 		if (MyInstance->bIsTarget)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 나를 락온")));
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 나를 락온")));
 			//감지 사운드
 		}
 		else
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 나를 락온해제")));//해제 사운드
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 나를 락온해제")));//해제 사운드
 
 		MyInstance->bIsTargetMS = false;
 	}

@@ -194,12 +194,12 @@ void ACommonProjectile::FireImpulse()
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
 						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
 					if (CenterToLength > RadialRadius)
 						CenterToLength = RadialRadius;
 
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
 				}
 				//적에게 맞았을 경우
@@ -208,11 +208,11 @@ void ACommonProjectile::FireImpulse()
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
 						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
 					if (CenterToLength > RadialRadius)
 						CenterToLength = RadialRadius;
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
 				}
 			}
@@ -241,7 +241,7 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		if (SingleMode && Test->bIsTestShot && Test->GetisAI() && OtherActor == Test->Player) {
 			Test->bIsTestShot = false;
 			Test->RightShot = true;
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("테스트 끝")));
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("테스트 끝")));
 		}
 		else {
 			if (SingleMode && !Test->bIsTestShot)

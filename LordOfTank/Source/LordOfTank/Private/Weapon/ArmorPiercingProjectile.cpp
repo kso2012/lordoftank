@@ -77,7 +77,7 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 
 		else if (SingleGameMode) {
 			if (OtherActor->IsA(ALOTPlayer::StaticClass())) {
-				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "Damage Player!");
+			//	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "Damage Player!");
 				OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 				Cast<ALOTPlayer>(OtherActor)->ApplyDamage(ProjectileDamage);
 			}
@@ -85,7 +85,7 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 		
 		if (UDestructibleComponent* DestructibleComponent = Cast<UDestructibleComponent>(OtherComp))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, " Destructorble!");
+			//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, " Destructorble!");
 			DestructibleComponent->ApplyRadiusDamage(10000000.f, OtherComp->GetComponentLocation(),900.f, 10000000.f, RIF_Constant);
 			//DestructibleComponent->ApplyDamage(10000000.f, OtherComp->GetComponentLocation(), GetActorForwardVector(), 10000000.f);
 		}

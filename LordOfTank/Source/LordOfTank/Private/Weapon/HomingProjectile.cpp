@@ -181,12 +181,12 @@ void AHomingProjectile::FireImpulse()
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
 						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
 					if (CenterToLength > RadialRadius)
 						CenterToLength = RadialRadius;
 
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
 				}
 				//적에게 맞았을 경우
@@ -195,11 +195,11 @@ void AHomingProjectile::FireImpulse()
 					FVector ActorLocation = InsideActor->GetActorLocation();
 					float CenterToLength = UKismetMathLibrary::Sqrt(UKismetMathLibrary::Square(Origin.X - ActorLocation.X)
 						+ UKismetMathLibrary::Square(Origin.Y - ActorLocation.Y) + UKismetMathLibrary::Square(Origin.Z - ActorLocation.Z));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CenterToLength));
 					if (CenterToLength > RadialRadius)
 						CenterToLength = RadialRadius;
 					float DamageRatio = (1.0f - (CenterToLength / RadialRadius));
-					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
 				}
 			}
@@ -248,15 +248,15 @@ void AHomingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 void AHomingProjectile::SetHomingTarget(AActor* HomingTarget,float Magnitude)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "SetHomingTarget Call!!");
+	//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "SetHomingTarget Call!!");
 	if (HomingTarget) {
 		ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
 		ProjectileMovement->HomingAccelerationMagnitude = Magnitude;
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, HomingTarget->GetName() +"SetHomingTarget Success!!");
-		
+		//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, HomingTarget->GetName() +"SetHomingTarget Success!!");
+
 	}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "SetHomingTarget Fail!!");
+		;//GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "SetHomingTarget Fail!!");
 }
 
 void AHomingProjectile::ActivateHoming()

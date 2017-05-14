@@ -6,6 +6,7 @@
 #include "Weapon/CommonProjectile.h"
 #include "Weapon/ArmorPiercingProjectile.h"
 #include "Weapon/HomingProjectile.h"
+#include "Weapon/Projectile.h"
 #include "Effects/TankCameraShake.h"
 #include "LOTGameInstance.h"
 #include "GameMode/MultiGameMode.h"
@@ -197,6 +198,7 @@ void ALOTMultiPlayer::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	InputComponent->BindAction("ChangePawn", IE_Pressed, this, &ALOTMultiPlayer::ChangePawn);
 	InputComponent->BindAction("Q_BT", IE_Pressed, this, &ALOTMultiPlayer::ExWeapon);
 	InputComponent->BindAction("E_BT", IE_Pressed, this, &ALOTMultiPlayer::NextWeapon);
+	InputComponent->BindAction("Z_BT", IE_Pressed, this, &ALOTMultiPlayer::TurnOver);
 	
 }
 
@@ -216,7 +218,7 @@ void ALOTMultiPlayer::Tick(float DeltaTime)
 	{
 		DrawTrajectory();
 		RaisePower();
-		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재파워 %f"), CurShootingPower));
+		//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재파워 %f"), CurShootingPower));
 	}
 
 
@@ -306,13 +308,13 @@ void ALOTMultiPlayer::FireEnd()
 			{
 				Type = PROJECTILE_COMMON;
 				//TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("보통탄 발사 %d"), Type));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("보통탄 발사 %d"), Type));
 			}
 			else if (AArmorPiercingProjectile* const ProjectileType = Cast<AArmorPiercingProjectile>(TempActor))
 			{
 				Type = PROJECTILE_ARMORPIERCING;
 				//TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
-				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("관통탄 발사%d"), Type));
+				//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("관통탄 발사%d"), Type));
 			}
 			else if (AHomingProjectile* const ProjectileType = Cast<AHomingProjectile>(TempActor))
 			{
@@ -452,7 +454,7 @@ void ALOTMultiPlayer::PossessCall()
 	GameModeTest->MyPlayer.Drone->SetUI(true);
 	Test->Possess(GameModeTest->MyPlayer.Drone);
 	UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Engine/VREditor/Sounds/VR_teleport_Cue.VR_teleport_Cue")));
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
 }
 
 
@@ -461,7 +463,7 @@ void ALOTMultiPlayer::PossessCall()
 void ALOTMultiPlayer::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 
-	// Only add impulse and destroy projectile if we hit a physics
+	
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
 		;
@@ -572,7 +574,7 @@ void ALOTMultiPlayer::NextWeapon()
 		CurInventoryIndex++;
 		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 포탄 %d"), CurInventoryIndex));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 포탄 %d"), CurInventoryIndex));
 }
 
 void ALOTMultiPlayer::ExWeapon()
@@ -581,5 +583,21 @@ void ALOTMultiPlayer::ExWeapon()
 		CurInventoryIndex--;
 		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 포탄 %d"), CurInventoryIndex));
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재 포탄 %d"), CurInventoryIndex));
+}
+
+void ALOTMultiPlayer::TurnOver()
+{
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead)
+	{
+		if (GameModeTest->MyPlayer.AP>200.f)
+		{
+			GameModeTest->MyPlayer.AP -= 200.f;
+			GetMesh()->AddImpulse(FVector(0.f,0.f, 2000000.f));
+			GetMesh()->AddRelativeRotation(FRotator(180.f,0.f,0.f), false, nullptr, ETeleportType::TeleportPhysics);
+
+		}
+	}
 }
