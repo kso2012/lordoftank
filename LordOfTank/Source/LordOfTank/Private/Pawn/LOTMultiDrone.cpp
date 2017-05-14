@@ -242,7 +242,7 @@ ALOTMultiDrone::ALOTMultiDrone()
 
 
 	Acceleration = 300.f;
-	DecreaseAccel = -150.f;
+	DecreaseAccel = 150.f;
 	TurnSpeed = 50.f;
 	MaxSpeed = 4000.f;
 	MinSpeed = -4000.f;
@@ -378,10 +378,12 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 		if (CurrentForwardSpeed > 0)
 		{
 			CurrentAcc = -1.f * DecreaseAccel;
+			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("감속 %f"), DecreaseAccel));
 		}
 		else if (CurrentForwardSpeed < 0)
 		{
 			CurrentAcc = DecreaseAccel;
+			GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("증속 %f"), DecreaseAccel));
 		}
 		
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);

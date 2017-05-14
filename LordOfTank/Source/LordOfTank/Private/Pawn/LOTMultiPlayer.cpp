@@ -111,16 +111,17 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	EngineSoundComponent->SetSound(SoundCue.Object);
 	EngineSoundComponent->SetupAttachment(GetMesh());
 
-	//static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
-	//CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
-	//if (CrossHairBP.Class != NULL)
-	//{
-	//	CrossHair->SetChildActorClass(CrossHairBP.Class);
-	//	CrossHair->SetupAttachment(BarrelMesh, TEXT("Muzzle"));
-	//	//CrossHair->SetupAttachment(FireModeCamera);
-	//	CrossHair->SetVisibility(false, true);
-	//	//CrossHair->CreateChildActor();
-	//}
+	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP2.crossBP2_C"));
+	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
+	if (CrossHairBP.Class != NULL)
+	{
+		CrossHair->SetChildActorClass(CrossHairBP.Class);
+		//CrossHair->SetupAttachment(BarrelMesh, TEXT("Muzzle"));
+		CrossHair->SetupAttachment(FireModeCamera);
+		CrossHair->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
+		CrossHair->SetVisibility(false, true);
+		//CrossHair->CreateChildActor();
+	}
 
 	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
 	UI = CreateDefaultSubobject<UChildActorComponent>("UI");
@@ -366,7 +367,7 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 		TurretMesh->SetVisibility(false, false);
 		GetMesh()->SetVisibility(false, false);
 		BarrelMesh->SetVisibility(false, false);
-		//CrossHair->SetVisibility(true, true);
+		CrossHair->SetVisibility(true, true);
 		
 
 	}
@@ -381,7 +382,7 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 		TurretMesh->SetVisibility(true, false);
 		GetMesh()->SetVisibility(true, false);
 		BarrelMesh->SetVisibility(true, false);
-		//CrossHair->SetVisibility(false, true);
+		CrossHair->SetVisibility(false, true);
 		
 	}
 }
