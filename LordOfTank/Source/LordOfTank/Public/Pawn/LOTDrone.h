@@ -228,6 +228,8 @@ public:
 
 	int GetPawnNum() { return PawnNum; }
 
+	float DecreaseAccel;
+
 	// Drone의 인지 범위 내에 탱크가 들어왔는지 판단하는 변수
 	int DecideCollisionState;
 
@@ -242,6 +244,7 @@ public:
 	UFUNCTION()
 		void DroneLostEnemy(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	float FloatingAnim;
 
 	// ViewBox를 Activate
 	void OnViewBox() {

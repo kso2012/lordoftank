@@ -2,6 +2,7 @@
 
 #include "LordOfTank.h"
 #include "LOTDrone.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "LOTPlayer.h"
 #include "LordOfTank/LordOfTankGameModeBase.h"
 
@@ -180,7 +181,7 @@ ALOTDrone::ALOTDrone()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
 	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->TargetArmLength = 160.0f; 
+	SpringArm->TargetArmLength = 160.0f;
 	SpringArm->SocketOffset = FVector(0.f, 0.f, 60.f);
 	SpringArm->bEnableCameraLag = false;
 	SpringArm->CameraLagSpeed = 15.f;
@@ -197,9 +198,6 @@ ALOTDrone::ALOTDrone()
 	SpringArm2->SocketOffset = FVector(0.f, 0.f, 0.f);
 	SpringArm2->bEnableCameraLag = false;
 	SpringArm2->CameraLagSpeed = 0.f;
-	//SpringArm->SetRelativeRotation(FRotator(-110.f, 0.0f, 0.0f));
-	SpringArm2->SetRelativeRotation(FRotator(-80.f, 0.0f, 0.0f));
-	//SpringArm2->SetRelativeLocation(FVector(500.0f, 0.0f, 1300.0f));
 
 	DetectCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
 	DetectCamera->SetupAttachment(SpringArm2, USpringArmComponent::SocketName);
@@ -236,10 +234,10 @@ ALOTDrone::ALOTDrone()
 	bIsDetectMode = false; 
 	PossessDrone = false;
 	bDetectMode = false;
-
+	DecreaseAccel = 150.f;
 	MoveAP = 2.f;
 	AP = 2500.f;
-
+	FloatingAnim = 0.f;
 	//PawnNum = PawnDrone;
 
 	DecideCollisionState = None;
@@ -262,7 +260,7 @@ void ALOTDrone::Tick(float DeltaTime)
 
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, CurrentUpwardSpeed * DeltaTime);
-	const FVector LocalMove = FVector(CurrentUpwardSpeed * DeltaTime, 0.f, CurrentForwardSpeed * DeltaTime);
+	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, CurrentUpwardSpeed * DeltaTime);
 	AddActorLocalOffset(LocalMove, true);
 
 
@@ -273,7 +271,7 @@ void ALOTDrone::Tick(float DeltaTime)
 	DeltaRotation.Roll = CurrentRollSpeed * DeltaTime;
 
 
-	AddActorWorldRotation(DeltaRotation);;
+	AddActorLocalRotation(DeltaRotation);
 
 	Super::Tick(DeltaTime);
 
@@ -351,7 +349,7 @@ void ALOTDrone::MoveForwardInput(float Val)
 	//키 입력을 했다면
 	if (bHasInputForward && AP > 0)
 	{
-		CurrentAcc = Val* (-1.0f) * Acceleration;
+		CurrentAcc = Val* Acceleration;
 		bAcceleratedForward = (Val > 0) ? true : false;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
@@ -364,12 +362,12 @@ void ALOTDrone::MoveForwardInput(float Val)
 		//전방으로 가속하고 있었다면 
 		if (bAcceleratedForward)
 		{
-			CurrentAcc = -1.f * Acceleration;
+			CurrentAcc = -1.f * DecreaseAccel;
 		}
 		//후방으로 가속하고 있었다면
 		else
 		{
-			CurrentAcc =  Acceleration;
+			CurrentAcc = DecreaseAccel;
 		}
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		float TempClamp = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
@@ -402,11 +400,11 @@ void ALOTDrone::MoveUpwardInput(float Val)
 	{
 		if (CurrentUpwardSpeed > 0)
 		{
-			CurrentAcc = -1.f * Acceleration;
+			CurrentAcc = -1.f * DecreaseAccel;
 		}
 		else if (CurrentUpwardSpeed < 0)
 		{
-			CurrentAcc = Acceleration;
+			CurrentAcc = DecreaseAccel;
 		}
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		float TempClamp = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
@@ -464,6 +462,8 @@ void ALOTDrone::SetAnim()
 {
 	BabylonMesh20->AddLocalRotation(FRotator(0.f, 0.f, CurrentYawSpeed/TurnSpeed));
 	BabylonMesh21->AddLocalRotation(FRotator(0.f, 0.f, 1.0f));
+	FloatingAnim += 0.1f;
+	BabylonMesh->AddLocalOffset(FVector(0.f, 0.f, UKismetMathLibrary::Sin(FloatingAnim)*2.0f));
 }
 
 void ALOTDrone::DetectMode()

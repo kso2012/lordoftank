@@ -2,6 +2,7 @@
 
 #include "LordOfTank.h"
 #include "LOTMultiDrone.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "GameMode/MultiGameMode.h"
 #include "LOTGameInstance.h"
 #include "LOTPlayer.h"
@@ -75,22 +76,19 @@ ALOTMultiDrone::ALOTMultiDrone()
 
 	CollisionComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("SphereComp"));
 	// Use a sphere as a simple collision representation
-	CollisionComp->InitCapsuleSize(400.f,900.f);
-	//CollisionComp->InitSphereRadius(1.0f);
+	CollisionComp->InitCapsuleSize(900.f,400.f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Drone");
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	CollisionComp->SetCollisionObjectType(ECC_Pawn);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
-	CollisionComp->SetRelativeRotation(FRotator(80.f, 0.f, 0.f));
-	//CollisionComp->SetupAttachment(Root);
 	RootComponent = CollisionComp;
 
 	BabylonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh"));
 	BabylonMesh->SetStaticMesh(ConstructorStatics.BabylonMesh.Get());
 	BabylonMesh->SetupAttachment(CollisionComp);
-	BabylonMesh->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	BabylonMesh->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f));
 	
 
 	BabylonMesh1 = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh1"));
@@ -194,10 +192,8 @@ ALOTMultiDrone::ALOTMultiDrone()
 	SpringArm->SocketOffset = FVector(0.f, 0.f, 60.f);
 	SpringArm->bEnableCameraLag = false;
 	SpringArm->CameraLagSpeed = 15.f;
-	//SpringArm->SetRelativeRotation(FRotator(-110.f, 0.0f, 0.0f));
-	SpringArm->SetRelativeRotation(FRotator(-80.f, 0.0f, 0.0f));
-	SpringArm->SetRelativeLocation(FVector(500.0f, 0.0f, 1300.0f));
-	//SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
+	SpringArm->SetRelativeRotation(FRotator(-30.f, 0.0f, 0.0f));
+	SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
@@ -211,9 +207,6 @@ ALOTMultiDrone::ALOTMultiDrone()
 	SpringArm2->SocketOffset = FVector(0.f, 0.f, 0.f);
 	SpringArm2->bEnableCameraLag = false;
 	SpringArm2->CameraLagSpeed = 0.f;
-	//SpringArm->SetRelativeRotation(FRotator(-110.f, 0.0f, 0.0f));
-	SpringArm2->SetRelativeRotation(FRotator(-80.f, 0.0f, 0.0f));
-	//SpringArm2->SetRelativeLocation(FVector(500.0f, 0.0f, 1300.0f));
 
 	DetectCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
 	DetectCamera->SetupAttachment(SpringArm2, USpringArmComponent::SocketName);
@@ -252,6 +245,7 @@ ALOTMultiDrone::ALOTMultiDrone()
 	bHasInputForward = false;
 	bIsDetectMode = false;
 	MoveAP = 5.f;
+	FloatingAnim = 0.f;
 
 }
 
@@ -269,8 +263,11 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
-	const FVector LocalMove = FVector(CurrentUpwardSpeed * DeltaTime, 0.f, CurrentForwardSpeed * DeltaTime);
-
+	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f,  CurrentUpwardSpeed * DeltaTime);
+	
+	
+	//Addrelativel
+	//AddActorWorldOffset(LocalMove, true);
 	AddActorLocalOffset(LocalMove, true);
 
 	//AddActorWorldOffset(LocalMove, true);
@@ -280,9 +277,8 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 	DeltaRotation.Yaw = CurrentYawSpeed * DeltaTime;
 	DeltaRotation.Roll = CurrentRollSpeed * DeltaTime;
 
-
-	//AddActorLocalRotation(DeltaRotation);
-	AddActorWorldRotation(DeltaRotation);
+	AddActorLocalRotation(DeltaRotation);
+	//AddActorWorldRotation(DeltaRotation);
 	Super::Tick(DeltaTime);
 
 	SetAnim();
@@ -364,7 +360,7 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	//키 입력을 했다면
 	if (bHasInputForward /*&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead*/)
 	{
-		CurrentAcc = Val* (-1.0f) * Acceleration;
+		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
 		/*GameModeTest->MyPlayer.AP -= MoveAP;
@@ -481,8 +477,10 @@ void ALOTMultiDrone::MoveRightInput(float Val)
 
 void ALOTMultiDrone::SetAnim()
 {
+	FloatingAnim  += 0.1f;
 	BabylonMesh20->AddLocalRotation(FRotator(0.f, 0.f, CurrentYawSpeed / TurnSpeed));
 	BabylonMesh21->AddLocalRotation(FRotator(0.f, 0.f, 1.0f));
+	BabylonMesh->AddLocalOffset(FVector(0.f, 0.f, UKismetMathLibrary::Sin(FloatingAnim)*2.0f));
 }
 
 void ALOTMultiDrone::DetectMode()

@@ -178,7 +178,6 @@ public:
 
 	void SetUI(bool bIsPlayer);
 
-
-
+	float FloatingAnim;
 
 };
