@@ -17,17 +17,20 @@ AHomingProjectile::AHomingProjectile()
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> AmmoStaticMesh(TEXT("StaticMesh'/Game/ProjectilesPack/Meshes/Projectiles/Rockets/SM_Rocket_04.SM_Rocket_04'"));
 	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
-	AmmoMesh->SetRelativeLocation(FVector(-300.0f, 0.0f, 0.0f));
+	AmmoMesh->SetRelativeLocation(FVector(-600.0f, 0.0f, 0.0f));
+	AmmoMesh->SetRelativeScale3D(FVector(0.5f,0.5f,0.5));
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
-	TrailParticle->SetTemplate(TrailParticleAsset.Object);
+	//static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
+	//TrailParticle->SetTemplate(TrailParticleAsset.Object);
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
 	FlareParticle->SetTemplate(FlareParticleAsset.Object);
-
+	FlareParticle->SetRelativeScale3D(FVector(10.0f, 10.0f, 10.0f));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
 	ExplosionParticle = ExplosionParticleAsset.Object;
 	
+	static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue(TEXT("/Game/LOTAssets/TankAssets/Audio/Flyby_Cue.Flyby_Cue"));
+	FlySoundComponent->SetSound(SoundCue.Object);
 
 	AddCollisionChannelToAffect(ECC_MAX);
 	//AddCollisionChannelToAffect(ECC_Pawn);
@@ -39,8 +42,17 @@ AHomingProjectile::AHomingProjectile()
 	RadialRadius = 1000.f; //폭발 반경
 	ImpulseStrength = 1000000.f;
 	ProjectileDamage = 50.f;
-	ProjectileMovement->bIsHomingProjectile = true;
+	//ProjectileMovement->bIsHomingProjectile = true;
 	ProjectileMovement->HomingAccelerationMagnitude = 100.f;
+
+}
+
+void AHomingProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	FlySoundComponent->Play();
+
 
 }
 
@@ -222,26 +234,33 @@ void AHomingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	//멀티게임
 	if (GameMode) {
 		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
-
+		ALOTMultiPlayer* MultiParent = Cast<ALOTMultiPlayer>(ParentTank);
+		MultiParent->SetbIsShoot(false);
 		GameInstance->SendExplosion();
 	}
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
-
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/Explosion_Cue.Explosion_Cue")),
+		GetActorLocation(), GetActorRotation());
 
 	Destroy();
 }
 
-void AHomingProjectile::SetHomingTarget(AActor* HomingTarget)
+void AHomingProjectile::SetHomingTarget(AActor* HomingTarget,float Magnitude)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "SetHomingTarget Call!!");
 	if (HomingTarget) {
 		ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
-		ALOTMultiPlayer* MultiParent = Cast<ALOTMultiPlayer>(ParentTank);
-		MultiParent->SetbIsShoot(false);
+		ProjectileMovement->HomingAccelerationMagnitude = Magnitude;
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, HomingTarget->GetName() +"SetHomingTarget Success!!");
 		
 	}
 	else
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "SetHomingTarget Fail!!");
+}
+
+void AHomingProjectile::ActivateHoming()
+{
+	ProjectileMovement->StopMovementImmediately();
+	ProjectileMovement->bIsHomingProjectile = true;
 }

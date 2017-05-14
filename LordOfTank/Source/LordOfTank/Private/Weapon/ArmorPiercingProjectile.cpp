@@ -16,19 +16,32 @@ AArmorPiercingProjectile::AArmorPiercingProjectile()
 	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> AmmoStaticMesh(TEXT("StaticMesh'/Game/ProjectilesPack/Meshes/Projectiles/Rockets/SM_Rocket_01.SM_Rocket_01'"));
 	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
-	AmmoMesh->SetRelativeLocation(FVector(-300.0f, 0.0f, 0.0f));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
-	TrailParticle->SetTemplate(TrailParticleAsset.Object);
+	AmmoMesh->SetRelativeLocation(FVector(-500.0f, 0.0f, 0.0f));
+	//static ConstructorHelpers::FObjectFinder<UParticleSystem> TrailParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke_Trail.P_Smoke_Trail'"));
+	//TrailParticle->SetTemplate(TrailParticleAsset.Object);
 
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
 	FlareParticle->SetTemplate(FlareParticleAsset.Object);
-
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Smoke.P_Smoke'"));
+	FlareParticle->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
 	ExplosionParticle = ExplosionParticleAsset.Object;
+
+	static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue(TEXT("/Game/LOTAssets/TankAssets/Audio/Flyby_Cue.Flyby_Cue"));
+	FlySoundComponent->SetSound(SoundCue.Object);
 
 	ProjectileDamage = 40.f;
 
 }
+
+void AArmorPiercingProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	FlySoundComponent->Play();
+
+
+}
+
 
 
 void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -88,7 +101,8 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 	}
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
-
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/Explosion_Cue.Explosion_Cue")),
+		GetActorLocation(), GetActorRotation());
 
 
 

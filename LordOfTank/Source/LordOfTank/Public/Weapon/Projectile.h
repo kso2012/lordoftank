@@ -39,6 +39,11 @@ protected:
 
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* Camera;
+
+
+	//탱크 엔진 사운드
+	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UAudioComponent* FlySoundComponent;
 	
 public:	
 
@@ -49,7 +54,7 @@ public:
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 
-	virtual void SetHomingTarget(AActor* HomingTarget);
+	virtual void SetHomingTarget(AActor* HomingTarget, float Magnitude);
 
 protected:
 

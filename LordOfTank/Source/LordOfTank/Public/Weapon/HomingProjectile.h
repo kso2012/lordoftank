@@ -13,6 +13,8 @@ class LORDOFTANK_API AHomingProjectile : public AProjectile
 {
 	GENERATED_BODY()
 
+	void BeginPlay();
+
 
 	void AddCollisionChannelToAffect(enum ECollisionChannel CollisionChannel);
 
@@ -43,7 +45,9 @@ public:
 	UFUNCTION()
 		virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
-	virtual void SetHomingTarget(AActor* HomingTarget) override;
+	virtual void SetHomingTarget(AActor* HomingTarget, float Magnitude) override;
+
+	void ActivateHoming();
 	
 
 };

@@ -23,9 +23,12 @@ ACommonProjectile::ACommonProjectile()
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> FlareParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_Flare.P_Flare'"));
 	static ConstructorHelpers::FObjectFinder<UParticleSystem> ExplosionParticleAsset(TEXT("ParticleSystem'/Game/ProjectilesPack/Particles/Effects/P_ExplosionWithShrapnel.P_ExplosionWithShrapnel'"));
 
+	static ConstructorHelpers::FObjectFinder<USoundCue> SoundCue(TEXT("/Game/LOTAssets/TankAssets/Audio/Flyby_Cue.Flyby_Cue"));
+	FlySoundComponent->SetSound(SoundCue.Object);
+
 	AmmoMesh->SetStaticMesh(AmmoStaticMesh.Object);
 	FlareParticle->SetTemplate(FlareParticleAsset.Object);
-	FlareParticle->SetRelativeScale3D(FVector(3.0f, 3.0f, 3.0f));
+	FlareParticle->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
 	ExplosionParticle = ExplosionParticleAsset.Object;
 
 
@@ -47,13 +50,15 @@ void ACommonProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FlySoundComponent->Play();
+
 	//MakeInvisability();
 
 
 }
 
 void ACommonProjectile::MakeInvisability() {
-	Single = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(AActor::GetWorld()));
+	ALordOfTankGameModeBase* const Single = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(AActor::GetWorld()));
 	//ALordOfTankGameModeBase* const SingleMode = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	ALOTPlayer* const Test = Cast<ALOTPlayer>(ParentTank);
 
@@ -270,5 +275,7 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), GetActorRotation(), true)->SetRelativeScale3D(FVector(4.0f, 4.0f, 4.0f));
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/Explosion_Cue.Explosion_Cue")),
+		GetActorLocation(), GetActorRotation());
 	Destroy();
 }

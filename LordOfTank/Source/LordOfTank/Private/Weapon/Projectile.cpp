@@ -52,6 +52,10 @@ AProjectile::AProjectile()
 	ProjectileMovement->bShouldBounce = true;
 	ProjectileMovement->ProjectileGravityScale = 1.f;
 
+	
+	FlySoundComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineSound"));
+	FlySoundComponent->SetupAttachment(RootComponent);
+
 	bIsFireEnemy = false;
 }
 
@@ -87,7 +91,7 @@ void AProjectile::SetInitialVelocity(FVector velocity)
 
 }
 
-void AProjectile::SetHomingTarget(AActor* HomingTarget)
+void AProjectile::SetHomingTarget(AActor* HomingTarget, float Magnitude)
 {
 	;
 }

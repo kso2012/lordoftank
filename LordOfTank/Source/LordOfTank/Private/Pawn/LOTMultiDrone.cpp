@@ -200,6 +200,7 @@ ALOTMultiDrone::ALOTMultiDrone()
 	{
 		CrossHair->SetChildActorClass(CrossHairBP.Class);
 		CrossHair->SetupAttachment(DetectCamera);
+		CrossHair->SetRelativeLocation(FVector(50.0f, 0.0f, 0.0f));
 		CrossHair->SetVisibility(false,true);
 		//CrossHair->CreateChildActor();
 	}
@@ -234,7 +235,7 @@ void ALOTMultiDrone::BeginPlay()
 
 }
 
-// Called every frame
+
 void ALOTMultiDrone::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -261,7 +262,7 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("위방향 속도= %f,앞방향 속도 = %f"), CurrentUpwardSpeed, CurrentForwardSpeed));
 }
 
-// Called to bind functionality to input
+
 void ALOTMultiDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 {
 
@@ -269,8 +270,7 @@ void ALOTMultiDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 
 	check(InputComponent);
 
-	// Bind our control axis' to callback functions
-	//InputComponent->BindAxis("Thrust", this, &ALOTMultiDrone::ThrustInput);
+	
 	InputComponent->BindAxis("Upward", this, &ALOTMultiDrone::MoveUpwardInput);
 	InputComponent->BindAxis("Forward", this, &ALOTMultiDrone::MoveForwardInput);
 	InputComponent->BindAxis("Right", this, &ALOTMultiDrone::MoveRightInput);
@@ -293,32 +293,34 @@ void ALOTMultiDrone::SetTarget()
 	//현재 월드를 가져온다.
 	UWorld* const World = GetWorld();
 	//벡터의 시작점
-	FVector StartTrace = DetectCamera->K2_GetComponentLocation() + DetectCamera->GetForwardVector() * 500;
+	FVector StartTrace = CrossHair->K2_GetComponentLocation(); //+ DetectCamera->GetForwardVector() * 500;
 	//벡터의 끝점
-	FVector EndTrace = StartTrace + DetectCamera->GetForwardVector() * 1000000;
+	FVector EndTrace = StartTrace + CrossHair->GetForwardVector() * 1000000000;
 	//결과를 담을 구조체변수
 	FHitResult OutHit;
 	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
 	if(UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
 	{
-		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
-		//GameInstance->
-		if (OutHit.GetActor() != GameModeTest->MyPlayer.Tank)
-		{
-			if (GameModeTest->MyPlayer.TargetActor == NULL) {
-				GameModeTest->MyPlayer.TargetActor = OutHit.GetActor();
-				GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
-				GameInstance->SendTargeting(true);
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 적을 락온")));
-			}
-			else {
-				GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
-				GameModeTest->MyPlayer.TargetActor = NULL;
-				GameInstance->SendTargeting(false);
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 락온 해제")));
-				
-			}
-		}
+		OutHit.GetActor()->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+		//ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		////GameInstance->
+		//if (OutHit.GetActor() != GameModeTest->MyPlayer.Tank)
+		//{
+		//	if (GameModeTest->MyPlayer.TargetActor == NULL) {
+		//		GameModeTest->MyPlayer.TargetActor = OutHit.GetActor();
+		//		GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+		//		GameInstance->SendTargeting(true); 
+		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 적을 락온")));
+				UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TargetLock_Cue.TargetLock_Cue")));
+		//	}
+		//	else {
+		//		GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
+		//		GameModeTest->MyPlayer.TargetActor = NULL;
+		//		GameInstance->SendTargeting(false);
+		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 락온 해제")));
+				UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TargetLock_Cue.TargetLock_Cue")));
+		//	}
+		//}
 	}
 
 }
@@ -332,14 +334,14 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 	//키 입력을 했다면
-	if (bHasInputForward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead)
+	if (bHasInputForward /*&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead*/)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		GameModeTest->MyPlayer.AP -= MoveAP;
+		/*GameModeTest->MyPlayer.AP -= MoveAP;
 		if (GameModeTest->MyPlayer.AP <= 0) 
-			GameModeTest->MyPlayer.AP = 0;
+			GameModeTest->MyPlayer.AP = 0;*/
 		
 	}
 	//정지상태가 아니라면
@@ -373,14 +375,14 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead)
+	if (bHasInputUpward /*&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead*/)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
-		GameModeTest->MyPlayer.AP -= MoveAP;
+		/*GameModeTest->MyPlayer.AP -= MoveAP;
 		if (GameModeTest->MyPlayer.AP <= 0) 
-			GameModeTest->MyPlayer.AP = 0;
+			GameModeTest->MyPlayer.AP = 0;*/
 		
 		
 
@@ -515,6 +517,7 @@ void ALOTMultiDrone::PossessCall()
 	SetUI(false);
 	GameModeTest->MyPlayer.Tank->SetUI(true);
 	Test->Possess(GameModeTest->MyPlayer.Tank);
+	UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Engine/VREditor/Sounds/VR_teleport_Cue.VR_teleport_Cue")));
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
 }
 

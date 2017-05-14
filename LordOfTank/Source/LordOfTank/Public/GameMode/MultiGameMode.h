@@ -78,6 +78,8 @@ public:
 	void TurnChange();
 
 	void EnemyTargeting();
+
+	void EnemyActivateHoming();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 		FPlayerInfomation MyPlayer;
 
@@ -107,6 +109,10 @@ private:
 	float MinAP;
 
 	float MinShield;
+
+	AProjectile* TempActor;
+
+
 
 	
 

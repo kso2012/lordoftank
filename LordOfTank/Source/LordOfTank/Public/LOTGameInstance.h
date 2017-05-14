@@ -162,7 +162,8 @@ public:
 
 	//CS_FINISH_LOA
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "room")
-		FShowRoom RoomInfo;
+		TArray<FShowRoom> RoomInfo;
+		//FShowRoom RoomInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "lobby")
 		FShowLobby LobbyInfo;
@@ -227,8 +228,6 @@ public:
 
 	static void ToCalleventThread(LPVOID p);
 
-	void ReadPacket(int index);
-
 	void ProcessPacket(char *ptr);
 
 	void InitEvent(SOCKET sock);
@@ -250,6 +249,8 @@ public:
 	void SendExplosion();
 
 	void SendTargeting(bool bTarget);
+
+	void SendActivateHoming();
 
 	
 	
@@ -313,6 +314,10 @@ public:
 	bool bIsTargetMS;
 	bool bIsTarget;
 	//-----
+
+	//유도 전환상태
+	bool bEnemyActivateHoming;
+	//
 
 
 };

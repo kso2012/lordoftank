@@ -3,6 +3,7 @@
 #pragma once
 
 #include "WheeledVehicle.h"
+#include "Weapon/Projectile.h"
 #include "LOTMultiPlayer.generated.h"
 
 /**
@@ -40,8 +41,8 @@ class LORDOFTANK_API ALOTMultiPlayer : public AWheeledVehicle
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UAudioComponent* EngineSoundComponent;
 
-	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* CrossHair;
+	//UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	UChildActorComponent* CrossHair;
 
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* UI;
@@ -122,7 +123,7 @@ private:
 	////빔을 그리는 함수
 	void DrawBeam(FVector StartLocation, FVector EndLocation);
 
-	//유도미사일에게 넘겨줄 유도타겟
+	
 	class AActor* HomingTarget;
 
 
@@ -148,6 +149,8 @@ private:
 
 	float MoveAP;
 
+	bool bIsFireHoming;
+
 	bool bIsSendForward;
 
 	bool bIsSendRight;
@@ -159,6 +162,8 @@ private:
 	bool bIsShoot;
 
 	bool bIsPushFire;
+
+	AProjectile* TempActor;
 
 	
 

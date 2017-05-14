@@ -13,8 +13,8 @@
 
 #define OP_RECV 1
 #define OP_SEND 2
-#define MAX_USER 2
-#define MAX_ROOM 1
+#define MAX_USER 10
+#define MAX_ROOM 5
 #define SERVER_PORT 4000
 #define MAX_BUF_SIZE 4000
 
@@ -30,6 +30,7 @@
 #define CS_TANK_EXPLOSION 10
 #define CS_RETURN_MAIN 11
 #define CS_DRONE_TARGETING 12
+#define CS_ACTIVATE_HOMING 13
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
@@ -43,10 +44,12 @@
 #define SC_TANK_HIT 10
 #define SC_FINISH_GAME 11
 #define SC_DRONE_TARGETING 12
+#define SC_ACTIVATE_HOMING 13
 
 #define PROJECTILE_COMMON 1
 #define PROJECTILE_ARMORPIERCING 2
 #define PROJECTILE_HOMING 3
+
 #define GAME_LOSE 1
 #define GAME_WIN 2
 #define ENEMY_OUT 3
@@ -112,6 +115,12 @@ struct cs_packet_tank_shot
 	int projectile;
 };
 
+struct cs_packet_activate_homing
+{
+	BYTE size;
+	BYTE type;
+};
+
 struct cs_packet_tank_hit
 {
 	BYTE size;
@@ -143,9 +152,9 @@ struct sc_packet_room_show
 {
 	BYTE size;
 	BYTE type;
-	int roomNum;
-	int counts;
-	int state;
+	int roomNum[MAX_ROOM];
+	int counts[MAX_ROOM];
+	int state[MAX_ROOM];
 };
 
 struct sc_packet_player_num
@@ -219,6 +228,12 @@ struct sc_packet_tank_shot
 	float power;
 	FRotator rotation;
 	int projectile;
+};
+
+struct sc_packet_activate_homing
+{
+	BYTE size;
+	BYTE type;
 };
 
 struct sc_packet_tank_hit

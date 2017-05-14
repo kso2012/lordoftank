@@ -23,6 +23,7 @@ ULOTGameInstance::ULOTGameInstance()
 	bIsTargetMS = false;
 	bIsTarget = false;
 	EndState = 0;
+	RoomInfo.SetNum(5);
 }
 
 void ULOTGameInstance::ResetVar()
@@ -61,8 +62,8 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
-	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
+	//serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	InitEvent(sock);
@@ -117,9 +118,11 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("방정보받음")));
 		sc_packet_room_show *my_packet = reinterpret_cast<sc_packet_room_show*>(ptr);
-		RoomInfo.roomNum = my_packet->roomNum;
-		RoomInfo.counts = my_packet->counts;
-		RoomInfo.state = my_packet->state;
+		for (int i = 0; i < MAX_ROOM; ++i) {
+			RoomInfo[i].roomNum = my_packet->roomNum[i];
+			RoomInfo[i].counts = my_packet->counts[i];
+			RoomInfo[i].state = my_packet->state[i];
+		}
 		break;
 	}
 	case SC_PLAYER_NUM:
@@ -218,6 +221,14 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		bIsTargetMS = true;
 		bIsTarget = my_packet->isTargeting;
 		break;
+	}
+
+	case SC_ACTIVATE_HOMING:
+	{
+		sc_packet_activate_homing *my_packet = reinterpret_cast<sc_packet_activate_homing*>(ptr);
+		bEnemyActivateHoming = true;
+		break;
+
 	}
 	case SC_FINISH_GAME:
 	{
@@ -346,7 +357,7 @@ void ULOTGameInstance::CloseProc(int index)
 
 bool ULOTGameInstance::ClickRoomBT(int roomnum)
 {
-	if (RoomInfo.state == 0 || RoomInfo.state == 1)
+	if (RoomInfo[roomnum].state == 0 || RoomInfo[roomnum].state == 1)
 	{
 
 		cs_packet_room_click *room_click = reinterpret_cast<cs_packet_room_click *>(send_buffer);
@@ -503,6 +514,18 @@ void ULOTGameInstance::SendTargeting(bool bTarget)
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
 
+void ULOTGameInstance::SendActivateHoming()
+{
+	cs_packet_activate_homing *activate_homing = reinterpret_cast< cs_packet_activate_homing*>(send_buffer);
+	activate_homing->type = CS_ACTIVATE_HOMING;
+	activate_homing->size = sizeof(cs_packet_activate_homing);
+	send_wsabuf.len = sizeof(cs_packet_activate_homing);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+
+
 void ULOTGameInstance::Disconnect()
 {
 	if (bIsConnected) {
@@ -513,3 +536,4 @@ void ULOTGameInstance::Disconnect()
 		bIsConnected = false;
 	}
 }
+

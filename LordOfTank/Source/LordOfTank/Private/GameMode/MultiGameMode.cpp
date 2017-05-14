@@ -129,6 +129,7 @@ void AMultiGameMode::Tick(float DeltaTime)
 		EnemyTargeting();
 		TurnChange();
 		ApplyMovement();
+		EnemyActivateHoming();
 		EnemyFire();
 		ApplyDamage();
 		SetMoveable();
@@ -169,7 +170,7 @@ void AMultiGameMode::EnemyFire()
 			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(MyInstance->EnemyShotLocation,
 				FRotator(0.f, 0.f, 0.f), FVector(1.f, 1.f, 1.f)), FVector(MyInstance->EnemyShotPower, 0.f, 0.f));
 			if (MyInstance->EnemyShotProjectileType == PROJECTILE_COMMON) {
-				ACommonProjectile* TempActor = World->SpawnActor<ACommonProjectile>(ACommonProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
+				TempActor = World->SpawnActor<ACommonProjectile>(ACommonProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
 				TempActor->SetInitialVelocity(InitialVelocity);
 				TempActor->ParentTank = EnemyPlayer.Tank;
 				TempActor->SetEnemyFire(true);
@@ -177,7 +178,7 @@ void AMultiGameMode::EnemyFire()
 			}
 			else if (MyInstance->EnemyShotProjectileType == PROJECTILE_ARMORPIERCING)
 			{
-				AArmorPiercingProjectile* TempActor = World->SpawnActor<AArmorPiercingProjectile>(AArmorPiercingProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
+				TempActor = World->SpawnActor<AArmorPiercingProjectile>(AArmorPiercingProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
 				TempActor->SetInitialVelocity(InitialVelocity);
 				TempActor->ParentTank = EnemyPlayer.Tank;
 				TempActor->SetEnemyFire(true);
@@ -185,16 +186,19 @@ void AMultiGameMode::EnemyFire()
 			}
 			else if (MyInstance->EnemyShotProjectileType == PROJECTILE_HOMING)
 			{
-				AHomingProjectile* TempActor = World->SpawnActor<AHomingProjectile>(AHomingProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
+				TempActor = World->SpawnActor<AHomingProjectile>(AHomingProjectile::StaticClass(), MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
 				TempActor->SetInitialVelocity(InitialVelocity);
 				TempActor->ParentTank = EnemyPlayer.Tank;
 				TempActor->SetEnemyFire(true);
 				if(MyInstance->bIsTarget)
-					TempActor->SetHomingTarget(MyPlayer.Tank);
+					TempActor->SetHomingTarget(MyPlayer.Tank, MyInstance->EnemyShotPower * 5);
 				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 유도탄 발사")));
 
 			}
 			
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TankFire_Cue.TankFire_Cue")),
+				MyInstance->EnemyShotLocation, MyInstance->EnemyShotRotation);
+
 			UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), MyInstance->EnemyShotLocation, 0.f, 500.f, false);
 			MyInstance->bEnemyIsShot = false;
 		}
@@ -369,4 +373,19 @@ void AMultiGameMode::EnemyTargeting()
 
 		MyInstance->bIsTargetMS = false;
 	}
+}
+
+void AMultiGameMode::EnemyActivateHoming()
+{
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (MyInstance->bEnemyActivateHoming)
+	{
+		if (AHomingProjectile* const ProjectileType = Cast<AHomingProjectile>(TempActor))
+		{
+			ProjectileType->ActivateHoming();
+			UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/HomingWarning.HomingWarning")));
+		}
+		MyInstance->bEnemyActivateHoming = false;
+	}
+	
 }

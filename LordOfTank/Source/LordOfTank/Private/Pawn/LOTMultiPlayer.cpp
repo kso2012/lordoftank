@@ -3,7 +3,6 @@
 #include "LordOfTank.h"
 #include "Vehicle/FrontWheel.h"
 #include "Vehicle/RearWheel.h"
-#include "Weapon/Projectile.h"
 #include "Weapon/CommonProjectile.h"
 #include "Weapon/ArmorPiercingProjectile.h"
 #include "Weapon/HomingProjectile.h"
@@ -104,7 +103,6 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	FireModeCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
 	FireModeCamera->bUsePawnControlRotation = false;
 	FireModeCamera->FieldOfView = 90.f;
-	//FireModeCamera->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("Body_TR"));
 	FireModeCamera->SetupAttachment(GetMesh(), TEXT("Body_TR"));
 	FireModeCamera->Deactivate();
 
@@ -113,15 +111,16 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	EngineSoundComponent->SetSound(SoundCue.Object);
 	EngineSoundComponent->SetupAttachment(GetMesh());
 
-	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
-	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
-	if (CrossHairBP.Class != NULL)
-	{
-		CrossHair->SetChildActorClass(CrossHairBP.Class);
-		CrossHair->SetupAttachment(FireModeCamera);
-		CrossHair->SetVisibility(false, true);
-		//CrossHair->CreateChildActor();
-	}
+	//static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
+	//CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
+	//if (CrossHairBP.Class != NULL)
+	//{
+	//	CrossHair->SetChildActorClass(CrossHairBP.Class);
+	//	CrossHair->SetupAttachment(BarrelMesh, TEXT("Muzzle"));
+	//	//CrossHair->SetupAttachment(FireModeCamera);
+	//	CrossHair->SetVisibility(false, true);
+	//	//CrossHair->CreateChildActor();
+	//}
 
 	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
 	UI = CreateDefaultSubobject<UChildActorComponent>("UI");
@@ -159,6 +158,8 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	CurInventoryIndex = 0;
 
 	Type = 0;
+
+	bIsFireHoming = false;
 }
 
 void ALOTMultiPlayer::BeginPlay()
@@ -231,12 +232,14 @@ void ALOTMultiPlayer::ChangeFiremodeBody()
 {
 	TurretMesh->SetRelativeRotation(FRotator(0.0f, FireModeCamera->RelativeRotation.Yaw, 0.0f));
 	BarrelMesh->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, 0.0f, 0.0f));
+	//CrossHair->SetRelativeRotation(FRotator(FireModeCamera->RelativeRotation.Pitch, FireModeCamera->RelativeRotation.Yaw, 0.0f));
 
 }
 
 void ALOTMultiPlayer::SetbIsShoot(bool IsShoot)
 {
 	bIsShoot = IsShoot;
+	bIsFireHoming = false;
 }
 
 
@@ -262,7 +265,7 @@ void ALOTMultiPlayer::FireStart()
 
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	if (bIsFireMode == true && GameModeTest->bIsMyTurn && !GameModeTest->MyPlayer.Dead && bIsShoot == false)
+	if (bIsFireMode == true /*&& GameModeTest->bIsMyTurn && !GameModeTest->MyPlayer.Dead && bIsShoot == false*/)
 	{
 		bIsPushFire = true;
 		CurShootingPower = MinShootingPower;
@@ -274,12 +277,13 @@ void ALOTMultiPlayer::FireEnd()
 {
 	
 	ClearBeam();
-	
-	if (CurrentProjectile != NULL && bIsPushFire)
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+
+	if (CurrentProjectile != NULL /*&& bIsPushFire && GameModeTest->bIsMyTurn*/)
 	{
 		UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 		ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
-		bIsPushFire = false;
+		
 		bIsShoot = true;
 		FRotator SpawnRotation = GetActorRotation() + FireModeCamera->RelativeRotation;//
 		SpawnRotation = MuzzleLocation->GetComponentRotation();
@@ -291,7 +295,7 @@ void ALOTMultiPlayer::FireEnd()
 			const FVector InitialVelocity = UKismetMathLibrary::TransformDirection(UKismetMathLibrary::MakeTransform(SpawnLocation,
 				FRotator(0.f, 0.f, 0.f), FVector(1.f, 1.f, 1.f)), FVector(CurShootingPower, 0.f, 0.f));
 
-			AProjectile* TempActor = World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation);
+			TempActor = World->SpawnActor<AProjectile>(CurrentProjectile, SpawnLocation, SpawnRotation);
 			TempActor->SetInitialVelocity(InitialVelocity);
 			TempActor->ParentTank = this;
 			TempActor->SetEnemyFire(false);
@@ -300,31 +304,50 @@ void ALOTMultiPlayer::FireEnd()
 			if (ACommonProjectile* const ProjectileType = Cast<ACommonProjectile>(TempActor))
 			{
 				Type = PROJECTILE_COMMON;
-				TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
+				//TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
 				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("º¸ÅëÅº ¹ß»ç %d"), Type));
 			}
 			else if (AArmorPiercingProjectile* const ProjectileType = Cast<AArmorPiercingProjectile>(TempActor))
 			{
 				Type = PROJECTILE_ARMORPIERCING;
-				TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
+				//TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
 				GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("°üÅëÅº ¹ß»ç%d"), Type));
 			}
 			else if (AHomingProjectile* const ProjectileType = Cast<AHomingProjectile>(TempActor))
 			{
 				Type = PROJECTILE_HOMING;
 				AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-				if (GameModeTest->MyPlayer.TargetActor != NULL) {
-					ProjectileType->SetHomingTarget(GameModeTest->MyPlayer.TargetActor);
+			/*	if (GameModeTest->MyPlayer.TargetActor != NULL) {
+					ProjectileType->SetHomingTarget(GameModeTest->MyPlayer.TargetActor, CurShootingPower*5);
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Å¸°Ù À¯µµÅº ¹ß»ç%d"), Type));
-				}
-				else
-					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("À¯µµÅº ¹ß»ç%d"), Type));
+					bIsFireHoming = true;
+				}*/
+				//else
+					//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("À¯µµÅº ¹ß»ç%d"), Type));
 
-				TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
+				//TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower, Type);
+				
 			}
+		
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TankFire_Cue.TankFire_Cue")),
+				SpawnLocation, SpawnRotation);
 			
 		}
 	}
+
+	/*else if (bIsFireHoming)
+	{
+		if (AHomingProjectile* const ProjectileType = Cast<AHomingProjectile>(TempActor))
+		{
+			ULOTGameInstance* const TestInstance = Cast<ULOTGameInstance>(GetGameInstance());
+			TestInstance->SendActivateHoming();
+			ProjectileType->ActivateHoming();
+		}
+	}
+*/
+
+
+	bIsPushFire = false;
 	
 
 
@@ -343,7 +366,7 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 		TurretMesh->SetVisibility(false, false);
 		GetMesh()->SetVisibility(false, false);
 		BarrelMesh->SetVisibility(false, false);
-		CrossHair->SetVisibility(true, true);
+		//CrossHair->SetVisibility(true, true);
 		
 
 	}
@@ -358,7 +381,7 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 		TurretMesh->SetVisibility(true, false);
 		GetMesh()->SetVisibility(true, false);
 		BarrelMesh->SetVisibility(true, false);
-		CrossHair->SetVisibility(false, true);
+		//CrossHair->SetVisibility(false, true);
 		
 	}
 }
@@ -372,7 +395,7 @@ void ALOTMultiPlayer::MoveForward(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
+	/*if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 		if (Val != 0.f)
 		{
@@ -383,8 +406,8 @@ void ALOTMultiPlayer::MoveForward(float Val)
 		}
 	}
 	else
-		GetVehicleMovementComponent()->SetThrottleInput(0.f);
-	//GetVehicleMovementComponent()->SetThrottleInput(Val);
+		GetVehicleMovementComponent()->SetThrottleInput(0.f);*/
+	GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
 
@@ -392,13 +415,13 @@ void ALOTMultiPlayer::MoveRight(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
+	/*if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
 		GetVehicleMovementComponent()->SetSteeringInput(Val);
 		
 	}
 	else
-		GetVehicleMovementComponent()->SetThrottleInput(0.f);
-	//GetVehicleMovementComponent()->SetSteeringInput(Val);
+		GetVehicleMovementComponent()->SetThrottleInput(0.f);*/
+	GetVehicleMovementComponent()->SetSteeringInput(Val);
 
 }
 
@@ -427,6 +450,7 @@ void ALOTMultiPlayer::PossessCall()
 	SetUI(false);
 	GameModeTest->MyPlayer.Drone->SetUI(true);
 	Test->Possess(GameModeTest->MyPlayer.Drone);
+	UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Engine/VREditor/Sounds/VR_teleport_Cue.VR_teleport_Cue")));
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
 }
 
@@ -543,18 +567,18 @@ void ALOTMultiPlayer::SetDead()
 
 void ALOTMultiPlayer::NextWeapon()
 {
-	if (0 < CurInventoryIndex) {
-		CurInventoryIndex--;
-		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
-	}
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("ÇöÀç Æ÷Åº %f"), CurInventoryIndex));
-}
-
-void ALOTMultiPlayer::ExWeapon()
-{
 	if (2 > CurInventoryIndex) {
 		CurInventoryIndex++;
 		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("ÇöÀç Æ÷Åº %f"), CurInventoryIndex));
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("ÇöÀç Æ÷Åº %d"), CurInventoryIndex));
+}
+
+void ALOTMultiPlayer::ExWeapon()
+{
+	if (0 < CurInventoryIndex) {
+		CurInventoryIndex--;
+		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
+	}
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("ÇöÀç Æ÷Åº %d"), CurInventoryIndex));
 }

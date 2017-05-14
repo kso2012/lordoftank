@@ -281,7 +281,7 @@ void ALOTPlayer::FireEnd()
 			if (isNotAI) {
 				UGameplayStatics::PlayWorldCameraShake(GetWorld(), UTankCameraShake::StaticClass(), GetActorLocation(), 0.f, 500.f, false);
 				UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(TempActor, 0.4f, VTBlend_Linear, 0.0f, true);
-				TestInstance->SendFire(SpawnLocation, SpawnRotation, CurShootingPower);
+				
 			}
 			TempActor->GetTank(this);
 		}
