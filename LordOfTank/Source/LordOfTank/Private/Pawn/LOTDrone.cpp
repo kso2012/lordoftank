@@ -235,6 +235,7 @@ ALOTDrone::ALOTDrone()
 
 	DecideCollisionState = None;
 	SetViewBoxLocation();
+	timercounteron = false;
 }
 
 
@@ -270,6 +271,14 @@ void ALOTDrone::Tick(float DeltaTime)
 	SetAnim();
 	
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("위방향 속도= %f,앞방향 속도 = %f"), CurrentUpwardSpeed, CurrentForwardSpeed));
+	if (timercounteron) {
+		timercounter += DeltaTime;
+		if (timercounter > 1.0f) {
+			TankPossess();
+			timercounter = 0;
+			timercounteron = false;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -486,8 +495,6 @@ void ALOTDrone::ChangePawn()
 {
 	if (PossessDrone)
 		PossessDrone = false;
-	else
-		PossessDrone = true;
 
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 
@@ -496,17 +503,16 @@ void ALOTDrone::ChangePawn()
 	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Tank, 1.0f, VTBlend_EaseInOut, 10.f, true);
 	FLatentActionInfo LatentActionInfo;
 	LatentActionInfo.CallbackTarget = this;
-	LatentActionInfo.ExecutionFunction = "PossessCall";
-	LatentActionInfo.UUID = 123;
+	LatentActionInfo.ExecutionFunction = "TankPossess";
+	LatentActionInfo.UUID = 999;
 	LatentActionInfo.Linkage = 0;
 
-	UKismetSystemLibrary::Delay(GetWorld(), 1.f, LatentActionInfo);
-	SetSingleUI(false);
-	GameModeTest->MyPlayer.Tank->SetSingleUI(true);
+	timercounter = 0;
+	timercounteron = true;
 }
 
 
-void ALOTDrone::PossessCall()
+void ALOTDrone::TankPossess()
 {
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -514,6 +520,8 @@ void ALOTDrone::PossessCall()
 	GameModeTest->MyPlayer.Tank->SetSingleUI(true);
 	Test->UnPossess();
 	Test->Possess(GameModeTest->MyPlayer.Tank);
+	GameModeTest->MyPlayer.Drone->DisableInput(Test);
+	GameModeTest->MyPlayer.Tank->EnableInput(Test);
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
 }
 

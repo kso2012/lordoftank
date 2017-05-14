@@ -159,6 +159,7 @@ ALOTPlayer::ALOTPlayer()
 	bIsWaiting = false;
 	bIsTestShot = false;
 	MoveAP = 1.0f;
+	timercounteron = false;
 }
 
 void ALOTPlayer::BeginPlay()
@@ -209,7 +210,15 @@ void ALOTPlayer::Tick(float DeltaTime)
 	EngineSoundComponent->SetFloatParameter("RPM", GetVehicleMovement()->GetEngineRotationSpeed()*RPMToAudioScale);
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), myTurn));
 	
-	
+
+	if (timercounteron) {
+		timercounter += DeltaTime;
+		if (timercounter > 1.0f) {
+			DronePossess();
+			timercounter = 0;
+			timercounteron = false;
+		}
+	}
 }
 
 void ALOTPlayer::ChangeFiremodeBody()
@@ -488,8 +497,6 @@ void ALOTPlayer::ChangePawn()
 {
 	if (PossessTank)
 		PossessTank = false;
-	else
-		PossessTank = true;
 
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 
@@ -498,17 +505,15 @@ void ALOTPlayer::ChangePawn()
 	Test->SetViewTargetWithBlend(GameModeTest->MyPlayer.Drone, 1.0f, VTBlend_EaseInOut, 10.f, true);
 	FLatentActionInfo LatentActionInfo;
 	LatentActionInfo.CallbackTarget = this;
-	LatentActionInfo.ExecutionFunction = "PossessCall";
-	LatentActionInfo.UUID = 123;
+	LatentActionInfo.ExecutionFunction = "DronePossess";
+	LatentActionInfo.UUID = 999;
 	LatentActionInfo.Linkage = 0;
-
-	UKismetSystemLibrary::Delay(GetWorld(), 1.f, LatentActionInfo);
-	SetSingleUI(false);
-	GameModeTest->MyPlayer.Drone->SetSingleUI(true);
+	timercounter = 0;
+	timercounteron = true;
 }
 
 
-void ALOTPlayer::PossessCall()
+void ALOTPlayer::DronePossess()
 {
 	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
@@ -516,6 +521,8 @@ void ALOTPlayer::PossessCall()
 	GameModeTest->MyPlayer.Drone->SetSingleUI(true);
 	Test->UnPossess();
 	Test->Possess(GameModeTest->MyPlayer.Drone);
+	GameModeTest->MyPlayer.Tank->DisableInput(Test);
+	GameModeTest->MyPlayer.Drone->EnableInput(Test);
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Possess call!!!")));
 }
 
