@@ -15,6 +15,9 @@ class LORDOFTANK_API ALOTMultiDrone : public APawn
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 		class UCapsuleComponent* CollisionComp;
 
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
+		class UCapsuleComponent* BeamCollisionComp;
+
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* BabylonMesh;
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -64,7 +67,8 @@ class LORDOFTANK_API ALOTMultiDrone : public APawn
 	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UStaticMeshComponent* BabylonMesh23;
 
-
+	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UStaticMeshComponent* BeamMesh;
 
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class USpringArmComponent* SpringArm;
@@ -139,6 +143,8 @@ private:
 
 	uint32 bIsDetectMode : 1;
 
+	uint32 bIsPullMode : 1;
+
 	float MoveAP;
 
 //	class AActor* HomingTarget;
@@ -168,6 +174,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	//Å¸°Ù¼³Á¤
 	void SetTarget();
+
+	void PullActor(float time);
+
+	void RightClickPress();
+
+	void RightClickRelease();
 
 	//FORCEINLINE class AActor* GetHomingTarget() const { return HomingTarget; }
 

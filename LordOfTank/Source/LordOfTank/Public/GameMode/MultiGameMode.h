@@ -30,6 +30,7 @@ struct FPlayerInfomation
 	
 	float PlayerNum;
 	bool Moveable;
+	bool DroneMoveable;
 	bool Dead;
 };
 
@@ -65,6 +66,8 @@ public:
 	
 	void ApplyDamage();
 	
+	void ApplyEmp();
+	
 	void EnemyFire();
 
 	void SetMoveable();
@@ -80,6 +83,7 @@ public:
 	void EnemyTargeting();
 
 	void EnemyActivateHoming();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 		FPlayerInfomation MyPlayer;
 

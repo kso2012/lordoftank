@@ -299,7 +299,7 @@ public:
 	float ChargingAP;
 
 	bool bIsmyTurn;
-
+	bool bUseableDrone;
 	bool bChangeTurnMS;//턴 메세지를 받았는가?
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Playing")
 		bool bIsWaiting;
@@ -318,6 +318,11 @@ public:
 	//유도 전환상태
 	bool bEnemyActivateHoming;
 	//
+
+	//emp맞았을 경우
+	bool bIsHitEmp;
+	bool bRecvHitMS;
+	float HitEmpPlayerNum;
 
 
 };

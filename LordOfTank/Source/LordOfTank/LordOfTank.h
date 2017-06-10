@@ -45,10 +45,13 @@
 #define SC_FINISH_GAME 11
 #define SC_DRONE_TARGETING 12
 #define SC_ACTIVATE_HOMING 13
+#define SC_EMP_ON 14
+#define SC_EMP_OFF 15
 
 #define PROJECTILE_COMMON 1
 #define PROJECTILE_ARMORPIERCING 2
 #define PROJECTILE_HOMING 3
+#define PROJECTILE_EMP 4
 
 #define GAME_LOSE 1
 #define GAME_WIN 2
@@ -259,5 +262,13 @@ struct sc_packet_drone_targeting
 	BYTE type;
 	bool isTargeting;
 };
+
+struct sc_packet_emp
+{
+	BYTE size;
+	BYTE type;
+	int playerNum;
+};
+
 
 #pragma pack (pop)

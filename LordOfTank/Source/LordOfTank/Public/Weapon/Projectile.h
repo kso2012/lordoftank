@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "LOTPlayer.h"
 #include "GameMode/MultiGameMode.h"
+#include "GameMode/TrainingMode.h"
 #include "LordOfTankGameModeBase.h"
 #include "LOTGameInstance.h"
 #include "Projectile.generated.h"
@@ -77,6 +78,7 @@ public:
 	void SetInitialVelocity(FVector velocity);
 
 	AActor* ParentTank;
+	AActor* ParentDrone;
 
 	void GetTank(ALOTPlayer * tank) { ParentTank = tank; }
 

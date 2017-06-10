@@ -473,7 +473,7 @@ void ALOTDrone::SetAnim()
 {
 	BabylonMesh20->AddLocalRotation(FRotator(0.f, 0.f, CurrentYawSpeed/TurnSpeed));
 	BabylonMesh21->AddLocalRotation(FRotator(0.f, 0.f, 1.0f));
-	FloatingAnim += 0.1f;
+	FloatingAnim += 0.05f;
 	BabylonMesh->AddLocalOffset(FVector(0.f, 0.f, UKismetMathLibrary::Sin(FloatingAnim)*2.0f));
 }
 

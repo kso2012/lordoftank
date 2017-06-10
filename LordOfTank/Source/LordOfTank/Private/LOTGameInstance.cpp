@@ -14,6 +14,7 @@ ULOTGameInstance::ULOTGameInstance()
 	bIsStart = false;
 	bIsHurt = false;
 	PlayerNum = 0;
+	HitEmpPlayerNum = 0;
 	LeftTime = 0;
 	GameStateEnum = EGameState::Mode_Main;
 	bEnemyIsShot = false;
@@ -21,7 +22,9 @@ ULOTGameInstance::ULOTGameInstance()
 	bIsWaiting = true;
 	bRecvIsEndGame = false;
 	bIsTargetMS = false;
+	bRecvHitMS = false;
 	bIsTarget = false;
+	bIsHitEmp = false;
 	EndState = 0;
 	RoomInfo.SetNum(5);
 }
@@ -36,8 +39,11 @@ void ULOTGameInstance::ResetVar()
 	bRecvIsEndGame = false;
 	PlayerNum = 0;
 	LeftTime = 0;
+	HitEmpPlayerNum = 0;
 	bIsTargetMS = false;
+	bRecvHitMS = false;
 	bIsTarget = false;
+	bIsHitEmp = false;
 	GameStateEnum = EGameState::Mode_Main;
 	EndState = 0;
 }
@@ -62,8 +68,8 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	//serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
-	serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
+	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	InitEvent(sock);
@@ -179,6 +185,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		bChangeTurnMS = true;
 		bIsmyTurn = my_packet->turn;
 		ChargingAP = my_packet->ap;
+		//bUseableDrone = my_packet->canUseDrone;
 		break;
 	}
 
@@ -238,6 +245,26 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("상대 쳐나감")));
 		
+		break;
+	}
+
+	case SC_EMP_ON:
+	{
+		sc_packet_emp *my_packet = reinterpret_cast<sc_packet_emp*>(ptr);
+		HitEmpPlayerNum = my_packet->playerNum;
+		bIsHitEmp = true;
+		bRecvHitMS = true;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("emp on 받음")));
+		break;
+	}
+
+	case SC_EMP_OFF:
+	{
+		sc_packet_emp *my_packet = reinterpret_cast<sc_packet_emp*>(ptr);
+		HitEmpPlayerNum = my_packet->playerNum;
+		bIsHitEmp = false;
+		bRecvHitMS = true;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("emp off 받음")));
 		break;
 	}
 

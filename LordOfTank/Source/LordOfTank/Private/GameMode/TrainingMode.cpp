@@ -14,7 +14,7 @@
 ATrainingMode::ATrainingMode()
 {
 	DroneSpawningHeight = 10000.f;
-	//DefaultPawnClass = ALOTPlayer::StaticClass();
+	DefaultPawnClass = NULL;
 	PrimaryActorTick.bCanEverTick = true;
 
 	MaxHealth = 100.f;

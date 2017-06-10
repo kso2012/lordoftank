@@ -85,6 +85,19 @@ ALOTMultiDrone::ALOTMultiDrone()
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
 	RootComponent = CollisionComp;
 
+	BeamCollisionComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapSuleComp"));
+	BeamCollisionComp->InitCapsuleSize(1000.f, 3000.f);
+	BeamCollisionComp->BodyInstance.SetCollisionProfileName("DroneBeam");
+	BeamCollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	BeamCollisionComp->CanCharacterStepUpOn = ECB_No;
+	BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	BeamCollisionComp->SetCollisionObjectType(ECC_WorldDynamic);
+	BeamCollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
+	BeamCollisionComp->SetRelativeLocation(FVector(0.f, 0.f, -3400.f));
+	BeamCollisionComp->SetupAttachment(CollisionComp);
+	
+
 	BabylonMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BabylonMesh"));
 	BabylonMesh->SetStaticMesh(ConstructorStatics.BabylonMesh.Get());
 	BabylonMesh->SetupAttachment(CollisionComp);
@@ -213,6 +226,12 @@ ALOTMultiDrone::ALOTMultiDrone()
 	DetectCamera->bUsePawnControlRotation = false;
 	DetectCamera->Deactivate();
 
+	BeamMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BeamMesh"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> BeamStaticMesh(TEXT("/Game/Effect/S_EV_SimpleLightBeam_02.S_EV_SimpleLightBeam_02"));
+	BeamMesh->SetStaticMesh(BeamStaticMesh.Object);
+	BeamMesh->SetupAttachment(CollisionComp);
+	BeamMesh->SetRelativeScale3D(FVector(44.408920f, 44.408920f, 46.852932f));
+	BeamMesh->SetVisibility(false);
 
 	static ConstructorHelpers::FClassFinder<AActor> CrossHairBP(TEXT("/Game/Blueprints/crossBP.crossBP_C"));
 	CrossHair = CreateDefaultSubobject<UChildActorComponent>("CrossHair");
@@ -244,6 +263,7 @@ ALOTMultiDrone::ALOTMultiDrone()
 	bHasInputUpward = false;
 	bHasInputForward = false;
 	bIsDetectMode = false;
+	bIsPullMode = false;
 	MoveAP = 5.f;
 	FloatingAnim = 0.f;
 
@@ -283,6 +303,9 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 
 	SetAnim();
 
+	if (bIsPullMode)
+		PullActor(DeltaTime);
+
 	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("위방향 속도= %f,앞방향 속도 = %f"), CurrentUpwardSpeed, CurrentForwardSpeed));
 }
 
@@ -299,53 +322,78 @@ void ALOTMultiDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 	InputComponent->BindAxis("Forward", this, &ALOTMultiDrone::MoveForwardInput);
 	InputComponent->BindAxis("Right", this, &ALOTMultiDrone::MoveRightInput);
 	InputComponent->BindAction("FireMode", IE_Pressed, this, &ALOTMultiDrone::DetectMode);
-	InputComponent->BindAction("SetTarget", IE_Pressed, this, &ALOTMultiDrone::SetTarget);
+	InputComponent->BindAction("SetTarget", IE_Pressed, this, &ALOTMultiDrone::RightClickPress);
+	InputComponent->BindAction("SetTarget", IE_Released, this, &ALOTMultiDrone::RightClickRelease);
 
 	InputComponent->BindAction("ChangePawn", IE_Pressed, this, &ALOTMultiDrone::ChangePawn);
 
 
 }
 
+void ALOTMultiDrone::RightClickPress()
+{
+	if (bIsDetectMode == false)
+	{
+		bIsPullMode = true;
+		BeamMesh->SetVisibility(true);
+		BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		BeamCollisionComp->SetCollisionObjectType(ECC_WorldDynamic);
+		BeamCollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
+
+	}
+	else {
+		SetTarget();
+		BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void ALOTMultiDrone::RightClickRelease()
+{
+	bIsPullMode = false;
+	BeamMesh->SetVisibility(false);
+
+}
+
 void ALOTMultiDrone::SetTarget()
 {
-	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	//ClearBeam();
-	//타겟설정 가능한 타입을 넣을 배열
-	TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
-	//비히클타입만 체크하도록 한다.
-	TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
-	//현재 월드를 가져온다.
-	UWorld* const World = GetWorld();
-	//벡터의 시작점
-	FVector StartTrace = CrossHair->K2_GetComponentLocation(); //+ DetectCamera->GetForwardVector() * 500;
-	//벡터의 끝점
-	FVector EndTrace = StartTrace + CrossHair->GetForwardVector() * 1000000000;
-	//결과를 담을 구조체변수
-	FHitResult OutHit;
-	//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
-	if(UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
-	{
-		OutHit.GetActor()->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
-		//ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
-		////GameInstance->
-		//if (OutHit.GetActor() != GameModeTest->MyPlayer.Tank)
-		//{
-		//	if (GameModeTest->MyPlayer.TargetActor == NULL) {
-		//		GameModeTest->MyPlayer.TargetActor = OutHit.GetActor();
-		//		GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
-		//		GameInstance->SendTargeting(true); 
-		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 적을 락온")));
-				UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TargetLock_Cue.TargetLock_Cue")));
-		//	}
-		//	else {
-		//		GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
-		//		GameModeTest->MyPlayer.TargetActor = NULL;
-		//		GameInstance->SendTargeting(false);
-		//		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 락온 해제")));
-				UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TargetLock_Cue.TargetLock_Cue")));
-		//	}
-		//}
-	}
+		AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		//ClearBeam();
+		//타겟설정 가능한 타입을 넣을 배열
+		TArray<TEnumAsByte<EObjectTypeQuery>> TraceObjects;
+		//비히클타입만 체크하도록 한다.
+		TraceObjects.Add(UEngineTypes::ConvertToObjectType(ECC_Vehicle));
+		//현재 월드를 가져온다.
+		UWorld* const World = GetWorld();
+		//벡터의 시작점
+		FVector StartTrace = CrossHair->K2_GetComponentLocation(); //+ DetectCamera->GetForwardVector() * 500;
+		//벡터의 끝점
+		FVector EndTrace = StartTrace + CrossHair->GetForwardVector() * 1000000000;
+		//결과를 담을 구조체변수
+		FHitResult OutHit;
+		//시작점과 끝점간에 빛을 쏴서 비히클 액터가 있다면
+		if (UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), StartTrace, EndTrace, 10.f, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true))
+		{
+			OutHit.GetActor()->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+			ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+			if (OutHit.GetActor() != GameModeTest->MyPlayer.Tank)
+			{
+				if (GameModeTest->MyPlayer.TargetActor == NULL) {
+					GameModeTest->MyPlayer.TargetActor = OutHit.GetActor();
+					GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(true);
+					GameInstance->SendTargeting(true);
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 적을 락온")));
+					UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TargetLock_Cue.TargetLock_Cue")));
+				}
+				else {
+					GameModeTest->MyPlayer.TargetActor->GetRootPrimitiveComponent()->SetRenderCustomDepth(false);
+					GameModeTest->MyPlayer.TargetActor = NULL;
+					GameInstance->SendTargeting(false);
+					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 락온 해제")));
+					UGameplayStatics::SpawnSound2D(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/TargetLock_Cue.TargetLock_Cue")));
+				}
+			}
+		}
+	
 
 }
 
@@ -358,14 +406,14 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 	//키 입력을 했다면
-	if (bHasInputForward /*&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead*/)
+	if (bHasInputForward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		/*GameModeTest->MyPlayer.AP -= MoveAP;
+		GameModeTest->MyPlayer.AP -= MoveAP;
 		if (GameModeTest->MyPlayer.AP <= 0) 
-			GameModeTest->MyPlayer.AP = 0;*/
+			GameModeTest->MyPlayer.AP = 0;
 		
 	}
 	//정지상태가 아니라면
@@ -401,14 +449,14 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward /*&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead*/)
+	if (bHasInputUpward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
 	{
 		CurrentAcc = Val*  Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
-		/*GameModeTest->MyPlayer.AP -= MoveAP;
+		GameModeTest->MyPlayer.AP -= MoveAP;
 		if (GameModeTest->MyPlayer.AP <= 0) 
-			GameModeTest->MyPlayer.AP = 0;*/
+			GameModeTest->MyPlayer.AP = 0;
 		
 		
 
@@ -456,7 +504,7 @@ void ALOTMultiDrone::ClearBeam()
 
 void ALOTMultiDrone::MoveRightInput(float Val)
 {
-
+	
 
 	float TargetYawSpeed = (Val * TurnSpeed);
 
@@ -477,7 +525,7 @@ void ALOTMultiDrone::MoveRightInput(float Val)
 
 void ALOTMultiDrone::SetAnim()
 {
-	FloatingAnim  += 0.1f;
+	FloatingAnim  += 0.05f;
 	BabylonMesh20->AddLocalRotation(FRotator(0.f, 0.f, CurrentYawSpeed / TurnSpeed));
 	BabylonMesh21->AddLocalRotation(FRotator(0.f, 0.f, 1.0f));
 	BabylonMesh->AddLocalOffset(FVector(0.f, 0.f, UKismetMathLibrary::Sin(FloatingAnim)*2.0f));
@@ -560,5 +608,37 @@ void ALOTMultiDrone::SetUI(bool bIsPlayer)
 	}
 	else
 		UI->SetVisibility(true, true);
+
+}
+
+void  ALOTMultiDrone::PullActor(float time)
+{
+	
+	TArray<AActor*> OverlapActors;
+
+	BeamCollisionComp->GetOverlappingActors(OverlapActors, nullptr);
+
+	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("액터 갯수%d"), OverlapActors.Num()));
+
+	for (auto& Actors : OverlapActors)
+	{
+		if (ALOTMultiPlayer* Test = Cast<ALOTMultiPlayer>(Actors))
+		{
+
+			FVector DirVector = GetActorLocation() - Test->GetActorLocation();
+
+			FVector NomarizeVector = UKismetMathLibrary::Normal(DirVector);
+
+			Test->GetMesh()->SetPhysicsLinearVelocity(UKismetMathLibrary::VInterpTo(Test->GetVelocity(),
+				(NomarizeVector*FVector(1.f, 1.f, 0.5f))*1900.f, time, 5.f));
+			FRotator PawnRtator = Test->GetActorRotation();
+
+			Test->SetActorRelativeRotation(UKismetMathLibrary::RInterpTo(PawnRtator, FRotator(0.f, PawnRtator.Pitch, PawnRtator.Yaw), time, 0.5f)
+				, false, nullptr, ETeleportType::TeleportPhysics);
+
+
+		}
+
+	}
 
 }

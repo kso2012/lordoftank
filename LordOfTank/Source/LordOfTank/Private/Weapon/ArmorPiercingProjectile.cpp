@@ -76,13 +76,8 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 
 		}
 
-<<<<<<< HEAD
-		else if (SingleGameMode) {
-			if (OtherActor->IsA(ALOTPlayer::StaticClass())) {
-			//	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Black, "Damage Player!");
-				OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-				Cast<ALOTPlayer>(OtherActor)->ApplyDamage(ProjectileDamage);
-=======
+
+
 		else if (SingleGameMode || TrainingGameMode) {
 			if (ALOTPlayer* const Test = Cast<ALOTPlayer>(OtherActor)) {
 				//쏜 자신에게 맞았을 경우 
@@ -97,7 +92,7 @@ void AArmorPiercingProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 					OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 					Test->ApplyDamage(ProjectileDamage, PROJECTILE_ARMORPIERCING);
 				}
->>>>>>> 046ad5562b1a29def4d07842db7b68bb0304c612
+
 			}
 		}
 		
