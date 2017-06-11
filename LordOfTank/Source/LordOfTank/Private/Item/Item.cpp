@@ -75,6 +75,7 @@ AItem::AItem()
 
 	Gravity = 9.8f;
 	bShakePlus = true;
+	bIsMoving = true;
 }
 
 // Called when the game starts or when spawned
@@ -88,39 +89,43 @@ void AItem::BeginPlay()
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FVector BoxLocation = BoxMesh->GetComponentLocation();
-	
 
-	SetFallingSpeed();
+	if (bIsMoving) {
+		FVector BoxLocation = BoxMesh->GetComponentLocation();
 
-	if (!bUseGravity) {
-		if (ParachuteSize < 10.f) {
-			ParachuteSize += 0.1f;
-			ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
+
+		SetFallingSpeed();
+
+		if (!bUseGravity) {
+			if (ParachuteSize < 10.f) {
+				ParachuteSize += 0.1f;
+				ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
+			}
+			CheckLocation();
+			BoxLocation.Z -= FallingSpeed * DeltaTime;
+
+			ShakeBox();
 		}
-		CheckLocation();
-		BoxLocation.Z -= FallingSpeed * DeltaTime;
+		else {
+			if (ParachuteSize > 0.f) {
+				ParachuteSize -= 0.5f;
+				ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
+				if (ParachuteSize < 5.f)
+					BoxMesh->SetEnableGravity(true);
+			}
+			BoxLocation.Z -= (FallingSpeed + Gravity) * DeltaTime;
+			Gravity += 9.8f;
+			if (ParachuteSize <= 0.f) {
+				FallingSpeed = 0.f;
+				Gravity = 0.f;
+				ParachuteMesh->DestroyComponent();
+				bIsMoving = false;
+			}
+		}
 
-		ShakeBox();
+
+		BoxMesh->SetWorldLocation(BoxLocation);
 	}
-	else {
-		if (ParachuteSize > 0.f) {
-			ParachuteSize -= 0.5f;
-			ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
-			if(ParachuteSize < 5.f)
-				BoxMesh->SetEnableGravity(true);
-		}
-		BoxLocation.Z -= (FallingSpeed + Gravity) * DeltaTime;
-		Gravity += 9.8f;
-		if (ParachuteSize <= 0.f) {
-			FallingSpeed = 0.f;
-			Gravity = 0.f;
-			ParachuteMesh->DestroyComponent();
-		}
-	}
-
-
-	BoxMesh->SetWorldLocation(BoxLocation);
 }
 
 void AItem::SetFallingSpeed() {

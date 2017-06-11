@@ -53,6 +53,8 @@ ALordOfTankGameModeBase::ALordOfTankGameModeBase()
 
 	MinShield = 0.f;
 
+	bIsRight = false;
+
 }
 
 void ALordOfTankGameModeBase::StartPlay()
@@ -157,6 +159,7 @@ void ALordOfTankGameModeBase::Tick(float DeltaTime)
 
 
 void ALordOfTankGameModeBase::Think() {
+
 		if (PlayerTurn == 2 && !bIsInRange) {
 			if (!bIsRightDirection) {
 				SetDroneDirection(); 
@@ -240,16 +243,17 @@ void ALordOfTankGameModeBase::Think() {
 			// AI 포신이 제대로 조준이 되었을 경우 파워 조절 후 발사
 			else if(EnemyPlayer.Tank->TurretAim == CorrectAim && !EnemyPlayer.Tank->bIsWaiting) {
 				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, "SetAim()");
-				if (distance == 0.f)
-					SetPower();
+				distance = EnemyPlayer.Tank->getPower();
+				//if (distance == 0.f)
+				//	SetPower();
 				//EnemyPlayer.Tank->CommandShoot(distance);
 				EnemyPlayer.Tank->SetAim(distance);
-				if (EnemyPlayer.Tank->RightShot) {
 
-					bIsTurretRightDirection = false;
-					EnemyPlayer.Tank->TurretAim = None;
-					distance = 0.f;
-				}
+				bIsTurretRightDirection = false; 
+				EnemyPlayer.Tank->TurretAim = None;
+				bIsRight = false;
+				bIsRightDirection = false;
+				bIsInRange = false;
 			}
 		}
 
@@ -320,7 +324,7 @@ void ALordOfTankGameModeBase::SyncDroneAP() {
 			EnemyPlayer.AP = 0.f;
 		EnemyPlayer.Tank->SetAP(EnemyPlayer.AP);
 		EnemyPlayer.Drone->SetAP(EnemyPlayer.AP);
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("EnemyAP : %f"), EnemyPlayer.AP));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("EnemyAP : %f"), EnemyPlayer.AP));
 	}
 	
 }
@@ -340,6 +344,6 @@ void ALordOfTankGameModeBase::SyncTankAP() {
 			EnemyPlayer.AP = 0.f;
 		EnemyPlayer.Tank->SetAP(EnemyPlayer.AP);
 		EnemyPlayer.Drone->SetAP(EnemyPlayer.AP);
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("EnemyAP : %f"), EnemyPlayer.AP));
+		//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FString::Printf(TEXT("EnemyAP : %f"), EnemyPlayer.AP));
 	}
 }

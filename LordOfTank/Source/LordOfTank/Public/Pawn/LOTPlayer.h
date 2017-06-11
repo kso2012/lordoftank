@@ -37,7 +37,7 @@ class LORDOFTANK_API ALOTPlayer : public AWheeledVehicle
 		class UStaticMeshComponent* BarrelMesh;
 
 		//총구위치
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class USceneComponent* MuzzleLocation;
 
 
@@ -136,6 +136,10 @@ public:
 		float Shield;
 	
 
+	//발사 파워
+	UPROPERTY(BlueprintReadWrite)
+		float CurShootingPower;
+
 private:
 
 
@@ -194,8 +198,6 @@ private:
 
 	float MaxShootingPower;
 
-	//발사 파워
-	float CurShootingPower;
 
 
 	bool bIsPushFire;
@@ -290,5 +292,7 @@ public:
 
 	void SetAP(float ap) { AP = ap; }
 	float ReturnAP() { return AP; }
+
+	void SetPower() {	CurShootingPower = MaxShootingPower; }
 	
 };

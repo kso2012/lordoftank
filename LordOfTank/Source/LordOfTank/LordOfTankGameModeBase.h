@@ -16,6 +16,7 @@ struct FPlayerInfomations
 {
 	GENERATED_USTRUCT_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
 	ALOTPlayer* Tank;
 	ALOTDrone* Drone;
 	AActor* TargetActor;
@@ -60,6 +61,10 @@ public:
 	//플레이어 턴
 	UPROPERTY(BlueprintReadWrite)
 		int PlayerTurn;
+
+
+	UPROPERTY(BlueprintReadWrite)
+		bool bIsRight;
 
 	/*
 	//플레이어 데이터를 저장하는 함수

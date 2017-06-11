@@ -187,7 +187,7 @@ void ACommonProjectile::FireImpulse()
 		}
 		//싱글게임
 		else if (SingleMode == UGameplayStatics::GetGameMode(GetWorld()) || TrainingGameMode){
-
+			ALOTPlayer* const Parent = Cast<ALOTPlayer>(ParentTank);
 			if (ALOTPlayer* const Test = Cast<ALOTPlayer>(InsideActor)) {
 				//쏜 자신에게 맞았을 경우 
 				if ((bIsFireEnemy == false && Test == ParentTank))
@@ -217,6 +217,7 @@ void ACommonProjectile::FireImpulse()
 					//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이쏜거 내가맞음 %f!!"), ProjectileDamage*DamageRatio));
 					//GameInstance->SendTankHit(ProjectileDamage*DamageRatio);
 					Test->ApplyDamage(ProjectileDamage*DamageRatio, PROJECTILE_COMMON);
+
 				}
 			}
 		}
@@ -242,25 +243,24 @@ void ACommonProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 	//액터에 맞았을 경우임
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
-		if (SingleMode && Test->bIsTestShot && Test->GetisAI() && OtherActor == Test->Player) {
-			Test->bIsTestShot = false;
-			Test->RightShot = true;
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("테스트 끝")));
-		}
-		else {
-			if (SingleMode && !Test->bIsTestShot)
-				Test->ChangeTurn();
-		}
-	}
 
-	if (TrainingGameMode)
-		Test->ChangeTurn();
+	}
 	
 	
 	//위에 if문 안에 넣으면 액터에 충돌할때만 데미지줘서 주변에 떨어졌을 때 데미지계산 못함
 	FireImpulse();
 
-
+	if (SingleMode || TrainingGameMode) {
+		Test->bIsWaiting = false;
+		Test->bIsShoot = false;
+		Test->ChangeTurn();
+	}
+	if (SingleMode && !Test->GetisAI()) {
+	}
+	//else if (SingleMode && Test->GetisAI()) {
+	//	if (!Test->RightShot)
+	//		Test->SetPower();
+	//}
 
 	AMultiGameMode* const GameMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	//멀티게임

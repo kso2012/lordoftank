@@ -55,5 +55,7 @@ public:
 	void ScaleUpParachute();
 
 	void ScaleDownParachute();
+
+	bool bIsMoving;
 	
 };

@@ -143,7 +143,7 @@ ALOTPlayer::ALOTPlayer()
 	CurrentHealth = MaxHealth;
 
 	// 초기 AP를 100으로 설정
-	AP = 2500.f;
+	AP = 50000.f;
 
 	MinShootingPower=100.f;
 	RaisingRate = 50.f;
@@ -464,15 +464,18 @@ void ALOTPlayer::DrawTrajectory()
 	{
 		time1 = index * TimeInterval;
 		time2 = (index + 1) * TimeInterval;
+
 		point1 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time1);
 		point2 = GetSegmentatTime(SpawnLocation, InitialVelocity, FVector(0.f, 0.f, -980.f), time2);
+
 		DrawBeam(point1, point2);
 
 		if (UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), point1, point2, TraceObjects, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, OutHit, true)) {
 			//RightShot = true;
-			//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("crash")));
+			GEngine->AddOnScreenDebugMessage(6, 2.0f, FColor::Blue, FString::Printf(TEXT("crash")));
 			break;
 		}
+			
 		
 	}
 }
@@ -596,7 +599,13 @@ void ALOTPlayer::ChangeTurn() {
 		// 발사중일 땐 bIsShoot = true인데 포탄이 폭발할 때 턴을 넘기도록 함. 이 함수는 Projectile에서 호출됨
 		bIsShoot = false; 
 		RightShot = false;
-		AP += 20;
+		CurShootingPower = MinShootingPower;
+		AP += 2000;
+		if (AP > 50000.f)
+			AP = 50000.f;
+		AimCount = 0;
+		bIsTestShot = false;
+		bIsWaiting = false;
 		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Trun Changed")));
 }
 
@@ -628,25 +637,60 @@ void ALOTPlayer::RotateTurret(FRotator RotateDirection) {
 
 void ALOTPlayer::SetAim(float distance) {
 	if (AimCount == 0) {
-		CurShootingPower = distance - 10000;
+		//CurShootingPower = distance - 10000;
+		CurShootingPower = MinShootingPower;
 		AimCount++;
 		bIsTestShot = true;
 	}
-	if (!bIsWaiting) {
-		CurShootingPower += 1000;
+	APlayerController* const Test = Cast<APlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	ALordOfTankGameModeBase* const GameModeTest = Cast<ALordOfTankGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 
-		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Power = %f"), CurShootingPower));
-		bIsWaiting = true;
-		ShootAI(CurShootingPower);
+	bIsWaiting = true;
+	/*
+	if (!Velocity.X) {
+		if (UGameplayStatics::SuggestProjectileVelocity(GetWorld(), TossVelocity, MuzzleLocation->GetComponentLocation(), EnemyLocation, CurShootingPower, false, 100.f, 9800.f)) {
+			//FVector BLocation = BarrelMesh->GetForwardVector();
+			//DVector = UKismetMathLibrary::VLerp(*TossVelocity, BarrelMesh->GetComponentLocation(), 1.f);
+			//EnemyPlayer.Drone->RotateDrone(DVector.Rotation());
+
+			//bIsRightDirection = true;
+			//DroneRotateDirection = None;
+			//DroneDirection = FVector(0, 0, 0);
+			RightShot = true;
+			bIsTestShot = false;
+		}
+		else {
+			CurShootingPower += 100;
+			bIsWaiting = false;
+			//UGameplayStatics::SuggestProjectileVelocity(GetWorld(), *TossVelocity, MuzzleLocation->GetComponentLocation(), EnemyLocation, CurShootingPower, true, 100.f, -980.f);
+
+			GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CurShootingPower));
+		}
+	}*/
+	if (GameModeTest->bIsRight) {
+		RightShot = true;
+		bIsTestShot = false;
+	}
+	else {
+		CurShootingPower += 100;
+		bIsWaiting = false;
 	}
 
+	GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), CurShootingPower));
+	if (RightShot) {
+		RightShot = false;
+		ShootAI(CurShootingPower);
+		BarrelMesh->SetRelativeRotation(FRotator(0, 0, 0));
+		GameModeTest->bIsRight = false;
+	}
 
-	if ((CurShootingPower > distance + 30000.f || CurShootingPower > MaxShootingPower) && !RightShot) {
+	if ((CurShootingPower > MaxShootingPower) && !RightShot) {
 		CurShootingPower = MinShootingPower;
 		BarrelMesh->AddLocalRotation(FRotator(1.f, 0, 0));
 		if (BarrelMesh->GetComponentRotation().Roll > 80.f)
 			BarrelMesh->AddLocalRotation(FRotator(-1.f, 0, 0));
-		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("Barrel Rotate")));
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("Barrel Rotate")));
+		AimCount = 0;
 	}
 
 }
