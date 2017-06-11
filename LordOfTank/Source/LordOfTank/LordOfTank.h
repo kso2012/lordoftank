@@ -31,6 +31,8 @@
 #define CS_RETURN_MAIN 11
 #define CS_DRONE_TARGETING 12
 #define CS_ACTIVATE_HOMING 13
+#define CS_BEAM_ON 14
+#define CS_BEAM_OFF 15
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
@@ -47,6 +49,8 @@
 #define SC_ACTIVATE_HOMING 13
 #define SC_EMP_ON 14
 #define SC_EMP_OFF 15
+#define SC_BEAM_ON 16
+#define SC_BEAM_OFF 17
 
 #define PROJECTILE_COMMON 1
 #define PROJECTILE_ARMORPIERCING 2
@@ -146,6 +150,12 @@ struct cs_packet_drone_targeting
 };
 
 struct cs_packet_return_main
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct cs_packet_use_beam
 {
 	BYTE size;
 	BYTE type;
@@ -269,6 +279,13 @@ struct sc_packet_emp
 	BYTE type;
 	int playerNum;
 };
+
+struct sc_packet_use_beam
+{
+	BYTE size;
+	BYTE type;
+};
+
 
 
 #pragma pack (pop)

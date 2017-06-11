@@ -122,6 +122,10 @@ private:
 
 	UParticleSystemComponent* Beam;
 
+	UParticleSystemComponent* EmpEffect;
+
+	UAudioComponent* EmpSound;
+
 
 	float CurrentForwardSpeed;
 
@@ -181,6 +185,8 @@ public:
 
 	void RightClickRelease();
 
+	void SetBeamVisible(bool bBeam);
+
 	//FORCEINLINE class AActor* GetHomingTarget() const { return HomingTarget; }
 
 	UFUNCTION(BlueprintCallable, Category = "Custom")
@@ -189,6 +195,8 @@ public:
 	void DetectMode();
 
 	void SetUI(bool bIsPlayer);
+
+	void SetEmp(bool EmpState);
 
 	float FloatingAnim;
 

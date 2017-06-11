@@ -25,6 +25,8 @@ ULOTGameInstance::ULOTGameInstance()
 	bRecvHitMS = false;
 	bIsTarget = false;
 	bIsHitEmp = false;
+	bRecvBeamMS = false;
+	bBeamIsActivated = false;
 	EndState = 0;
 	RoomInfo.SetNum(5);
 }
@@ -68,8 +70,8 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
-	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
+	//serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
+	serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	InitEvent(sock);
@@ -265,6 +267,24 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		bIsHitEmp = false;
 		bRecvHitMS = true;
 		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("emp off 받음")));
+		break;
+	}
+
+	case SC_BEAM_ON:
+	{
+		sc_packet_use_beam *my_packet = reinterpret_cast<sc_packet_use_beam*>(ptr);
+		bRecvBeamMS = true;
+		bBeamIsActivated = true;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("beam on 받음")));
+		break;
+	}
+
+	case SC_BEAM_OFF:
+	{
+		sc_packet_use_beam *my_packet = reinterpret_cast<sc_packet_use_beam*>(ptr);
+		bRecvBeamMS = true;
+		bBeamIsActivated = false;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("beam off 받음")));
 		break;
 	}
 
@@ -551,7 +571,25 @@ void ULOTGameInstance::SendActivateHoming()
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
 
+void ULOTGameInstance::SendActivateBeam()
+{
+	cs_packet_use_beam *use_beam = reinterpret_cast< cs_packet_use_beam*>(send_buffer);
+	use_beam->type = CS_BEAM_ON;
+	use_beam->size = sizeof(cs_packet_use_beam);
+	send_wsabuf.len = sizeof(cs_packet_use_beam);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
 
+void ULOTGameInstance::SendDeactivateBeam()
+{
+	cs_packet_use_beam *use_beam = reinterpret_cast< cs_packet_use_beam*>(send_buffer);
+	use_beam->type = CS_BEAM_OFF;
+	use_beam->size = sizeof(cs_packet_use_beam);
+	send_wsabuf.len = sizeof(cs_packet_use_beam);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
 
 void ULOTGameInstance::Disconnect()
 {
@@ -563,4 +601,6 @@ void ULOTGameInstance::Disconnect()
 		bIsConnected = false;
 	}
 }
+
+
 

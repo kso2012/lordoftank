@@ -135,6 +135,7 @@ void AMultiGameMode::Tick(float DeltaTime)
 		TurnChange();
 		ApplyMovement();
 		ApplyEmp();
+		ApplyBeam();
 		EnemyActivateHoming();
 		EnemyFire();
 		ApplyDamage();
@@ -414,6 +415,24 @@ void AMultiGameMode::EnemyActivateHoming()
 	
 }
 
+void AMultiGameMode::ApplyBeam()
+{
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+
+	if (MyInstance->bRecvBeamMS)
+	{
+		if (MyInstance->bBeamIsActivated)
+		{
+			EnemyPlayer.Drone->SetBeamVisible(true);
+		}
+		else
+		{
+			EnemyPlayer.Drone->SetBeamVisible(false);
+		}
+		MyInstance->bRecvBeamMS = false;
+	}
+}
+
 void AMultiGameMode::ApplyEmp()
 {
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
@@ -427,17 +446,20 @@ void AMultiGameMode::ApplyEmp()
 				//내가 1p라면
 				if (MyInstance->PlayerNum == 1)
 				{
+					
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가맞음!!!")));
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
-						MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));
+					MyPlayer.Drone->SetEmp(true);
+					/*UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
+						MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));*/
 					MyPlayer.DroneMoveable = false;
 				}
 				//내가 2p라면
 				else if (MyInstance->PlayerNum == 2)
 				{
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이맞음!!!")));
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
-						EnemyPlayer.Drone->GetActorLocation(), EnemyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));
+					EnemyPlayer.Drone->SetEmp(true);
+					/*UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
+						EnemyPlayer.Drone->GetActorLocation(), EnemyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));*/
 				}
 			}
 			//2p가 맞았을 경우
@@ -447,15 +469,17 @@ void AMultiGameMode::ApplyEmp()
 				if (MyInstance->PlayerNum == 1)
 				{
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이맞음!!!")));
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
-						EnemyPlayer.Drone->GetActorLocation(), EnemyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));
+					EnemyPlayer.Drone->SetEmp(true);
+					/*UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
+						EnemyPlayer.Drone->GetActorLocation(), EnemyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));*/
 				}
 				//내가 2p라면
 				else if (MyInstance->PlayerNum == 2)
 				{
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가맞음!!!")));
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
-						MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));
+					MyPlayer.Drone->SetEmp(true);
+					/*UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
+						MyPlayer.Drone->GetActorLocation(), MyPlayer.Drone->GetActorRotation(), true)->SetRelativeScale3D(FVector(15.0f, 15.0f, 15.0f));*/
 					MyPlayer.DroneMoveable = false;
 				}
 			}
@@ -469,11 +493,13 @@ void AMultiGameMode::ApplyEmp()
 				if (MyInstance->PlayerNum == 1)
 				{
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 풀림!!!")));
+					MyPlayer.Drone->SetEmp(false);
 					MyPlayer.DroneMoveable = true;
 				}
 				//내가 2p라면
 				else if (MyInstance->PlayerNum == 2)
 				{
+					EnemyPlayer.Drone->SetEmp(false);
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 풀림!!!")));
 				}
 			}
@@ -483,16 +509,19 @@ void AMultiGameMode::ApplyEmp()
 				//내가 1p라면
 				if (MyInstance->PlayerNum == 1)
 				{
+					EnemyPlayer.Drone->SetEmp(false);
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("적이 풀림!!!")));
 				}
 				//내가 2p라면
 				else if (MyInstance->PlayerNum == 2)
 				{
+					MyPlayer.Drone->SetEmp(false);
 					GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("내가 풀림!!!")));
 					MyPlayer.DroneMoveable = true;
 				}
 			}
 		}
+		MyInstance->bRecvHitMS = false;
 	}
 
 }

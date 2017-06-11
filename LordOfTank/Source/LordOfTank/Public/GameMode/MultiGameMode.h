@@ -67,6 +67,8 @@ public:
 	void ApplyDamage();
 	
 	void ApplyEmp();
+
+	void ApplyBeam();
 	
 	void EnemyFire();
 

@@ -252,6 +252,10 @@ public:
 
 	void SendActivateHoming();
 
+	void SendActivateBeam();
+
+	void SendDeactivateBeam();
+
 	
 	
 
@@ -323,6 +327,10 @@ public:
 	bool bIsHitEmp;
 	bool bRecvHitMS;
 	float HitEmpPlayerNum;
+	//
 
+	//beam »ç¿ë
+	bool bRecvBeamMS;
+	bool bBeamIsActivated;
 
 };

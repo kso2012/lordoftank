@@ -264,7 +264,7 @@ ALOTMultiDrone::ALOTMultiDrone()
 	bHasInputForward = false;
 	bIsDetectMode = false;
 	bIsPullMode = false;
-	MoveAP = 5.f;
+	MoveAP = 2.f;
 	FloatingAnim = 0.f;
 
 }
@@ -332,25 +332,50 @@ void ALOTMultiDrone::SetupPlayerInputComponent(UInputComponent* InputComponent)
 
 void ALOTMultiDrone::RightClickPress()
 {
-	if (bIsDetectMode == false)
-	{
-		bIsPullMode = true;
-		BeamMesh->SetVisibility(true);
-		BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		BeamCollisionComp->SetCollisionObjectType(ECC_WorldDynamic);
-		BeamCollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
+	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameModeTest->MyPlayer.DroneMoveable) {
+		if (bIsDetectMode == false)
+		{
+			ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+			GameInstance->SendActivateBeam();
+			bIsPullMode = true;
+			BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+			BeamCollisionComp->SetCollisionObjectType(ECC_WorldDynamic);
+			BeamCollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
+			SetBeamVisible(true);
 
+		}
+		else {
+			SetTarget();
+			BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
 	}
-	else {
-		SetTarget();
-		BeamCollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ALOTMultiDrone::SetBeamVisible(bool bBeam)
+{
+	if (bBeam)
+	{
+		BeamMesh->SetVisibility(true);
+		
+	}
+	else
+	{
+		BeamMesh->SetVisibility(false);
 	}
 }
 
 void ALOTMultiDrone::RightClickRelease()
 {
-	bIsPullMode = false;
-	BeamMesh->SetVisibility(false);
+	if (bIsPullMode)
+	{
+		bIsPullMode = false;
+		ULOTGameInstance* const GameInstance = Cast<ULOTGameInstance>(GetGameInstance());
+		GameInstance->SendDeactivateBeam();
+	}
+	
+	SetBeamVisible(false);
+	
 
 }
 
@@ -641,4 +666,36 @@ void  ALOTMultiDrone::PullActor(float time)
 
 	}
 
+}
+
+void ALOTMultiDrone::SetEmp(bool EmpState)
+{
+	if (EmpState == true)
+	{
+		CurrentForwardSpeed = 0.f;
+		CurrentUpwardSpeed = 0.f;
+		CurrentPitchSpeed = 0.f;
+		CurrentYawSpeed = 0.f;
+		CurrentRollSpeed = 0.f;
+		UWorld* const World = GetWorld();
+		if (World) {
+			if (!EmpEffect) {
+				EmpEffect = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), LoadObject<UParticleSystem>(nullptr, TEXT("ParticleSystem'/Game/ProjectilesPack/Materials/Common/LightningParticle.LightningParticle'")),
+					GetActorLocation(), GetActorRotation(), true);
+				EmpSound = UGameplayStatics::SpawnSoundAtLocation(GetWorld(), LoadObject<USoundCue>(nullptr, TEXT("/Game/LOTAssets/TankAssets/Audio/EmpShock_Cue.EmpShock_Cue")),
+					GetActorLocation(), GetActorRotation());
+			}
+			/*World->SpawnActor<AActor>(LoadObject<AActor>(nullptr, TEXT("Game/Blueprints/EmpEffect.EmpEffect_C"))->GetClass(),
+				GetActorLocation(), GetActorRotation());*/
+		}
+	}
+	else
+	{
+		if (EmpEffect)
+		{
+			
+			EmpEffect->DestroyComponent();
+			EmpSound->FinishDestroy();
+		}
+	}
 }
