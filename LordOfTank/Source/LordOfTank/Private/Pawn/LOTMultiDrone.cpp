@@ -695,7 +695,7 @@ void ALOTMultiDrone::SetEmp(bool EmpState)
 		{
 			
 			EmpEffect->DestroyComponent();
-			EmpSound->FinishDestroy();
+			EmpSound->DestroyComponent();
 		}
 	}
 }
