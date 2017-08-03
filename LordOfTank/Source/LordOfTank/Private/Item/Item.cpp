@@ -9,6 +9,14 @@
 #include "Item.h"
 
 
+#define		RESTOREHP		0
+#define		RESTORESHIELD	1
+#define		RESTOREAP		2
+#define		P_AROMORPIERCE	3
+#define		P_HOMING		4
+#define		P_EMP			5
+
+
 // Sets default values
 AItem::AItem()
 {
@@ -164,6 +172,16 @@ void AItem::Tick(float DeltaTime)
 	if ((MultiMode->MyPlayer.Tank->GetActorLocation() - BoxLocation).Size() <= 500.f && bRemainItem) {
 		my_Instance->SendEatItem(item_count);
 		bRemainItem = false;
+		if (item_num == RESTOREHP || item_num == RESTORESHIELD)
+			my_Instance->SendAdjustItem(item_num);
+		else if (item_num == RESTOREAP)
+			my_Instance->bAteAP = true;
+		else if (item_num == P_AROMORPIERCE)
+			my_Instance->bAte_ARMOR_PIERCE = true;
+		else if (item_num == P_HOMING)
+			my_Instance->bAte_HOMING = true;
+		else if (item_num == P_EMP)
+			my_Instance->bAte_EMP = true;
 	}
 
 	if (!my_Instance->ItemsInfo[item_count].bIsAlive)

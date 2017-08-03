@@ -90,6 +90,12 @@ public:
 	////인벤토리생성
 	void SetDefaultInvetory();
 
+	void SetArmorPierceNum();
+
+	void SetHomingNum();
+
+	void SetEmpNum();
+
 
 private:
 
@@ -103,6 +109,10 @@ private:
 	////탄환을 넣을 인벤토리
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 		TArray<TSubclassOf<class AProjectile>> ProjectileInventory;
+
+	//가지고 있는 탄의 개수를 저장할 배열
+	int HadProjectileNum[4];
+	
 	////사격모드일 때 Barrel과 Gun 메쉬 변환.
 	void ChangeFiremodeBody();
 

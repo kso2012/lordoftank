@@ -131,6 +131,10 @@ void AMultiGameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (!bIsEndGame) {
+		IncreaseArmorPierceNum();
+		IncreaseHomingNum();
+		IncreaseEmpNum();
+
 		EnemyTargeting();
 		TurnChange();
 		ApplyMovement();
@@ -143,6 +147,9 @@ void AMultiGameMode::Tick(float DeltaTime)
 		EndGame();
 		SendLocation();
 
+		RestoreHP();
+		RestoreSHIELD();
+		RestoreAP();
 	}
 	
 }
@@ -525,3 +532,64 @@ void AMultiGameMode::ApplyEmp()
 	}
 
 }
+
+void AMultiGameMode::RestoreHP() {
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (MyInstance->bAteHP) {
+		MyPlayer.HP += MyInstance->delta_HP;
+		if (MyPlayer.HP > MaxHealth)
+			MyPlayer.HP = MaxHealth;
+		MyInstance->bAteHP = false; 
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("HP 회복"))); 
+	}
+}
+
+void AMultiGameMode::RestoreSHIELD() {
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (MyInstance->bAteSHIELD) {
+		MyPlayer.Shield += MyInstance->delta_SHIELD;
+		if (MyPlayer.Shield > MaxShield)
+			MyPlayer.Shield = MaxShield;
+		MyInstance->bAteSHIELD = false;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("SHEILD 회복")));
+	}
+}
+
+void AMultiGameMode::RestoreAP() {
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (MyInstance->bAteAP) {
+		MyPlayer.AP = MaxAP;
+		MyInstance->bAteAP = false;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("AP 회복")));
+	}
+}
+
+
+void AMultiGameMode::IncreaseArmorPierceNum() {
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (MyInstance->bAte_ARMOR_PIERCE) {
+		MyPlayer.Tank->SetArmorPierceNum();
+		MyInstance->bAte_ARMOR_PIERCE = false;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("관통탄 충전")));
+	}
+}
+
+void AMultiGameMode::IncreaseHomingNum() {
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (MyInstance->bAte_HOMING) {
+		MyPlayer.Tank->SetHomingNum();
+		MyInstance->bAte_HOMING = false;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("유도탄 충전")));
+	}
+}
+
+
+void AMultiGameMode::IncreaseEmpNum() {
+	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
+	if (MyInstance->bAte_EMP) {
+		MyPlayer.Tank->SetEmpNum();
+		MyInstance->bAte_EMP = false;
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("EMP 충전")));
+	}
+}
+

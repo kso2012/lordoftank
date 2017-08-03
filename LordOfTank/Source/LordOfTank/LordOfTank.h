@@ -37,6 +37,8 @@
 #define CS_ITEM_MOVE 18
 #define CS_DELETE_PLANE 19
 #define CS_EAT_ITEM 20
+#define CS_RESTORE_HP 21
+#define CS_RESTORE_SHIELD 22
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
@@ -61,6 +63,8 @@
 #define SC_ITEM_MOVE 21
 #define SC_DELETE_PLANE 22
 #define SC_EAT_ITEM 23
+#define SC_RESTORE_HP 24
+#define SC_RESTORE_SHIELD 25
 
 #define PROJECTILE_COMMON 1
 #define PROJECTILE_ARMORPIERCING 2
@@ -206,6 +210,12 @@ struct cs_packet_eat_item
 	BYTE size;
 	BYTE type;
 	int itemNum;
+};
+
+struct cs_packet_adjust_item
+{
+	BYTE size;
+	BYTE type;
 };
 
 struct sc_packet_room_show
@@ -377,6 +387,13 @@ struct sc_packet_eat_item
 	BYTE size;
 	BYTE type;
 	int itemNum;
+};
+
+struct sc_packet_adjust_item
+{
+	BYTE size;
+	BYTE type;
+	int num;
 };
 
 #pragma pack (pop)

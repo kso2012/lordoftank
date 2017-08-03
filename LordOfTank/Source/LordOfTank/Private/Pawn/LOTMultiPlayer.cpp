@@ -164,6 +164,10 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 	Type = 0;
 
 	bIsFireHoming = false;
+
+	for (int i = 0; i < 4; i++) {
+		HadProjectileNum[i] = 0;
+	}
 }
 
 void ALOTMultiPlayer::BeginPlay()
@@ -583,6 +587,18 @@ void ALOTMultiPlayer::NextWeapon()
 		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("ÇöÀç Æ÷Åº %d"), CurInventoryIndex));
+	if (CurInventoryIndex == 0) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("ÀÏ¹ÝÅº")));
+	}
+	else if (CurInventoryIndex == 1) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("°üÅëÅº %d"), HadProjectileNum[CurInventoryIndex]));
+	}
+	else if (CurInventoryIndex == 2) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("À¯µµÅº %d"), HadProjectileNum[CurInventoryIndex]));
+	}
+	else if (CurInventoryIndex == 3) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("EMP %d"), HadProjectileNum[CurInventoryIndex]));
+	}
 }
 
 void ALOTMultiPlayer::ExWeapon()
@@ -592,6 +608,18 @@ void ALOTMultiPlayer::ExWeapon()
 		CurrentProjectile = ProjectileInventory[CurInventoryIndex];
 	}
 	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("ÇöÀç Æ÷Åº %d"), CurInventoryIndex));
+	if (CurInventoryIndex == 0) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("ÀÏ¹ÝÅº")));
+	}
+	else if (CurInventoryIndex == 1) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("°üÅëÅº %d"), HadProjectileNum[CurInventoryIndex]));
+	}
+	else if (CurInventoryIndex == 2) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("À¯µµÅº %d"), HadProjectileNum[CurInventoryIndex]));
+	}
+	else if (CurInventoryIndex == 3) {
+		GEngine->AddOnScreenDebugMessage(2, 2.0f, FColor::Blue, FString::Printf(TEXT("EMP %d"), HadProjectileNum[CurInventoryIndex]));
+	}
 }
 
 void ALOTMultiPlayer::TurnOver()
@@ -608,4 +636,16 @@ void ALOTMultiPlayer::TurnOver()
 
 		}
 	}
+}
+
+void ALOTMultiPlayer::SetArmorPierceNum() {
+	HadProjectileNum[1] += 2;
+}
+
+void ALOTMultiPlayer::SetHomingNum() {
+	HadProjectileNum[2] += 1;
+}
+
+void ALOTMultiPlayer::SetEmpNum() {
+	HadProjectileNum[3] += 1;
 }
