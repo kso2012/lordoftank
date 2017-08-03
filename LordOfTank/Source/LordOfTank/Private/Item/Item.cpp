@@ -2,6 +2,10 @@
 
 #include "LordOfTank.h"
 #include "Components/BoxComponent.h"
+#include "Pawn/LOTMultiPlayer.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "LOTGameInstance.h"
+#include "GameMode/MultiGameMode.h"
 #include "Item.h"
 
 
@@ -76,66 +80,105 @@ AItem::AItem()
 	Gravity = 9.8f;
 	bShakePlus = true;
 	bIsMoving = true;
+	bRemainItem = true;
 }
 
 // Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
+	ULOTGameInstance* const my_Instance = Cast<ULOTGameInstance>(GetGameInstance());
 	
+	item_num = my_Instance->D_itemNum;
+	item_count = my_Instance->itemIndex;
+	
+	//GEngine->AddOnScreenDebugMessage(1, 30.0f, FColor::Blue, FString::Printf(TEXT("박스 위치 %f %f %f"), BoxMesh->GetComponentLocation().X, BoxMesh->GetComponentLocation().Y, BoxMesh->GetComponentLocation().Z ));
 }
 
 // Called every frame
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	ULOTGameInstance* const my_Instance = Cast<ULOTGameInstance>(GetGameInstance());
+	AMultiGameMode* const MultiMode = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 
-	if (bIsMoving) {
-		FVector BoxLocation = BoxMesh->GetComponentLocation();
+
+	FVector BoxLocation = BoxMesh->GetComponentLocation();
+	if (my_Instance->PlayerNum == 1) {
+		if (bIsMoving) {
 
 
-		SetFallingSpeed();
+			SetFallingSpeed();
 
-		if (!bUseGravity) {
-			if (ParachuteSize < 10.f) {
-				ParachuteSize += 0.1f;
-				ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
+			if (!bUseGravity) {
+				if (ParachuteSize < 10.f) {
+					ParachuteSize += 0.1f;
+					ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
+				}
+				CheckLocation();
+				BoxLocation.Z -= FallingSpeed * DeltaTime;
+
+				ShakeBox();
 			}
-			CheckLocation();
-			BoxLocation.Z -= FallingSpeed * DeltaTime;
+			else {
+				if (ParachuteSize > 0.f) {
+					ParachuteSize -= 0.5f;
+					ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
+					if (ParachuteSize < 5.f)
+						BoxMesh->SetEnableGravity(true);
+				}
+				BoxLocation.Z -= (FallingSpeed + Gravity) * DeltaTime;
+				Gravity += 9.8f;
+				if (ParachuteSize <= 0.f) {
+					FallingSpeed = 0.f;
+					Gravity = 0.f;
+					ParachuteMesh->DestroyComponent();
+					bIsMoving = false;
+				}
+			}
 
-			ShakeBox();
+
+			BoxMesh->SetWorldLocation(BoxLocation);
 		}
-		else {
-			if (ParachuteSize > 0.f) {
-				ParachuteSize -= 0.5f;
-				ParachuteMesh->SetWorldScale3D(FVector(ParachuteSize, ParachuteSize, ParachuteSize));
-				if (ParachuteSize < 5.f)
-					BoxMesh->SetEnableGravity(true);
-			}
-			BoxLocation.Z -= (FallingSpeed + Gravity) * DeltaTime;
-			Gravity += 9.8f;
-			if (ParachuteSize <= 0.f) {
-				FallingSpeed = 0.f;
-				Gravity = 0.f;
-				ParachuteMesh->DestroyComponent();
-				bIsMoving = false;
-			}
+		
+		if (BoxLocation != my_Instance->ItemsInfo[item_count].item_Location) {
+			my_Instance->SendItemLocation(item_count, BoxLocation, BoxMesh->GetComponentRotation(), ParachuteSize);
 		}
-
-
-		BoxMesh->SetWorldLocation(BoxLocation);
 	}
+
+
+	
+	else{
+			if (bIsMoving) {
+				if (my_Instance->Parachute_Size <= 0) {
+					ParachuteMesh->DestroyComponent();
+					bIsMoving = false;
+				}
+				ParachuteMesh->SetWorldScale3D(FVector(my_Instance->Parachute_Size, my_Instance->Parachute_Size, my_Instance->Parachute_Size));
+			}
+			BoxLocation = my_Instance->ItemsInfo[item_count].item_Location;
+			BoxMesh->SetWorldLocation(BoxLocation);
+			BoxMesh->SetRelativeRotation(my_Instance->ItemsInfo[item_count].item_Rotation);
+	}
+
+	if ((MultiMode->MyPlayer.Tank->GetActorLocation() - BoxLocation).Size() <= 500.f && bRemainItem) {
+		my_Instance->SendEatItem(item_count);
+		bRemainItem = false;
+	}
+
+	if (!my_Instance->ItemsInfo[item_count].bIsAlive)
+		this->Destroy();
+
 }
 
 void AItem::SetFallingSpeed() {
-	FallingSpeed += 1.f;
+	FallingSpeed += 5.f;
 }
 
 void AItem::CheckFalling(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	bIsFalling = false;
-	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), bIsFalling));
+	//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%f"), bIsFalling));
 	/*
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{

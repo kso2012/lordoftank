@@ -14,8 +14,9 @@ USTRUCT(BlueprintType)
 struct FPlayerInfomation
 {
 	GENERATED_USTRUCT_BODY()
-	
-	ALOTMultiPlayer* Tank;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerInfo")
+		ALOTMultiPlayer* Tank;
 	ALOTMultiDrone* Drone;
 	AActor* TargetActor;
 	FVector Velocity;

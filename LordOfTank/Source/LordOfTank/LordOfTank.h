@@ -10,7 +10,6 @@
 #define COLLISION_PROJECTILE   ECC_GameTraceChannel1
 #define COLLISION_PICKUP      ECC_GameTraceChannel2
 
-
 #define OP_RECV 1
 #define OP_SEND 2
 #define MAX_USER 10
@@ -33,6 +32,11 @@
 #define CS_ACTIVATE_HOMING 13
 #define CS_BEAM_ON 14
 #define CS_BEAM_OFF 15
+#define CS_PLANE_MOVE 16
+#define CS_SPAWN_ITEM 17
+#define CS_ITEM_MOVE 18
+#define CS_DELETE_PLANE 19
+#define CS_EAT_ITEM 20
 
 #define SC_ROOM_SHOW 1
 #define SC_PLAYER_NUM 2
@@ -51,6 +55,12 @@
 #define SC_EMP_OFF 15
 #define SC_BEAM_ON 16
 #define SC_BEAM_OFF 17
+#define SC_SPAWN_PLANE 18
+#define SC_PLANE_MOVE 19
+#define SC_SPAWN_ITEM 20
+#define SC_ITEM_MOVE 21
+#define SC_DELETE_PLANE 22
+#define SC_EAT_ITEM 23
 
 #define PROJECTILE_COMMON 1
 #define PROJECTILE_ARMORPIERCING 2
@@ -159,6 +169,43 @@ struct cs_packet_use_beam
 {
 	BYTE size;
 	BYTE type;
+};
+
+struct cs_packet_plane_move
+{
+	BYTE size;
+	BYTE type;
+	FVector location;
+	FRotator rotator;
+};
+
+struct cs_packet_spawn_item
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct cs_packet_item_move
+{
+	BYTE size;
+	BYTE type;
+	FVector location;
+	FRotator rotator;
+	float parachuteSize;
+	int index;
+};
+
+struct cs_packet_delete_plane
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct cs_packet_eat_item
+{
+	BYTE size;
+	BYTE type;
+	int itemNum;
 };
 
 struct sc_packet_room_show
@@ -286,6 +333,50 @@ struct sc_packet_use_beam
 	BYTE type;
 };
 
+struct sc_packet_spawn_plane
+{
+	BYTE size;
+	BYTE type;
+	int planeLocation;
+	FVector itemLocation;
+	int itemNum;
+};
 
+struct sc_packet_plane_move
+{
+	BYTE size;
+	BYTE type;
+	FVector location;
+	FRotator rotator;
+};
+
+struct sc_packet_spawn_item
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct sc_packet_item_move
+{
+	BYTE size;
+	BYTE type;
+	FVector location;
+	FRotator rotator;
+	float parachuteSize;
+	int index;
+};
+
+struct sc_packet_delete_plane
+{
+	BYTE size;
+	BYTE type;
+};
+
+struct sc_packet_eat_item
+{
+	BYTE size;
+	BYTE type;
+	int itemNum;
+};
 
 #pragma pack (pop)

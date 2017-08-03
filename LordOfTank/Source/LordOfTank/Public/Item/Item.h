@@ -57,5 +57,13 @@ public:
 	void ScaleDownParachute();
 
 	bool bIsMoving;
+
+	//아이템 종류를 나타내는 것
+	int item_num;
+
+	//아이템의 인덱스
+	int item_count;
+
+	bool bRemainItem;
 	
 };

@@ -29,6 +29,9 @@ ULOTGameInstance::ULOTGameInstance()
 	bBeamIsActivated = false;
 	EndState = 0;
 	RoomInfo.SetNum(5);
+	bIsCreatingItem = false;
+	bIsPlaneAlive = false;
+	itemIndex = -1;
 }
 
 void ULOTGameInstance::ResetVar()
@@ -70,8 +73,8 @@ bool ULOTGameInstance::ClickIpEntBT()
 	SOCKADDR_IN serveraddr;
 	ZeroMemory(&serveraddr, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
-	//serveraddr.sin_addr.s_addr = inet_addr("192.168.1.51");
-	serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
+	serveraddr.sin_addr.s_addr = inet_addr("175.196.145.229");
+	//serveraddr.sin_addr.s_addr = inet_addr(TCHAR_TO_UTF8(*IPaddr));
 	serveraddr.sin_port = htons(SERVER_PORT);
 
 	InitEvent(sock);
@@ -288,6 +291,59 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		break;
 	}
 
+	case SC_SPAWN_PLANE:
+	{
+		sc_packet_spawn_plane *my_packet = reinterpret_cast<sc_packet_spawn_plane*>(ptr);
+		planeSpawnLocation = my_packet->planeLocation;
+		itemSpawnLocation = my_packet->itemLocation;
+		D_itemNum = my_packet->itemNum;
+		bIsPlaneAlive = true;
+		itemIndex++;
+		ItemsInfo[itemIndex].itemNum = D_itemNum;
+		break;
+	}
+
+	case SC_PLANE_MOVE:
+	{
+		sc_packet_plane_move *my_packet = reinterpret_cast<sc_packet_plane_move*>(ptr);
+		P_Location = my_packet->location;
+		P_Rotation = my_packet->rotator;
+		//GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Blue, FString::Printf(TEXT("비행기 좌표 %f %f %f"), P_Location.X, P_Location.Y, P_Location.Z));
+		break;
+	}
+
+	case SC_SPAWN_ITEM:
+	{
+		bIsCreatingItem = true;
+		ItemsInfo[itemIndex].bIsAlive = true;
+		break;
+	}
+
+	case SC_ITEM_MOVE:
+	{
+		sc_packet_item_move *my_packet = reinterpret_cast<sc_packet_item_move*>(ptr);
+		ItemsInfo[my_packet->index].item_Location = my_packet->location;
+		ItemsInfo[my_packet->index].item_Rotation = my_packet->rotator;
+		Parachute_Size = my_packet->parachuteSize;
+		//GEngine->AddOnScreenDebugMessage(2, 5.0f, FColor::Blue, FString::Printf(TEXT("아이템 좌표 %f %f %f"), I_Location.X, I_Location.Y, I_Location.Z));
+		break;
+	}
+
+	case SC_DELETE_PLANE:
+	{
+		bIsPlaneAlive = false;
+		//GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Yellow, FString::Printf(TEXT("비행기 삭제 메시지 받음")));
+		break;
+	}
+
+	case SC_EAT_ITEM:
+	{
+		sc_packet_eat_item *my_packet = reinterpret_cast<sc_packet_eat_item*>(ptr);
+		E_itemNum = my_packet->itemNum;
+		ItemsInfo[E_itemNum].bIsAlive = false;
+		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Blue, FString::Printf(TEXT("%d번 아이템을 먹었다고 받음"), E_itemNum));
+		break;
+	}
 
 	default:
 	{
@@ -589,6 +645,73 @@ void ULOTGameInstance::SendDeactivateBeam()
 	send_wsabuf.len = sizeof(cs_packet_use_beam);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::SendPlaneLocation(FVector P_Location, FRotator P_Rotation)
+{
+	cs_packet_plane_move *p_move = reinterpret_cast<cs_packet_plane_move*>(send_buffer); 
+	p_move->location = P_Location;
+	p_move->rotator = P_Rotation;
+	p_move->type = CS_PLANE_MOVE;
+	p_move->size = sizeof(cs_packet_plane_move);
+	send_wsabuf.len = sizeof(cs_packet_plane_move);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+	//GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Blue, FString::Printf(TEXT("비행기 좌표 %f %f %f"), P_Location.X, P_Location.Y, P_Location.Z));
+}
+
+void ULOTGameInstance::SendDeletePlane() {
+	cs_packet_delete_plane *plane = reinterpret_cast<cs_packet_delete_plane*>(send_buffer);
+	bIsPlaneAlive = false;
+	plane->type = CS_DELETE_PLANE;
+	plane->size = sizeof(cs_packet_delete_plane);
+	send_wsabuf.len = sizeof(cs_packet_delete_plane);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+	//GEngine->AddOnScreenDebugMessage(3, 5.0f, FColor::Yellow, FString::Printf(TEXT("비행기 삭제 메시지 보냄")));
+}
+
+void ULOTGameInstance::SendSpawnItem() {
+	cs_packet_spawn_item *item = reinterpret_cast<cs_packet_spawn_item*>(send_buffer);
+
+	ItemsInfo[itemIndex].bIsAlive = true;
+	item->type = CS_SPAWN_ITEM;
+	item->size = sizeof(cs_packet_spawn_item); 
+	send_wsabuf.len = sizeof(cs_packet_spawn_item);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+}
+
+void ULOTGameInstance::SendItemLocation(int BoxIndex, FVector I_Location, FRotator I_Rotation, float p_Size)
+{
+	cs_packet_item_move *i_move = reinterpret_cast<cs_packet_item_move*>(send_buffer);
+	ItemsInfo[BoxIndex].item_Location = I_Location;
+	ItemsInfo[BoxIndex].item_Rotation = I_Rotation;
+	i_move->location = I_Location;
+	i_move->rotator = I_Rotation;
+	i_move->index = BoxIndex;
+	i_move->parachuteSize = p_Size;
+	i_move->type = CS_ITEM_MOVE;
+	i_move->size = sizeof(cs_packet_item_move);
+	send_wsabuf.len = sizeof(cs_packet_item_move);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
+	//GEngine->AddOnScreenDebugMessage(2, 5.0f, FColor::Blue, FString::Printf(TEXT("아이템 좌표 %f %f %f"), I_Location.X, I_Location.Y, I_Location.Z));
+}
+
+void ULOTGameInstance::SendEatItem(int itemNum)
+{
+	cs_packet_eat_item *item = reinterpret_cast<cs_packet_eat_item*>(send_buffer);
+
+	item->itemNum = itemNum;
+	E_itemNum = itemNum;
+	ItemsInfo[E_itemNum].bIsAlive = false;
+	item->type = CS_EAT_ITEM;
+	item->size = sizeof(cs_packet_eat_item);
+	send_wsabuf.len = sizeof(cs_packet_eat_item);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL); 
+	GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Blue, FString::Printf(TEXT("%d번 아이템을 먹었다고 보냄"), itemNum));
 }
 
 void ULOTGameInstance::Disconnect()

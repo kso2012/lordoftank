@@ -118,7 +118,23 @@ struct FShowLobby
 	
 };
 
+USTRUCT(BlueprintType)
+struct FSaveItemInfo
+{
+	GENERATED_USTRUCT_BODY()
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
+		int itemNum;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
+		FVector item_Location;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
+		FRotator item_Rotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
+		bool bIsAlive;
+};
 
 
 
@@ -256,6 +272,22 @@ public:
 
 	void SendDeactivateBeam();
 
+	// 비행기 및 아이템 관련 함수
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		void SendPlaneLocation(FVector P_Location, FRotator P_Rotation);
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		void SendDeletePlane();
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		void SendSpawnItem();
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		void SendItemLocation(int BoxIndex, FVector I_Location, FRotator I_Rotation, float p_Size);
+
+	UFUNCTION(BlueprintCallable, Category = "Item")
+		void SendEatItem(int itemNum);
+
 	
 	
 
@@ -333,4 +365,33 @@ public:
 	bool bRecvBeamMS;
 	bool bBeamIsActivated;
 
+
+	//item 생성 관련
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		bool bIsCreatingItem;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		int planeSpawnLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FVector itemSpawnLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		int D_itemNum;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		int E_itemNum;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		int itemIndex;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		bool bIsPlaneAlive;
+	FSaveItemInfo ItemsInfo[100];
+
+	//plane & item 위치와 회전
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FVector P_Location;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FRotator P_Rotation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FVector I_Location;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FRotator I_Rotation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		float Parachute_Size;
 };
