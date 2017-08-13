@@ -393,7 +393,7 @@ struct sc_packet_adjust_item
 {
 	BYTE size;
 	BYTE type;
-	int num;
+	float num;
 };
 
 #pragma pack (pop)

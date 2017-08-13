@@ -402,9 +402,9 @@ public:
 
 	//item Á¤º¸
 	bool bAteHP;
-	int delta_HP;
+	float delta_HP;
 	bool bAteSHIELD;
-	int delta_SHIELD;
+	float delta_SHIELD;
 	bool bAteAP;
 	bool bAte_ARMOR_PIERCE;
 	bool bAte_HOMING;

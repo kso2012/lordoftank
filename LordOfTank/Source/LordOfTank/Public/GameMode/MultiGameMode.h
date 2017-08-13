@@ -113,6 +113,9 @@ public:
 
 	bool bIsMyTurn;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProjectileNum")
+		int CurrentProjectileNum;
+
 private:
 	
 	float DroneSpawningHeight;

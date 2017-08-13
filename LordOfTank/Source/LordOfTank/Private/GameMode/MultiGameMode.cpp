@@ -135,6 +135,8 @@ void AMultiGameMode::Tick(float DeltaTime)
 		IncreaseHomingNum();
 		IncreaseEmpNum();
 
+		CurrentProjectileNum = MyPlayer.Tank->ProjectileNum();
+
 		EnemyTargeting();
 		TurnChange();
 		ApplyMovement();
@@ -322,6 +324,8 @@ void AMultiGameMode::TurnChange()
 				MyPlayer.AP = MaxAP;
 			else
 				MyPlayer.AP += MyInstance->ChargingAP;
+			MyPlayer.Tank->ChangeTurn();
+			MyPlayer.Tank->SetTurn(MyInstance->bIsmyTurn);
 		}
 		bIsMyTurn = MyInstance->bIsmyTurn;
 		MyInstance->bChangeTurnMS = false;
@@ -536,9 +540,7 @@ void AMultiGameMode::ApplyEmp()
 void AMultiGameMode::RestoreHP() {
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
 	if (MyInstance->bAteHP) {
-		MyPlayer.HP += MyInstance->delta_HP;
-		if (MyPlayer.HP > MaxHealth)
-			MyPlayer.HP = MaxHealth;
+		MyPlayer.HP = MyInstance->delta_HP;
 		MyInstance->bAteHP = false; 
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("HP 회복"))); 
 	}
@@ -547,9 +549,7 @@ void AMultiGameMode::RestoreHP() {
 void AMultiGameMode::RestoreSHIELD() {
 	ULOTGameInstance* const MyInstance = Cast<ULOTGameInstance>(GetGameInstance());
 	if (MyInstance->bAteSHIELD) {
-		MyPlayer.Shield += MyInstance->delta_SHIELD;
-		if (MyPlayer.Shield > MaxShield)
-			MyPlayer.Shield = MaxShield;
+		MyPlayer.Shield = MyInstance->delta_SHIELD;
 		MyInstance->bAteSHIELD = false;
 		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, FString::Printf(TEXT("SHEILD 회복")));
 	}
