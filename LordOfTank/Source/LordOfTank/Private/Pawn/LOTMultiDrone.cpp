@@ -84,6 +84,8 @@ ALOTMultiDrone::ALOTMultiDrone()
 	CollisionComp->SetCollisionObjectType(ECC_Pawn);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Block);
 	RootComponent = CollisionComp;
+	CollisionComp->SetEnableGravity(false);
+	CollisionComp->SetSimulatePhysics(true);
 
 	BeamCollisionComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapSuleComp"));
 	BeamCollisionComp->InitCapsuleSize(1000.f, 3000.f);
@@ -285,10 +287,16 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
 	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f,  CurrentUpwardSpeed * DeltaTime);
 	
+	FVector physicsVector = FVector(bHasInputForward, 0, bHasInputUpward);
+	//Camera->GetComponentRotation().Yaw;
+	
+	CollisionComp->SetAllPhysicsLinearVelocity(GetVelocity() + (physicsVector * CurrentForwardSpeed * DeltaTime));
+	//AddMovementInput(LocalMove, CurrentForwardSpeed * DeltaTime * 100.f);
+
 	
 	//Addrelativel
 	//AddActorWorldOffset(LocalMove, true);
-	AddActorLocalOffset(LocalMove, true);
+	//		AddActorLocalOffset(LocalMove, true);
 
 	//AddActorWorldOffset(LocalMove, true);
 

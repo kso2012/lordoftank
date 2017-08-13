@@ -31,7 +31,15 @@ ULOTGameInstance::ULOTGameInstance()
 	RoomInfo.SetNum(5);
 	bIsCreatingItem = false;
 	bIsPlaneAlive = false;
+
 	itemIndex = -1;
+
+	bAteHP = false;
+	bAteSHIELD = false;
+	bAteAP = false;
+	bAte_ARMOR_PIERCE = false;
+	bAte_HOMING = false;
+	bAte_EMP = false;
 }
 
 void ULOTGameInstance::ResetVar()
@@ -83,7 +91,7 @@ bool ULOTGameInstance::ClickIpEntBT()
 	GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("%d"), error_code));
 	if (retval == 0)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 성공"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 성공"));
 		WSAEventSelect(app.sarr[app.now], app.hEarr[app.now], FD_CONNECT);
 		app.now++;
 		// 스레드 생성
@@ -93,7 +101,7 @@ bool ULOTGameInstance::ClickIpEntBT()
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 실패"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("커넥트 실패"));
 		//bIsTryConnecting = false;
 		bIsConnected = false;
 		closesocket(sock);
@@ -127,7 +135,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	{
 	case SC_ROOM_SHOW:
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("방정보받음")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("방정보받음")));
 		sc_packet_room_show *my_packet = reinterpret_cast<sc_packet_room_show*>(ptr);
 		for (int i = 0; i < MAX_ROOM; ++i) {
 			RoomInfo[i].roomNum = my_packet->roomNum[i];
@@ -138,14 +146,14 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 	}
 	case SC_PLAYER_NUM:
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("플레이어넘버받음")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("플레이어넘버받음")));
 		sc_packet_player_num *my_packet = reinterpret_cast<sc_packet_player_num*>(ptr);
 		PlayerNum = my_packet->playerNum;
 		break;
 	}
 	case SC_ROOM_INFO:
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("로비정보받음")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("로비정보받음")));
 		sc_packet_room_info *my_packet = reinterpret_cast<sc_packet_room_info*>(ptr);
 		LobbyInfo.canStart = my_packet->canStart;
 		LobbyInfo.counts = my_packet->counts;
@@ -158,7 +166,7 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 
 	case SC_ROOM_READY:
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("레디정보받음")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, FString::Printf(TEXT("레디정보받음")));
 		sc_packet_room_ready *my_packet = reinterpret_cast<sc_packet_room_ready*>(ptr);
 		LobbyInfo.canStart = my_packet->canStart;
 		LobbyInfo.isReady1 = my_packet->isReady1;
@@ -342,6 +350,22 @@ void ULOTGameInstance::ProcessPacket(char *ptr)
 		E_itemNum = my_packet->itemNum;
 		ItemsInfo[E_itemNum].bIsAlive = false;
 		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Blue, FString::Printf(TEXT("%d번 아이템을 먹었다고 받음"), E_itemNum));
+		break;
+	}
+
+	case SC_RESTORE_HP:
+	{
+		sc_packet_adjust_item *my_packet = reinterpret_cast<sc_packet_adjust_item*>(ptr);
+		bAteHP = true;
+		delta_HP = my_packet->num;
+		break;
+	}
+
+	case SC_RESTORE_SHIELD:
+	{
+		sc_packet_adjust_item *my_packet = reinterpret_cast<sc_packet_adjust_item*>(ptr);
+		bAteSHIELD = true;
+		delta_SHIELD = my_packet->num;
 		break;
 	}
 
@@ -711,7 +735,23 @@ void ULOTGameInstance::SendEatItem(int itemNum)
 	send_wsabuf.len = sizeof(cs_packet_eat_item);
 	DWORD iobyte;
 	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL); 
-	GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Blue, FString::Printf(TEXT("%d번 아이템을 먹었다고 보냄"), itemNum));
+	//GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Blue, FString::Printf(TEXT("%d번 아이템을 먹었다고 보냄"), itemNum));
+}
+
+void ULOTGameInstance::SendAdjustItem(int itemNum) 
+{
+	cs_packet_adjust_item *item = reinterpret_cast<cs_packet_adjust_item*>(send_buffer);
+
+	if (itemNum == RESTOREHP) {
+		item->type = CS_RESTORE_HP;
+	}
+	else if (itemNum == RESTORESHIELD) {
+		item->type = CS_RESTORE_SHIELD;
+	}
+	item->size = sizeof(cs_packet_adjust_item);
+	send_wsabuf.len = sizeof(cs_packet_adjust_item);
+	DWORD iobyte;
+	WSASend(sock, &send_wsabuf, 1, &iobyte, 0, NULL, NULL);
 }
 
 void ULOTGameInstance::Disconnect()

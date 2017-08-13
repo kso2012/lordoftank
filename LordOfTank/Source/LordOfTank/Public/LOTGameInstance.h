@@ -14,6 +14,9 @@ using namespace std;
 #define WM_SOCKET    WM_USER + 1
 #define BUF_SIZE 1024
 
+#define		RESTOREHP		0
+#define		RESTORESHIELD	1
+
 /**
 *
 */
@@ -288,6 +291,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item")
 		void SendEatItem(int itemNum);
 
+	void SendAdjustItem(int itemNum);
+
 	
 	
 
@@ -394,4 +399,15 @@ public:
 		FRotator I_Rotation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 		float Parachute_Size;
+
+	//item Á¤º¸
+	bool bAteHP;
+	float delta_HP;
+	bool bAteSHIELD;
+	float delta_SHIELD;
+	bool bAteAP;
+	bool bAte_ARMOR_PIERCE;
+	bool bAte_HOMING;
+	bool bAte_EMP;
+
 };

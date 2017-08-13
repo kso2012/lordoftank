@@ -87,6 +87,18 @@ public:
 
 	void EnemyActivateHoming();
 
+	void RestoreHP();
+
+	void RestoreSHIELD();
+	
+	void RestoreAP();
+
+	void IncreaseArmorPierceNum();
+
+	void IncreaseHomingNum();
+
+	void IncreaseEmpNum();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player")
 		FPlayerInfomation MyPlayer;
 
@@ -100,6 +112,9 @@ public:
 		int EndState;
 
 	bool bIsMyTurn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProjectileNum")
+		int CurrentProjectileNum;
 
 private:
 	

@@ -5,6 +5,11 @@
 #include "WheeledVehicle.h"
 #include "LOTMultiPlayer.generated.h"
 
+#define P_COMMON		0
+#define P_ARMORPIERCE	1
+#define P_HOMING		2
+#define P_EMP			3
+
 /**
 *
 */
@@ -87,9 +92,30 @@ public:
 	void FireEnd();
 	//시점변경시 visible설정
 	void FireMode();
+
+	void ChangeTurn() { bIsPushFire = false; bIsShoot = false; }
 	////인벤토리생성
 	void SetDefaultInvetory();
 
+	void SetArmorPierceNum();
+
+	void SetHomingNum();
+
+	void SetEmpNum();
+
+	void SetTurn(bool turn) { bIsMyTurn = turn; }
+
+	UFUNCTION(BlueprintCallable, Category = "ProjectileNum")
+		int ProjectileType() { return CurInventoryIndex; }
+
+	UFUNCTION(BlueprintCallable, Category = "ProjectileNum")
+		int ProjectileNum() { return HadProjectileNum[CurInventoryIndex]; }
+
+	//가지고 있는 탄의 개수를 저장할 배열
+		int HadProjectileNum[4];
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ProjectileNum")
+		int CurInventoryIndex;
 
 private:
 
@@ -103,6 +129,8 @@ private:
 	////탄환을 넣을 인벤토리
 	UPROPERTY(EditDefaultsOnly, Category = Inventory)
 		TArray<TSubclassOf<class AProjectile>> ProjectileInventory;
+
+	
 	////사격모드일 때 Barrel과 Gun 메쉬 변환.
 	void ChangeFiremodeBody();
 
@@ -154,7 +182,6 @@ private:
 
 	bool bIsSendRight;
 
-	int CurInventoryIndex;
 
 	int Type;
 	//발사중인가?
@@ -166,7 +193,9 @@ private:
 
 	void TurnOver();
 
+	float d_time;
 
+	bool bIsMyTurn;
 
 
 
