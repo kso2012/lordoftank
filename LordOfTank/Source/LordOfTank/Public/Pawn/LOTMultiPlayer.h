@@ -49,7 +49,7 @@ class LORDOFTANK_API ALOTMultiPlayer : public AWheeledVehicle
 		UChildActorComponent* CrossHair;
 
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* UI;
+		UChildActorComponent* CockPit;
 
 
 

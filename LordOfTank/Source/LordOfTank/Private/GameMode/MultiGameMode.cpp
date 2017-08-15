@@ -109,8 +109,8 @@ void AMultiGameMode::StartPlay()
 
 	}
 
-	EnemyPlayer.Tank->SetUI(false);
-	EnemyPlayer.Drone->SetUI(false);
+	//EnemyPlayer.Tank->SetUI(false);
+	//EnemyPlayer.Drone->SetUI(false);
 	MyPlayer.Drone->SetUI(false);
 	Test->Possess(MyPlayer.Tank);
 	InitPlayer();

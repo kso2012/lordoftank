@@ -85,21 +85,23 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 
 
 
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
-	SpringArm->TargetOffset = FVector(0.f, 0.f, 200.f);
-	SpringArm->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
-	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->TargetArmLength = 600.0f;
-	SpringArm->bEnableCameraRotationLag = true;
-	SpringArm->CameraRotationLagSpeed = 7.f;
-	SpringArm->bInheritPitch = false;
-	SpringArm->bInheritRoll = false;
+	//SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
+	//SpringArm->TargetOffset = FVector(0.f, 0.f, 200.f);
+	//SpringArm->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
+	//SpringArm->SetupAttachment(RootComponent);
+	//SpringArm->TargetArmLength = 600.0f;
+	//SpringArm->bEnableCameraRotationLag = true;
+	//SpringArm->CameraRotationLagSpeed = 7.f;
+	//SpringArm->bInheritPitch = false;
+	//SpringArm->bInheritRoll = false;
 
 
 
 	MoveModeCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
-	MoveModeCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
-	MoveModeCamera->bUsePawnControlRotation = false;
+	MoveModeCamera->SetupAttachment(GetMesh(), TEXT("CockPitCamera"));
+	//MoveModeCamera->SetRelativeLocation(FVector(230.f, 0.f, 70.f));
+	//MoveModeCamera->SetupAttachment(SpringArm, TEXT("CockPitCamera"));
+	//MoveModeCamera->bUsePawnControlRotation = false;
 	MoveModeCamera->FieldOfView = 90.f;
 
 	FireModeCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera1"));
@@ -126,12 +128,14 @@ ALOTMultiPlayer::ALOTMultiPlayer()
 		//CrossHair->CreateChildActor();
 	}
 
-	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
-	UI = CreateDefaultSubobject<UChildActorComponent>("UI");
-	if (UIBP.Class != NULL)
+	static ConstructorHelpers::FClassFinder<AActor> CockPitBP(TEXT("/Game/LOTAssets/CockPit/BP/CockpitBP.CockpitBP_C"));
+	CockPit = CreateDefaultSubobject<UChildActorComponent>("CockPit");
+	if (CockPitBP.Class != NULL)
 	{
-		UI->SetChildActorClass(UIBP.Class);
-		UI->SetupAttachment(MoveModeCamera);
+		CockPit->SetChildActorClass(CockPitBP.Class);
+		CockPit->SetRelativeLocation(FVector(250.0f, 0.0f, -50.0f));
+		CockPit->SetupAttachment(GetMesh());
+		//CockPit->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 
@@ -178,6 +182,7 @@ void ALOTMultiPlayer::BeginPlay()
 	SetDefaultInvetory();
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 	EngineSoundComponent->Play();
+	
 
 }
 void ALOTMultiPlayer::SetDefaultInvetory()
@@ -235,7 +240,11 @@ void ALOTMultiPlayer::Tick(float DeltaTime)
 
 	float RPMToAudioScale = 2500.0f / GetVehicleMovement()->GetEngineMaxRotationSpeed();
 	EngineSoundComponent->SetFloatParameter("RPM", GetVehicleMovement()->GetEngineRotationSpeed()*RPMToAudioScale);
-
+	if (GetController())
+	{
+		GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Blue, FString::Printf(TEXT("현재파워 d")));
+	}
+	
 
 
 
@@ -398,9 +407,10 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 	if (bIsFireMode == true)
 	{
 		MoveModeCamera->Deactivate();
-		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		//CockPit->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		FireModeCamera->Activate();
-		UI->AttachToComponent(FireModeCamera,FAttachmentTransformRules::KeepRelativeTransform);
+		//CockPit->AttachToComponent(FireModeCamera,FAttachmentTransformRules::KeepRelativeTransform);
+		CockPit->SetVisibility(false, true);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		TurretMesh->SetVisibility(false, false);
 		GetMesh()->SetVisibility(false, false);
@@ -413,12 +423,13 @@ void ALOTMultiPlayer::ChangeCamera(bool bIsFireMode)
 	{
 		FireModeCamera->Deactivate();
 		//UI->DetachFromParent(true, true);
-		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		//CockPit->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		MoveModeCamera->Activate();
-		UI->AttachToComponent(MoveModeCamera, FAttachmentTransformRules::KeepRelativeTransform);
+		//CockPit->AttachToComponent(MoveModeCamera, FAttachmentTransformRules::KeepRelativeTransform);
+		CockPit->SetVisibility(true, true);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		TurretMesh->SetVisibility(true, false);
-		GetMesh()->SetVisibility(true, false);
+		GetMesh()->SetVisibility(false, false);
 		BarrelMesh->SetVisibility(true, false);
 		CrossHair->SetVisibility(false, true);
 		
@@ -434,7 +445,7 @@ void ALOTMultiPlayer::MoveForward(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
+	/*if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 		if (Val != 0.f)
 		{
@@ -444,9 +455,9 @@ void ALOTMultiPlayer::MoveForward(float Val)
 			
 		}
 	}
-	else
-		GetVehicleMovementComponent()->SetThrottleInput(0.f);
-	//GetVehicleMovementComponent()->SetThrottleInput(Val);
+	else*/
+		//GetVehicleMovementComponent()->SetThrottleInput(0.f);
+	GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
 
@@ -454,13 +465,13 @@ void ALOTMultiPlayer::MoveRight(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
-		GetVehicleMovementComponent()->SetSteeringInput(Val);
-		
-	}
-	else
-		GetVehicleMovementComponent()->SetThrottleInput(0.f);
-	//GetVehicleMovementComponent()->SetSteeringInput(Val);
+	//if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
+	//	GetVehicleMovementComponent()->SetSteeringInput(Val);
+	//	
+	//}
+	//else
+		//GetVehicleMovementComponent()->SetThrottleInput(0.f);
+	GetVehicleMovementComponent()->SetSteeringInput(Val);
 
 }
 
@@ -587,11 +598,14 @@ void ALOTMultiPlayer::SetUI(bool bIsPlayer)
 {
 	if (!bIsPlayer)
 	{
-		UI->SetVisibility(false, true);
+		GetMesh()->SetVisibility(true, true);
+		CockPit->SetVisibility(false, true);
+		
 	}
-	else
-		UI->SetVisibility(true, true);
-
+	else {
+		GetMesh()->SetVisibility(true, false);
+		CockPit->SetVisibility(true, true);
+	}
 	
 }
 
