@@ -285,12 +285,13 @@ void ALOTMultiDrone::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
-	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f,  CurrentUpwardSpeed * DeltaTime);
+	FVector forwardvector = this->GetActorForwardVector() * CurrentForwardSpeed;
+	const FVector LocalMove = FVector(forwardvector.X * DeltaTime * 300, forwardvector.Y * DeltaTime * 300,  CurrentUpwardSpeed * DeltaTime * 300);
 	
-	FVector physicsVector = FVector(bHasInputForward, 0, bHasInputUpward);
+	//FVector physicsVector = FVector(bHasInputForward, 0, 0);//bHasInputUpward, 0);
 	//Camera->GetComponentRotation().Yaw;
 	
-	CollisionComp->SetAllPhysicsLinearVelocity(GetVelocity() + (physicsVector * CurrentForwardSpeed * DeltaTime));
+	CollisionComp->SetAllPhysicsLinearVelocity(LocalMove);//(GetVelocity() + physicsVector * CurrentForwardSpeed * DeltaTime));
 	//AddMovementInput(LocalMove, CurrentForwardSpeed * DeltaTime * 100.f);
 
 	
