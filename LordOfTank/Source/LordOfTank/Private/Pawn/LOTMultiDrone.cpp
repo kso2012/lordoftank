@@ -203,12 +203,12 @@ ALOTMultiDrone::ALOTMultiDrone()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
 	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->TargetArmLength = .0f;
+	SpringArm->TargetArmLength = 0.0f;
 	SpringArm->SocketOffset = FVector(0.f, 0.f, 0.f);
 	SpringArm->bEnableCameraLag = false;
 	SpringArm->CameraLagSpeed = 15.f;
 	//SpringArm->SetRelativeRotation(FRotator(-30.f, 0.0f, 0.0f));
-	SpringArm->SetRelativeLocation(FVector(-20.0f, 0.0f, 130.0f));
+	SpringArm->SetRelativeLocation(FVector(-20.0f, 0.0f, 140.0f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
 	Camera->SetupAttachment(SpringArm);
@@ -246,8 +246,8 @@ ALOTMultiDrone::ALOTMultiDrone()
 		CrossHair->SetVisibility(false,true);
 		//CrossHair->CreateChildActor();
 	}
-
-	static ConstructorHelpers::FClassFinder<AActor> CockPitBP(TEXT("/Game/LOTAssets/CockPit/BP/CockpitBP.CockpitBP_C"));
+	
+	static ConstructorHelpers::FClassFinder<AActor> CockPitBP(TEXT("/Game/LOTAssets/CockPit/BP/CockpitBP2.CockpitBP_C2"));
 	CockPit = CreateDefaultSubobject<UChildActorComponent>("CockPit");
 	if (CockPitBP.Class != NULL)
 	{
@@ -447,9 +447,9 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		//GameModeTest->MyPlayer.AP -= MoveAP;
-		//if (GameModeTest->MyPlayer.AP <= 0) 
-			//GameModeTest->MyPlayer.AP = 0;
+		GameModeTest->MyPlayer.AP -= MoveAP;
+		if (GameModeTest->MyPlayer.AP <= 0) 
+			GameModeTest->MyPlayer.AP = 0;
 		
 	}
 	//정지상태가 아니라면
@@ -485,14 +485,14 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward )//&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
+	if (bHasInputUpward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
 	{
 		CurrentAcc = Val*  Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
-		//GameModeTest->MyPlayer.AP -= MoveAP;
-		//if (GameModeTest->MyPlayer.AP <= 0) 
-		//	GameModeTest->MyPlayer.AP = 0;
+		GameModeTest->MyPlayer.AP -= MoveAP;
+		if (GameModeTest->MyPlayer.AP <= 0) 
+			GameModeTest->MyPlayer.AP = 0;
 		
 		
 
