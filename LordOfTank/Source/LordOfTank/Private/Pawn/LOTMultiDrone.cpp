@@ -201,18 +201,18 @@ ALOTMultiDrone::ALOTMultiDrone()
 	BabylonMesh12->SetStaticMesh(ConstructorStatics.BabylonMesh12.Get());
 	BabylonMesh12->SetupAttachment(BabylonMesh21);
 
-	//SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
-	//SpringArm->SetupAttachment(RootComponent);
-	//SpringArm->TargetArmLength = 160.0f;
-	//SpringArm->SocketOffset = FVector(0.f, 0.f, 60.f);
-	//SpringArm->bEnableCameraLag = false;
-	//SpringArm->CameraLagSpeed = 15.f;
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
+	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = .0f;
+	SpringArm->SocketOffset = FVector(0.f, 0.f, 0.f);
+	SpringArm->bEnableCameraLag = false;
+	SpringArm->CameraLagSpeed = 15.f;
 	//SpringArm->SetRelativeRotation(FRotator(-30.f, 0.0f, 0.0f));
-	//SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
+	SpringArm->SetRelativeLocation(FVector(-20.0f, 0.0f, 130.0f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
-	Camera->SetupAttachment(RootComponent);
-	Camera->SetRelativeLocation(FVector(20.0f, 0.0f, 130.0f));
+	Camera->SetupAttachment(SpringArm);
+	//Camera->SetRelativeLocation(FVector(20.0f, 0.0f, 130.0f));
 	Camera->bUsePawnControlRotation = false;
 
 	
@@ -442,14 +442,14 @@ void ALOTMultiDrone::MoveForwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 	//키 입력을 했다면
-	if (bHasInputForward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
+	if (bHasInputForward )//&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
 	{
 		CurrentAcc = Val * Acceleration;
 		float NewForwardSpeed = CurrentForwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		GameModeTest->MyPlayer.AP -= MoveAP;
-		if (GameModeTest->MyPlayer.AP <= 0) 
-			GameModeTest->MyPlayer.AP = 0;
+		//GameModeTest->MyPlayer.AP -= MoveAP;
+		//if (GameModeTest->MyPlayer.AP <= 0) 
+			//GameModeTest->MyPlayer.AP = 0;
 		
 	}
 	//정지상태가 아니라면
@@ -485,14 +485,14 @@ void ALOTMultiDrone::MoveUpwardInput(float Val)
 	float CurrentAcc = 0.f;
 
 
-	if (bHasInputUpward && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
+	if (bHasInputUpward )//&& GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead && GameModeTest->MyPlayer.DroneMoveable)
 	{
 		CurrentAcc = Val*  Acceleration;
 		float NewUpwardSpeed = CurrentUpwardSpeed + (GetWorld()->GetDeltaSeconds() * CurrentAcc);
 		CurrentUpwardSpeed = FMath::Clamp(NewUpwardSpeed, MinSpeed, MaxSpeed);
-		GameModeTest->MyPlayer.AP -= MoveAP;
-		if (GameModeTest->MyPlayer.AP <= 0) 
-			GameModeTest->MyPlayer.AP = 0;
+		//GameModeTest->MyPlayer.AP -= MoveAP;
+		//if (GameModeTest->MyPlayer.AP <= 0) 
+		//	GameModeTest->MyPlayer.AP = 0;
 		
 		
 
@@ -580,7 +580,7 @@ void ALOTMultiDrone::DetectMode()
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true);
 		CrossHair->SetVisibility(true, true);
-		CockPit->SetVisibility(true, true);
+		CockPit->SetVisibility(false, true);
 		//SetUI(false);
 
 	}
@@ -588,16 +588,14 @@ void ALOTMultiDrone::DetectMode()
 	{
 		bIsDetectMode = false;
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("노탐색모드!!!"));
-		
-
 		DetectCamera->Deactivate();
 		//UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		Camera->Activate();
 		//UI->AttachToComponent(Camera, FAttachmentTransformRules::KeepRelativeTransform);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
-		BabylonMesh->SetVisibility(true, true);
+		BabylonMesh->SetVisibility(false, true);
 		CrossHair->SetVisibility(false, true);
-		CockPit->SetVisibility(false, true);
+		CockPit->SetVisibility(true, true);
 		//SetUI(true);
 
 	}
