@@ -201,17 +201,18 @@ ALOTMultiDrone::ALOTMultiDrone()
 	BabylonMesh12->SetStaticMesh(ConstructorStatics.BabylonMesh12.Get());
 	BabylonMesh12->SetupAttachment(BabylonMesh21);
 
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
-	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->TargetArmLength = 160.0f;
-	SpringArm->SocketOffset = FVector(0.f, 0.f, 60.f);
-	SpringArm->bEnableCameraLag = false;
-	SpringArm->CameraLagSpeed = 15.f;
-	SpringArm->SetRelativeRotation(FRotator(-30.f, 0.0f, 0.0f));
-	SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
+	//SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm0"));
+	//SpringArm->SetupAttachment(RootComponent);
+	//SpringArm->TargetArmLength = 160.0f;
+	//SpringArm->SocketOffset = FVector(0.f, 0.f, 60.f);
+	//SpringArm->bEnableCameraLag = false;
+	//SpringArm->CameraLagSpeed = 15.f;
+	//SpringArm->SetRelativeRotation(FRotator(-30.f, 0.0f, 0.0f));
+	//SpringArm->SetRelativeLocation(FVector(-1000.0f, 0.0f, 470.0f));
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera0"));
-	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	Camera->SetupAttachment(RootComponent);
+	Camera->SetRelativeLocation(FVector(20.0f, 0.0f, 130.0f));
 	Camera->bUsePawnControlRotation = false;
 
 	
@@ -246,12 +247,12 @@ ALOTMultiDrone::ALOTMultiDrone()
 		//CrossHair->CreateChildActor();
 	}
 
-	static ConstructorHelpers::FClassFinder<AActor> UIBP(TEXT("/Game/Blueprints/UIBP.UIBP_C"));
-	UI = CreateDefaultSubobject<UChildActorComponent>("UI");
-	if (UIBP.Class != NULL)
+	static ConstructorHelpers::FClassFinder<AActor> CockPitBP(TEXT("/Game/LOTAssets/CockPit/BP/CockpitBP.CockpitBP_C"));
+	CockPit = CreateDefaultSubobject<UChildActorComponent>("CockPit");
+	if (CockPitBP.Class != NULL)
 	{
-		UI->SetChildActorClass(UIBP.Class);
-		UI->SetupAttachment(Camera);
+		CockPit->SetChildActorClass(CockPitBP.Class);
+		CockPit->SetupAttachment(RootComponent);
 	}
 
 
@@ -275,6 +276,7 @@ ALOTMultiDrone::ALOTMultiDrone()
 void ALOTMultiDrone::BeginPlay()
 {
 	Super::BeginPlay();
+	CockPit->SetVisibility(false, true);
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 
 }
@@ -572,14 +574,14 @@ void ALOTMultiDrone::DetectMode()
 		bIsDetectMode = true;
 		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("탐색모드!!!"));
 		Camera->Deactivate();
-		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		//UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		DetectCamera->Activate();
-		UI->AttachToComponent(DetectCamera, FAttachmentTransformRules::KeepRelativeTransform);
+		//UI->AttachToComponent(DetectCamera, FAttachmentTransformRules::KeepRelativeTransform);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(false, true);
 		CrossHair->SetVisibility(true, true);
-
-		SetUI(false);
+		CockPit->SetVisibility(true, true);
+		//SetUI(false);
 
 	}
 	else
@@ -589,14 +591,14 @@ void ALOTMultiDrone::DetectMode()
 		
 
 		DetectCamera->Deactivate();
-		UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		//UI->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		Camera->Activate();
-		UI->AttachToComponent(Camera, FAttachmentTransformRules::KeepRelativeTransform);
+		//UI->AttachToComponent(Camera, FAttachmentTransformRules::KeepRelativeTransform);
 		//1번째 인자false->hide,2번째 인자 false->자식 컴포넌트도 영향을 미친다.
 		BabylonMesh->SetVisibility(true, true);
 		CrossHair->SetVisibility(false, true);
-
-		SetUI(true);
+		CockPit->SetVisibility(false, true);
+		//SetUI(true);
 
 	}
 }
@@ -638,11 +640,21 @@ void ALOTMultiDrone::SetUI(bool bIsPlayer)
 {
 	if (!bIsPlayer)
 	{
-		UI->SetVisibility(false, true);
+		
+		CockPit->SetVisibility(false, true);
+		BabylonMesh->SetVisibility(true, true);
+		//Camera->Deactivate();
+		//DetectCamera->Activate();
+		CrossHair->SetVisibility(false, true);
 	}
-	else
-		UI->SetVisibility(true, true);
+	else {
+		CockPit->SetVisibility(true, true);
+		BabylonMesh->SetVisibility(false, true);
+		DetectCamera->Deactivate();
+		Camera->Activate();
+		CrossHair->SetVisibility(false, true);
 
+	}
 }
 
 void  ALOTMultiDrone::PullActor(float time)

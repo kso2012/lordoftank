@@ -87,7 +87,7 @@ class LORDOFTANK_API ALOTMultiDrone : public APawn
 		UChildActorComponent* CrossHair;
 
 	UPROPERTY(Category = Display, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* UI;
+		UChildActorComponent* CockPit;
 
 
 protected:

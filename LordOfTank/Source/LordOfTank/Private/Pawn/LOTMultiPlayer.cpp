@@ -445,7 +445,7 @@ void ALOTMultiPlayer::MoveForward(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	/*if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
+	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
 		GetVehicleMovementComponent()->SetThrottleInput(Val);
 		if (Val != 0.f)
 		{
@@ -455,9 +455,9 @@ void ALOTMultiPlayer::MoveForward(float Val)
 			
 		}
 	}
-	else*/
-		//GetVehicleMovementComponent()->SetThrottleInput(0.f);
-	GetVehicleMovementComponent()->SetThrottleInput(Val);
+	else
+		GetVehicleMovementComponent()->SetThrottleInput(0.f);
+	//GetVehicleMovementComponent()->SetThrottleInput(Val);
 }
 
 
@@ -465,13 +465,13 @@ void ALOTMultiPlayer::MoveRight(float Val)
 {
 	AMultiGameMode* const GameModeTest = Cast<AMultiGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	
-	//if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
-	//	GetVehicleMovementComponent()->SetSteeringInput(Val);
-	//	
-	//}
-	//else
-		//GetVehicleMovementComponent()->SetThrottleInput(0.f);
-	GetVehicleMovementComponent()->SetSteeringInput(Val);
+	if (!bIsFireMode && GameModeTest->bIsMyTurn && GameModeTest->MyPlayer.Moveable && !GameModeTest->MyPlayer.Dead) {
+		GetVehicleMovementComponent()->SetSteeringInput(Val);
+		
+	}
+	else
+		GetVehicleMovementComponent()->SetThrottleInput(0.f);
+	//GetVehicleMovementComponent()->SetSteeringInput(Val);
 
 }
 
@@ -598,12 +598,15 @@ void ALOTMultiPlayer::SetUI(bool bIsPlayer)
 {
 	if (!bIsPlayer)
 	{
-		GetMesh()->SetVisibility(true, true);
+		GetMesh()->SetVisibility(true, false);
 		CockPit->SetVisibility(false, true);
+		CrossHair->SetVisibility(false, true);
 		
 	}
 	else {
-		GetMesh()->SetVisibility(true, false);
+		FireModeCamera->Deactivate();
+		MoveModeCamera->Activate();
+		GetMesh()->SetVisibility(false, false);
 		CockPit->SetVisibility(true, true);
 	}
 	
